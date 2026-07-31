@@ -30,77 +30,142 @@ body {
 
 button { font: inherit; }
 
-/* ====== Estante ====== */
-.estante-topo {
-  background: var(--primaria);
+html { scroll-behavior: smooth; }
+
+/* ====== Barra superior (estilo Calameo) ====== */
+.barra-topo {
+  background: #0b0c0e;
   color: #fff;
-  padding: 28px 20px 24px;
-}
-
-.estante-topo-conteudo {
-  max-width: 1100px;
-  margin: 0 auto;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 12px 24px;
+  gap: 16px;
+  padding: 0 20px;
+  min-height: 62px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
 }
 
-.estante-topo h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+.marca {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 55vw;
 }
 
-.estante-topo p {
-  margin: 4px 0 0;
-  font-size: 0.95rem;
-  opacity: 0.85;
-  flex-basis: 100%;
-}
+.marca .ponto { color: var(--realce); }
 
-.busca {
+.barra-acoes {
   margin-left: auto;
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.busca input {
+.icone-barra {
+  background: none;
+  border: none;
+  color: #fff;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: none;
+}
+
+.icone-barra:hover { background: rgba(255, 255, 255, 0.14); }
+.icone-barra svg { width: 20px; height: 20px; }
+
+.busca-barra { display: flex; align-items: center; gap: 6px; }
+
+.busca-barra input {
   font: inherit;
   border: none;
-  border-radius: 8px;
-  padding: 10px 12px 10px 38px;
-  min-width: 220px;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.94);
+  border-radius: 999px;
+  padding: 9px 16px;
+  width: min(230px, 42vw);
+  background: #fff;
   color: var(--tinta);
 }
 
-.busca input:focus { outline: 3px solid rgba(255, 255, 255, 0.45); }
+.busca-barra input:focus { outline: 3px solid rgba(255, 255, 255, 0.35); }
 
-.botao-gerenciar {
+.botao-publicar {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 14px;
-  margin-left: auto;
+  color: #fff;
+  text-decoration: none;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  padding: 9px 16px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
-.botao-gerenciar svg { width: 17px; height: 17px; }
+.botao-publicar:hover { background: rgba(255, 255, 255, 0.14); }
+.botao-publicar svg { width: 18px; height: 18px; }
 
-/* Com a busca visível, ela é quem empurra para a direita. */
-.busca:not([hidden]) ~ .botao-gerenciar { margin-left: 0; }
-
-.busca svg {
-  position: absolute;
-  left: 11px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
-  color: var(--tinta-suave);
-  pointer-events: none;
+/* ====== Hero ====== */
+.hero {
+  background: radial-gradient(120% 130% at 50% -10%, #ffffff 30%, #e7f2fb 60%, #b7d7f0 100%);
+  text-align: center;
+  padding: 62px 20px 70px;
 }
+
+.hero h1 {
+  margin: 0 0 16px;
+  font-size: clamp(1.9rem, 4.6vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #101317;
+}
+
+.hero p {
+  margin: 0 auto 30px;
+  max-width: 46ch;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.55;
+  color: #2c3340;
+}
+
+.botao-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #1b74e4;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.02rem;
+  padding: 14px 26px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(27, 116, 228, 0.35);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.botao-cta:hover { background: #1560bd; transform: translateY(-1px); }
+.botao-cta svg { width: 19px; height: 19px; }
+
+@media (max-width: 480px) {
+  .barra-topo { padding: 0 12px; gap: 8px; }
+  .botao-publicar { padding: 8px 12px; }
+  .hero { padding: 44px 16px 52px; }
+}
+
+/* ====== Estante ====== */
 
 .estante {
   max-width: 1100px;
@@ -113,8 +178,6 @@ button { font: inherit; }
 
 @media (max-width: 480px) {
   .estante { grid-template-columns: repeat(2, 1fr); gap: 20px 14px; padding: 20px 14px 40px; }
-  .estante-topo { padding: 20px 14px 18px; }
-  .busca { margin-left: 0; flex: 1 1 100%; }
 }
 
 .cartao {
@@ -423,15 +486,6 @@ body.leitor {
   flex-direction: column;
   gap: 20px;
 }
-
-.admin-nav { margin-left: auto; display: flex; gap: 8px; }
-
-.botao-claro {
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-}
-
-.botao-claro:hover { background: rgba(255, 255, 255, 0.24); }
 
 .cartao-admin {
   background: var(--superficie);

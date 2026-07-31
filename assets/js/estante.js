@@ -95,10 +95,23 @@ async function desenharCapa(catalogo, elementos) {
 }
 
 function configurarBusca(itens) {
-  if (itens.length < 6) return;
-  const busca = document.getElementById('busca');
+  const botao = document.getElementById('btn-busca');
   const campo = document.getElementById('campo-busca');
-  busca.hidden = false;
+
+  botao.addEventListener('click', () => {
+    campo.hidden = !campo.hidden;
+    botao.setAttribute('aria-expanded', String(!campo.hidden));
+    if (!campo.hidden) campo.focus();
+  });
+  campo.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Escape') {
+      campo.value = '';
+      campo.dispatchEvent(new Event('input'));
+      campo.hidden = true;
+      botao.setAttribute('aria-expanded', 'false');
+    }
+  });
+
   campo.addEventListener('input', () => {
     const termo = normalizar(campo.value.trim());
     let visiveis = 0;
@@ -131,12 +144,11 @@ async function iniciar() {
 
   if (manifesto.titulo) {
     document.getElementById('titulo-estante').textContent = manifesto.titulo;
+    document.getElementById('marca-texto').textContent = manifesto.titulo;
     document.title = manifesto.titulo;
   }
   if (manifesto.descricao) {
-    const descricao = document.getElementById('descricao-estante');
-    descricao.textContent = manifesto.descricao;
-    descricao.hidden = false;
+    document.getElementById('descricao-estante').textContent = manifesto.descricao;
   }
   document.getElementById('rodape-texto').textContent =
     `${document.title} · atualizado em ${new Date().toLocaleDateString('pt-BR')}`;
