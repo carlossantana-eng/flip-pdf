@@ -7,10 +7,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdf.worker.min.mjs', im
 
 const LARGURA_RENDER = Math.min(1440, Math.round(880 * Math.min(window.devicePixelRatio || 1, 2)));
 const LARGURA_LUPA = Math.min(2600, LARGURA_RENDER * 2);
-// Escala de AMPLIAÇÃO: 0 = visão normal (página inteira na largura);
-// o valor é o quanto se amplia além dela, até +200.
+// Escala de AMPLIAÇÃO: 0 = visão normal (a PÁGINA INTEIRA visível na
+// tela); o valor é o quanto se amplia além dela, até +300 (4× o normal).
 const ZOOM_MINIMO = 0;
-const ZOOM_MAXIMO = 200;
+const ZOOM_MAXIMO = 300;
 const PASSO_ZOOM = 15;
 
 const el = (id) => document.getElementById(id);
@@ -329,17 +329,32 @@ async function mostrarPaginaNaLupa(numero) {
   if (!lupa.hidden) imagem.src = cacheLupa.get(paginaLupa);
 }
 
+// Largura (em % do contêiner) em que a página aparece INTEIRA na tela —
+// essa é a "visão normal" (zoom 0). Páginas em pé ajustam pela altura.
+function larguraBaseLupa() {
+  const corpo = el('lupa-corpo');
+  const larguraDisponivel = Math.max(corpo.clientWidth - 32, 1);
+  const alturaDisponivel = Math.max(corpo.clientHeight - 32, 1);
+  const larguraAjustada = Math.min(larguraDisponivel, alturaDisponivel / proporcao);
+  return (larguraAjustada / larguraDisponivel) * 100;
+}
+
 // suave=true anima a transição (botões); false segue o dedo (barra).
 function aplicarNivelLupa(suave = false) {
   zoomLupa = Math.min(Math.max(zoomLupa, ZOOM_MINIMO), ZOOM_MAXIMO);
   const imagem = el('lupa-imagem');
   imagem.classList.toggle('zoom-suave', suave);
-  imagem.style.width = `${100 + zoomLupa}%`;
+  // zoom 0 → página inteira; +100 → 2× a visão normal; +300 → 4×.
+  imagem.style.width = `${larguraBaseLupa() * (1 + zoomLupa / 100)}%`;
   el('lupa-zoom').textContent = zoomLupa === 0 ? '0' : `+${Math.round(zoomLupa)}`;
   el('lupa-controle').value = String(zoomLupa);
   el('lupa-menos').disabled = zoomLupa <= ZOOM_MINIMO;
   el('lupa-mais').disabled = zoomLupa >= ZOOM_MAXIMO;
 }
+
+window.addEventListener('resize', () => {
+  if (!lupa.hidden) aplicarNivelLupa();
+});
 
 function abrirLupa() {
   lupa.hidden = false;
