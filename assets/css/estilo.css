@@ -139,11 +139,6 @@ button { font: inherit; }
 .marca-flip { color: var(--realce); }
 .marca-pdf { color: var(--texto-forte); }
 
-/* "PDF" vazado como na logomarca (com reserva sólida onde não há suporte) */
-@supports (-webkit-text-stroke: 1px #fff) {
-  .marca-pdf { color: transparent; -webkit-text-stroke: 1.2px var(--texto-forte); }
-}
-
 .barra-acoes {
   margin-left: auto;
   display: flex;
