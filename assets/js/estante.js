@@ -48,6 +48,9 @@ function criarCartao(catalogo) {
   esqueleto.className = 'esqueleto';
   capa.appendChild(esqueleto);
 
+  const prateleira = document.createElement('div');
+  prateleira.className = 'prateleira';
+
   const info = document.createElement('div');
   info.className = 'cartao-info';
   const titulo = document.createElement('h2');
@@ -57,7 +60,7 @@ function criarCartao(catalogo) {
   meta.textContent = '';
   info.append(titulo, meta);
 
-  cartao.append(capa, info);
+  cartao.append(capa, prateleira, info);
 
   // Lápis de edição — só para o dono, sem aparecer para os clientes.
   if (temToken()) {
@@ -172,11 +175,14 @@ async function iniciar() {
     return;
   }
 
-  if (manifesto.titulo) {
-    document.getElementById('titulo-estante').textContent = manifesto.titulo;
-    document.getElementById('marca-texto').textContent = manifesto.titulo;
-    document.title = manifesto.titulo;
-  }
+  // Estantes múltiplas: ?e=<id> abre uma estante específica; sem o
+  // parâmetro, abre a principal (título/descrição do manifesto).
+  const idEstante = new URLSearchParams(location.search).get('e') || 'principal';
+  const infoEstante = idEstante === 'principal'
+    ? { id: 'principal', nome: manifesto.titulo || 'Catálogos', descricao: manifesto.descricao }
+    : (manifesto.estantes || []).find((e) => e.id === idEstante);
+
+  if (manifesto.titulo) document.getElementById('marca-texto').textContent = manifesto.titulo;
   const identidade = manifesto.identidade || {};
   if (identidade.cor) aplicarCorDeDestaque(identidade.cor);
   if (identidade.logo) {
@@ -186,13 +192,26 @@ async function iniciar() {
     logo.alt = '';
     document.querySelector('.marca').prepend(logo);
   }
-  if (manifesto.descricao) {
-    document.getElementById('descricao-estante').textContent = manifesto.descricao;
+
+  if (!infoEstante) {
+    mostrarEstado(
+      '<h2>Estante não encontrada</h2>' +
+      '<p>Ela pode ter sido removida.</p>' +
+      '<a class="botao" href="estante.html">Ir para a estante principal</a>');
+    return;
+  }
+
+  document.getElementById('titulo-estante').textContent = infoEstante.nome;
+  document.title = infoEstante.nome;
+  if (infoEstante.descricao) {
+    document.getElementById('descricao-estante').textContent = infoEstante.descricao;
   }
   document.getElementById('rodape-texto').textContent =
     `${document.title} · atualizado em ${new Date().toLocaleDateString('pt-BR')}`;
 
-  const catalogos = (manifesto.catalogos || []).filter((c) => !c.lixeira).sort((a, b) =>
+  const catalogos = (manifesto.catalogos || [])
+    .filter((c) => !c.lixeira && (c.estante || 'principal') === infoEstante.id)
+    .sort((a, b) =>
     (b.adicionadoEm || '').localeCompare(a.adicionadoEm || '') ||
     a.titulo.localeCompare(b.titulo, 'pt-BR'));
 

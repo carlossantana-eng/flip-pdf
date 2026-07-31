@@ -45,6 +45,11 @@
         </label>
 
         <label class="campo">
+          <span>Estante</span>
+          <select id="campo-estante"></select>
+        </label>
+
+        <label class="campo">
           <span>Pasta</span>
           <select id="campo-pasta"></select>
         </label>
@@ -71,6 +76,32 @@
           <input id="campo-download" type="checkbox" checked>
           Permitir que os clientes baixem o PDF
         </label>
+
+        <h3 class="config-grupo">Design do leitor</h3>
+        <div class="linha-cores-design">
+          <label class="campo campo-cor">
+            <span>Fundo</span>
+            <input id="design-fundo" type="color" value="#000000">
+          </label>
+          <label class="campo campo-cor">
+            <span>Barras</span>
+            <input id="design-barra" type="color" value="#0b0d08">
+          </label>
+          <button class="botao botao-suave" id="btn-cores-padrao" type="button">Restaurar</button>
+        </div>
+
+        <span class="editor-rotulo">Botões do leitor</span>
+        <div class="design-botoes">
+          <label class="campo-check"><input type="checkbox" data-botao="barra" checked> Barra de ferramentas inferior</label>
+          <label class="campo-check"><input type="checkbox" data-botao="miniaturas" checked> Miniaturas</label>
+          <label class="campo-check"><input type="checkbox" data-botao="lupa" checked> Lupa (ampliar)</label>
+          <label class="campo-check"><input type="checkbox" data-botao="som" checked> Som da virada</label>
+          <label class="campo-check"><input type="checkbox" data-botao="velocidade" checked> Velocidade da animação</label>
+          <label class="campo-check"><input type="checkbox" data-botao="progresso" checked> Barra de progresso</label>
+          <label class="campo-check"><input type="checkbox" data-botao="compartilhar" checked> Compartilhar</label>
+          <label class="campo-check"><input type="checkbox" data-botao="telacheia" checked> Tela cheia</label>
+        </div>
+        <p class="dica">A prévia ao lado aplica as mudanças na hora — salve para publicar.</p>
 
         <p class="publicacao-nota" id="editor-arquivo"></p>
 

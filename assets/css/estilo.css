@@ -407,14 +407,44 @@ button { font: inherit; }
 .plano li { color: var(--tinta-suave); font-size: 0.92rem; padding-left: 22px; position: relative; }
 .plano li::before { content: '✓'; position: absolute; left: 0; color: var(--realce); font-weight: 700; }
 
-/* ====== Estante ====== */
+/* ====== Estante (visual de prateleiras, identidade neon) ====== */
 .estante {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 32px 20px 48px;
+  padding: 36px 20px 56px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 26px 22px;
+  gap: 40px 26px;
+  align-items: end;
+  /* painéis verticais sutis, como o fundo de uma estante */
+  background:
+    repeating-linear-gradient(90deg, rgba(163, 230, 53, 0.025) 0 2px, transparent 2px 110px),
+    linear-gradient(#050604, #030402);
+}
+
+/* A "tábua" onde cada catálogo se apoia. */
+.prateleira {
+  height: 12px;
+  margin: 0 -10px;
+  border-radius: 3px;
+  border-top: 2px solid rgba(163, 230, 53, 0.5);
+  background: linear-gradient(#242a18, #0a0c06);
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.85),
+    0 2px 12px rgba(163, 230, 53, 0.18);
+}
+
+.cartao .capa {
+  margin: 0 6px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.7);
+}
+
+.cartao:hover .capa,
+.cartao:focus-visible .capa {
+  transform: translateY(-6px);
 }
 
 @media (max-width: 480px) {
@@ -1847,6 +1877,18 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 .editor-lateral .linha-logo { margin-bottom: 8px; }
 .editor-dica { margin: 10px 0 0; text-align: center; }
 
+.linha-cores-design {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.linha-cores-design .campo { margin-bottom: 0; }
+.design-botoes { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+.design-botoes .campo-check { margin: 2px 0; }
+
 .editor-perigo {
   margin-top: 18px;
   padding-top: 14px;
@@ -1898,6 +1940,49 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 
 .botao-editar-capa:hover { border-color: var(--realce); color: var(--realce); box-shadow: var(--brilho); }
 .botao-editar-capa svg { width: 18px; height: 18px; }
+
+/* ====== Minhas Estantes ====== */
+.estantes-titulo { margin: 0; text-align: left; flex: 1; }
+
+.lista-estantes { display: flex; flex-direction: column; gap: 12px; }
+
+.linha-estante {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+.linha-estante:hover { border-color: #333; }
+
+.estante-identidade { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 260px; }
+
+.estante-icone {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(163, 230, 53, 0.4);
+  background: var(--realce-fraco);
+  color: var(--realce);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.estante-icone svg { width: 24px; height: 24px; }
+
+.estante-identidade strong { display: flex; align-items: center; gap: 8px; color: #fff; font-size: 1.02rem; }
+.estante-identidade a { display: block; color: var(--realce); font-size: 0.82rem; text-decoration: none; margin: 2px 0; word-break: break-all; }
+.estante-identidade a:hover { text-decoration: underline; }
+.estante-identidade p { margin: 0; color: var(--tinta-suave); font-size: 0.8rem; }
+
+.estante-acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+.estante-acoes .botao { padding: 8px 12px; font-size: 0.84rem; }
 
 /* ====== Cadastro e configurações ====== */
 .cartao-cadastro {

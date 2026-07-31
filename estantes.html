@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Minhas Estantes</title>
+  <link rel="stylesheet" href="assets/css/estilo.css?v=__VERSAO__">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23a3e635'%3E%3Crect x='3' y='3' width='42' height='42' rx='10' stroke-width='3.6'/%3E%3Cpath d='M12 14v20' stroke-width='2.8' stroke-linecap='round'/%3E%3Cpath d='M12 18h3.5M12 24h3.5M12 30h3.5' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M22 33.5V15l10.5-4.5v18L22 33.5Z' stroke-width='2.8' stroke-linejoin='round'/%3E%3Cpath d='M34.5 12.5c2.6 1.7 3.5 3 3.5 5.5v10c0 2.5-1.2 4-3.8 5.5' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body class="admin">
+  <header class="barra-topo">
+    <a class="marca" href="admin.html">
+      <span class="marca-icone" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor"><rect x="3" y="3" width="42" height="42" rx="10" stroke-width="3.6"/><path d="M12 14v20" stroke-width="2.8" stroke-linecap="round"/><path d="M12 18h3.5M12 24h3.5M12 30h3.5" stroke-width="2.4" stroke-linecap="round"/><path d="M22 33.5V15l10.5-4.5v18L22 33.5Z" stroke-width="2.8" stroke-linejoin="round"/><path d="M34.5 12.5c2.6 1.7 3.5 3 3.5 5.5v10c0 2.5-1.2 4-3.8 5.5" stroke-width="2.8" stroke-linecap="round"/></svg></span>
+      Estantes<span class="ponto">.</span>
+    </a>
+    <div class="barra-acoes">
+      <a class="botao-publicar" href="admin.html">← Painel</a>
+    </div>
+  </header>
+
+  <main class="arquivos-corpo">
+
+    <section class="cartao-admin" id="sem-chave" hidden>
+      <h2>Conecte-se primeiro</h2>
+      <p>Esta página usa a mesma chave do painel. Conecte-se por lá e volte aqui.</p>
+      <a class="botao" href="admin.html">Abrir o painel</a>
+    </section>
+
+    <div id="gerenciador" hidden>
+
+      <div class="arquivos-topo">
+        <h1 class="publicar-titulo estantes-titulo">Minhas Estantes</h1>
+        <div class="arquivos-ferramentas">
+          <input id="busca-estantes" type="search" placeholder="Pesquisar…" aria-label="Pesquisar estante">
+          <button class="botao" id="btn-nova-estante">+ Nova Estante</button>
+        </div>
+      </div>
+
+      <div class="lista-estantes" id="lista-estantes"></div>
+
+    </div>
+
+    <div class="estado-admin" id="erro-geral" hidden>
+      <h2>Algo deu errado</h2>
+      <p id="erro-geral-texto"></p>
+      <button class="botao" onclick="location.reload()">Recarregar</button>
+    </div>
+
+  </main>
+
+  <dialog class="dialogo" id="dialogo-catalogos">
+    <h2 id="dialogo-catalogos-titulo">Adicionar catálogos</h2>
+    <p class="dica">Marque o que deve aparecer nesta estante. O que for
+      desmarcado volta para a estante principal.</p>
+    <div class="opcoes-pasta" id="opcoes-catalogos"></div>
+    <div class="publicar-rodape">
+      <button class="botao botao-suave" id="catalogos-cancelar">Cancelar</button>
+      <button class="botao" id="catalogos-salvar">Salvar</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script type="module" src="assets/js/estantes.js?v=__VERSAO__"></script>
+</body>
+</html>

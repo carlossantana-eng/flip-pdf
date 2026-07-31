@@ -37,8 +37,13 @@ arquivo define as regras de trabalho.
 9. **Lixeira**: catálogo com `lixeira: true` no manifesto fica oculto
    da estante e do leitor, mas o PDF permanece no repositório até a
    exclusão definitiva pela página de arquivos.
+10. **Campos por catálogo no manifesto**: `pasta` (organização
+    privada), `estante` (estante pública; ausente = principal),
+    `permitirDownload: false`, `capa` e `leitor` (design do leitor:
+    `{fundo, barra, ocultar: [...]}`). Estantes extras vivem no
+    top-level `estantes: [{id, nome, descricao?, criadaEm}]`.
 
-10. **Contas de usuário são SIMULADAS** (`conta-simulada.js`,
+11. **Contas de usuário são SIMULADAS** (`conta-simulada.js`,
     localStorage): não prometem segurança nem multiusuário real. Não
     misturar com a chave do GitHub (que é a autenticação de publicação).
     A raiz é a landing da plataforma; a estante dos clientes é
