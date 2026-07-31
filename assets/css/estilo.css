@@ -139,16 +139,22 @@ button { font: inherit; }
 .marca-flip { color: var(--realce); }
 .marca-pdf { color: var(--texto-forte); }
 
-/* A marca fica sempre no centro da ilha; links e ações ocupam as laterais.
-   Em telas estreitas ela volta ao fluxo para não sobrepor busca e botões. */
+/* A logo fica sempre no centro da ilha; o rótulo da página fixa à esquerda.
+   Nas páginas da plataforma a própria marca FlipPDF é o elemento central
+   (.marca-central); nas do app, um ícone central dedicado (.logo-central).
+   Em telas estreitas tudo volta ao fluxo para não sobrepor busca e botões. */
+.logo-central { display: none; text-decoration: none; }
+
 @media (min-width: 720px) {
-  .marca {
+  .marca-central,
+  .logo-central {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     max-width: 40vw;
   }
+  .logo-central { display: inline-flex; }
   .barra-links { margin-left: 0; }
 }
 
