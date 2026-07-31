@@ -456,6 +456,9 @@ async function iniciar() {
 
   document.title = `${entrada.titulo} · ${manifesto.titulo || 'Catálogos'}`;
   el('titulo').textContent = entrada.titulo;
+  if (manifesto.identidade && manifesto.identidade.cor) {
+    document.documentElement.style.setProperty('--realce', manifesto.identidade.cor);
+  }
   configurarAcoes(entrada);
 
   el('carregando-texto').textContent = 'Baixando o catálogo…';

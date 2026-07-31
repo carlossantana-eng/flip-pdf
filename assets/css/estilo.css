@@ -56,6 +56,8 @@ html { scroll-behavior: smooth; }
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 55vw;
+  display: inline-flex;
+  align-items: center;
 }
 
 .marca .ponto { color: var(--realce); }
@@ -141,11 +143,19 @@ html { scroll-behavior: smooth; }
   color: #2c3340;
 }
 
+.marca-logo {
+  height: 30px;
+  width: auto;
+  margin-right: 10px;
+  vertical-align: middle;
+  border-radius: 4px;
+}
+
 .botao-cta {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: #1b74e4;
+  background: var(--cta, #1b74e4);
   color: #fff;
   text-decoration: none;
   font-weight: 700;
@@ -834,6 +844,159 @@ section[id], div[id="inicio"] { scroll-margin-top: 78px; }
 .estado-admin h2 { color: var(--tinta); }
 
 .rodape a { color: inherit; }
+
+/* ====== Conta (avatar e gaveta) ====== */
+.avatar-conta {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  background-color: var(--realce);
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-conta:hover { border-color: #fff; }
+
+.avatar-grande {
+  width: 52px;
+  height: 52px;
+  font-size: 1.05rem;
+  border-color: var(--borda);
+  cursor: default;
+}
+
+.conta-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(15, 18, 24, 0.45);
+}
+
+.conta-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 56;
+  width: min(320px, 88vw);
+  background: var(--superficie);
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  overflow-y: auto;
+}
+
+.conta-cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.conta-identidade { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.conta-identidade strong { display: block; font-size: 1.02rem; }
+.conta-identidade p {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: var(--tinta-suave);
+  word-break: break-all;
+}
+
+.selo-plano {
+  display: inline-block;
+  margin-top: 3px;
+  background: #e3f4ea;
+  color: #1d6f43;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.botao-icone-escuro { color: var(--tinta-suave); }
+.botao-icone-escuro:hover { background: #efece4; }
+
+.conta-itens { display: flex; flex-direction: column; padding: 12px 0; flex: 1; }
+
+.conta-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 8px;
+  color: var(--tinta);
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.conta-item:hover { background: #f2efe8; }
+.conta-item svg { width: 20px; height: 20px; color: var(--tinta-suave); flex: none; }
+
+.conta-sair {
+  border: none;
+  background: none;
+  color: #c0392b;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: left;
+  padding: 12px 8px;
+  cursor: pointer;
+  border-top: 1px solid var(--borda);
+}
+
+.conta-sair:hover { background: #fbeeec; border-radius: 0 0 8px 8px; }
+.conta-nota { margin: 4px 8px 0; font-size: 0.78rem; color: var(--tinta-suave); }
+
+/* ====== Cadastro e configurações ====== */
+.cartao-cadastro { border: 2px solid var(--realce); background: #fdf8f3; }
+
+.config-grupo {
+  margin: 22px 0 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--borda);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+.config-grupo:first-of-type { margin-top: 8px; padding-top: 0; border-top: none; }
+
+.campo-logo > span, .campo-cor > span {
+  display: block;
+  font-size: 0.86rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.campo-logo { margin-bottom: 14px; }
+.linha-logo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.linha-logo img { height: 42px; max-width: 160px; object-fit: contain; border-radius: 6px; background: #f0ede6; padding: 3px; }
+
+.campo-cor input[type="color"] {
+  width: 64px;
+  height: 36px;
+  padding: 2px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
 
 /* ====== Toast ====== */
 .toast {

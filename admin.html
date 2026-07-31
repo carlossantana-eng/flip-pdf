@@ -13,9 +13,47 @@
     <a class="marca" href="./">Painel<span class="ponto">.</span></a>
     <div class="barra-acoes">
       <a class="botao-publicar" href="./">← Ver a estante</a>
-      <button class="botao-publicar" id="btn-sair" hidden>Sair</button>
+      <button class="avatar-conta" id="btn-conta" title="Minha conta" aria-label="Minha conta" hidden>WE</button>
     </div>
   </header>
+
+  <!-- Menu de conta (gaveta lateral) -->
+  <div class="conta-fundo" id="conta-fundo" hidden></div>
+  <aside class="conta-menu" id="conta-menu" hidden aria-label="Minha conta">
+    <div class="conta-cabecalho">
+      <div class="conta-identidade">
+        <span class="avatar-conta avatar-grande" id="conta-avatar">WE</span>
+        <div>
+          <strong id="conta-nome">Meu perfil</strong>
+          <span class="selo-plano" id="conta-selo">No ar</span>
+          <p id="conta-email"></p>
+        </div>
+      </div>
+      <button class="botao-icone botao-icone-escuro" id="conta-fechar" title="Fechar" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <nav class="conta-itens">
+      <a href="#inicio" class="conta-item" data-fecha-menu>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Painel
+      </a>
+      <a href="#catalogos" class="conta-item" data-fecha-menu>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
+        Publicações
+      </a>
+      <a href="#config" class="conta-item" data-fecha-menu>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55h.01a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg>
+        Configurações
+      </a>
+      <a href="./" target="_blank" rel="noopener" class="conta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        Ver estante pública
+      </a>
+    </nav>
+    <button class="conta-sair" id="btn-sair">Terminar sessão</button>
+    <p class="conta-nota">Encerra o acesso deste navegador (remove a chave salva).</p>
+  </aside>
 
   <div class="admin-leiaute">
 
@@ -32,7 +70,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
         Catálogos
       </a>
-      <a href="#estante-config">
+      <a href="#config">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
         Estante
       </a>
@@ -85,6 +123,22 @@
       <!-- Passo 2: painel -->
       <div id="tela-gestao" hidden>
 
+        <!-- Cadastro: aparece só enquanto o perfil não foi preenchido -->
+        <section class="cartao-admin cartao-cadastro" id="cartao-cadastro" hidden>
+          <h2>Complete seu cadastro</h2>
+          <p>Esses dados personalizam o painel e o menu da sua conta.
+            Eles ficam no repositório público — use só informações que já são públicas.</p>
+          <label class="campo">
+            <span>Seu nome ou o da empresa</span>
+            <input id="cadastro-nome" type="text" maxlength="60" placeholder="Ex.: WE Consultoria">
+          </label>
+          <label class="campo">
+            <span>E-mail de contato (opcional)</span>
+            <input id="cadastro-email" type="email" maxlength="80" placeholder="Ex.: comercial@suaempresa.com.br">
+          </label>
+          <button class="botao" id="btn-concluir-cadastro">Concluir cadastro</button>
+        </section>
+
         <div class="saudacao" id="inicio">
           <h2 id="saudacao-titulo">Bom dia!</h2>
           <p><span aria-hidden="true">👋</span> <span id="saudacao-frase">Que seu dia seja cheio de alegria e conquistas!</span></p>
@@ -105,11 +159,11 @@
             <span class="texto-acao"><strong>Envio em lote</strong><small>vários PDFs de uma vez</small></span>
             <span class="mais-acao" aria-hidden="true">+</span>
           </button>
-          <a class="cartao-acao" href="#estante-config">
+          <a class="cartao-acao" href="#config">
             <span class="icone-acao" style="background:#2e9e6b">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
             </span>
-            <span class="texto-acao"><strong>Editar estante</strong><small>título e descrição</small></span>
+            <span class="texto-acao"><strong>Configurações</strong><small>estante, perfil e identidade</small></span>
           </a>
           <a class="cartao-acao" href="./" target="_blank" rel="noopener">
             <span class="icone-acao" style="background:#c05621">
@@ -141,8 +195,10 @@
           </ul>
         </section>
 
-        <section class="cartao-admin" id="estante-config">
-          <h2>Estante</h2>
+        <section class="cartao-admin" id="config">
+          <h2>Configurações</h2>
+
+          <h3 class="config-grupo">Estante</h3>
           <label class="campo">
             <span>Título do site</span>
             <input id="campo-titulo-estante" type="text" maxlength="80">
@@ -151,11 +207,33 @@
             <span>Descrição (opcional)</span>
             <input id="campo-descricao-estante" type="text" maxlength="160">
           </label>
+
+          <h3 class="config-grupo">Perfil</h3>
           <label class="campo">
-            <span>Nome na saudação do painel (opcional)</span>
+            <span>Seu nome ou o da empresa (saudação e menu da conta)</span>
             <input id="campo-nome-painel" type="text" maxlength="60" placeholder="Ex.: WE Consultoria">
           </label>
-          <button class="botao" id="btn-salvar-estante">Salvar</button>
+          <label class="campo">
+            <span>E-mail de contato (opcional — fica público no repositório)</span>
+            <input id="campo-email-perfil" type="email" maxlength="80">
+          </label>
+
+          <h3 class="config-grupo">Identidade visual</h3>
+          <div class="campo campo-logo">
+            <span>Logomarca (aparece na barra da estante e no avatar)</span>
+            <div class="linha-logo">
+              <img id="logo-previa" alt="" hidden>
+              <button class="botao botao-suave" id="btn-escolher-logo">Escolher imagem…</button>
+              <button class="botao botao-suave" id="btn-remover-logo" hidden>Remover</button>
+            </div>
+            <input id="campo-logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
+          </div>
+          <label class="campo campo-cor">
+            <span>Cor de destaque (detalhes da estante e do leitor)</span>
+            <input id="campo-cor" type="color" value="#c05621">
+          </label>
+
+          <button class="botao" id="btn-salvar-estante">Salvar configurações</button>
         </section>
 
         <section class="cartao-admin cartao-status" id="publicacao">

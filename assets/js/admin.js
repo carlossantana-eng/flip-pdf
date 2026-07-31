@@ -167,7 +167,8 @@ function mostrarErroGeral(texto) {
 
 function mostrarTelaToken(mensagemErro = '') {
   el('tela-gestao').hidden = true;
-  el('btn-sair').hidden = true;
+  el('btn-conta').hidden = true;
+  fecharMenuConta();
   document.body.classList.remove('conectado');
   el('tela-token').hidden = false;
   el('nome-repo-passo').textContent = `${dono}/${repo}`;
@@ -177,11 +178,15 @@ function mostrarTelaToken(mensagemErro = '') {
   erro.hidden = !mensagemErro;
 }
 
+function nomeDoPerfil() {
+  return ((manifesto.perfil && manifesto.perfil.nome) || manifesto.painelNome || '').trim();
+}
+
 function saudar() {
   const agora = new Date();
   const hora = agora.getHours();
   const periodo = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
-  const nome = (manifesto.painelNome || '').trim();
+  const nome = nomeDoPerfil();
   el('saudacao-titulo').textContent = nome ? `${periodo}, ${nome}!` : `${periodo}!`;
   const frases = [
     'Que seu dia seja leve e produtivo!',
@@ -195,17 +200,57 @@ function saudar() {
   el('saudacao-frase').textContent = frases[agora.getDay()];
 }
 
+function iniciaisDoNome(nome) {
+  const palavras = nome.split(/\s+/).filter(Boolean);
+  if (palavras.length === 0) return '•';
+  return palavras.slice(0, 2).map((p) => p[0]).join('').toUpperCase();
+}
+
+function atualizarConta() {
+  const nome = nomeDoPerfil();
+  const identidade = manifesto.identidade || {};
+  const botao = el('btn-conta');
+  botao.hidden = false;
+  if (identidade.logo) {
+    botao.textContent = '';
+    botao.style.backgroundImage = `url("${identidade.logo}")`;
+    el('conta-avatar').textContent = '';
+    el('conta-avatar').style.backgroundImage = `url("${identidade.logo}")`;
+  } else {
+    botao.style.backgroundImage = '';
+    botao.textContent = iniciaisDoNome(nome || manifesto.titulo || 'C');
+    el('conta-avatar').style.backgroundImage = '';
+    el('conta-avatar').textContent = iniciaisDoNome(nome || manifesto.titulo || 'C');
+  }
+  el('conta-nome').textContent = nome || manifesto.titulo || 'Meu perfil';
+  const email = (manifesto.perfil && manifesto.perfil.email) || '';
+  el('conta-email').textContent = email;
+  el('conta-email').hidden = !email;
+}
+
+function preencherConfiguracoes() {
+  el('campo-titulo-estante').value = manifesto.titulo || '';
+  el('campo-descricao-estante').value = manifesto.descricao || '';
+  el('campo-nome-painel').value = nomeDoPerfil();
+  el('campo-email-perfil').value = (manifesto.perfil && manifesto.perfil.email) || '';
+  el('campo-cor').value = (manifesto.identidade && manifesto.identidade.cor) || '#c05621';
+  const logo = manifesto.identidade && manifesto.identidade.logo;
+  const previa = el('logo-previa');
+  previa.hidden = !logo;
+  if (logo) previa.src = logo;
+  el('btn-remover-logo').hidden = !logo;
+}
+
 async function mostrarTelaGestao() {
   el('tela-token').hidden = true;
   el('tela-gestao').hidden = false;
-  el('btn-sair').hidden = false;
   document.body.classList.add('conectado');
   await carregarManifesto();
   saudar();
+  atualizarConta();
+  preencherConfiguracoes();
+  el('cartao-cadastro').hidden = Boolean(nomeDoPerfil());
   desenharLista();
-  el('campo-titulo-estante').value = manifesto.titulo || '';
-  el('campo-descricao-estante').value = manifesto.descricao || '';
-  el('campo-nome-painel').value = manifesto.painelNome || '';
   atualizarStatusPublicacao();
 }
 
@@ -411,28 +456,125 @@ async function enviarArquivos(listaDeArquivos) {
   }
 }
 
-/* ====== Cabeçalho da estante ====== */
+/* ====== Menu de conta ====== */
 
-async function salvarCabecalho() {
+function abrirMenuConta() {
+  el('conta-fundo').hidden = false;
+  el('conta-menu').hidden = false;
+}
+
+function fecharMenuConta() {
+  el('conta-fundo').hidden = true;
+  el('conta-menu').hidden = true;
+}
+
+/* ====== Cadastro (primeiro acesso) ====== */
+
+async function concluirCadastro() {
+  const nome = el('cadastro-nome').value.trim();
+  if (!nome) { avisar('Informe o seu nome ou o da empresa.'); return; }
+  const botao = el('btn-concluir-cadastro');
+  botao.disabled = true;
+  botao.textContent = 'Salvando…';
+  try {
+    await carregarManifesto();
+    manifesto.perfil = { ...(manifesto.perfil || {}), nome };
+    const email = el('cadastro-email').value.trim();
+    if (email) manifesto.perfil.email = email;
+    delete manifesto.painelNome;
+    await commitar(
+      [{ caminho: 'catalogos.json', conteudoBase64: manifestoBase64() }],
+      'Salva o perfil do painel',
+    );
+    el('cartao-cadastro').hidden = true;
+    saudar();
+    atualizarConta();
+    preencherConfiguracoes();
+    avisar(`Cadastro concluído — bem-vindo, ${nome}!`, true);
+    atualizarStatusPublicacao();
+  } catch (erro) {
+    console.error(erro);
+    avisar(`Não foi possível salvar: ${erro.message}`, true);
+  } finally {
+    botao.disabled = false;
+    botao.textContent = 'Concluir cadastro';
+  }
+}
+
+/* ====== Configurações (estante, perfil e identidade) ====== */
+
+const EXTENSOES_LOGO = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/svg+xml': 'svg' };
+let logoPendente = null;      // File escolhido, ainda não salvo
+let removerLogo = false;
+
+function escolherLogo(arquivo) {
+  if (!EXTENSOES_LOGO[arquivo.type]) {
+    avisar('Use uma imagem PNG, JPG, WebP ou SVG.');
+    return;
+  }
+  if (arquivo.size > 2 * 1024 * 1024) {
+    avisar('A logomarca deve ter até 2 MB.');
+    return;
+  }
+  logoPendente = arquivo;
+  removerLogo = false;
+  const previa = el('logo-previa');
+  previa.src = URL.createObjectURL(arquivo);
+  previa.hidden = false;
+  el('btn-remover-logo').hidden = false;
+  avisar('Logomarca escolhida — clique em "Salvar configurações" para publicar.');
+}
+
+async function salvarConfiguracoes() {
   const botao = el('btn-salvar-estante');
   const titulo = el('campo-titulo-estante').value.trim();
   if (!titulo) { avisar('O título do site não pode ficar vazio.'); return; }
   botao.disabled = true;
   try {
     await carregarManifesto();
+    const mudancas = [];
+    const logoAnterior = manifesto.identidade && manifesto.identidade.logo;
+
     manifesto.titulo = titulo;
     const descricao = el('campo-descricao-estante').value.trim();
     if (descricao) manifesto.descricao = descricao;
     else delete manifesto.descricao;
-    const nomePainel = el('campo-nome-painel').value.trim();
-    if (nomePainel) manifesto.painelNome = nomePainel;
-    else delete manifesto.painelNome;
-    await commitar(
-      [{ caminho: 'catalogos.json', conteudoBase64: manifestoBase64() }],
-      'Atualiza o cabeçalho da estante',
-    );
+
+    const nome = el('campo-nome-painel').value.trim();
+    const email = el('campo-email-perfil').value.trim();
+    if (nome || email) {
+      manifesto.perfil = {};
+      if (nome) manifesto.perfil.nome = nome;
+      if (email) manifesto.perfil.email = email;
+    } else {
+      delete manifesto.perfil;
+    }
+    delete manifesto.painelNome;
+
+    manifesto.identidade = { ...(manifesto.identidade || {}) };
+    manifesto.identidade.cor = el('campo-cor').value;
+
+    if (logoPendente) {
+      const caminhoLogo = `assets/identidade/logo.${EXTENSOES_LOGO[logoPendente.type]}`;
+      mudancas.push({ caminho: caminhoLogo, conteudoBase64: await arquivoParaBase64(logoPendente) });
+      if (logoAnterior && logoAnterior !== caminhoLogo) {
+        mudancas.push({ caminho: logoAnterior, conteudoBase64: null });
+      }
+      manifesto.identidade.logo = caminhoLogo;
+    } else if (removerLogo && logoAnterior) {
+      mudancas.push({ caminho: logoAnterior, conteudoBase64: null });
+      delete manifesto.identidade.logo;
+    }
+
+    mudancas.push({ caminho: 'catalogos.json', conteudoBase64: manifestoBase64() });
+    await commitar(mudancas, 'Atualiza as configurações da estante');
+
+    logoPendente = null;
+    removerLogo = false;
+    el('cartao-cadastro').hidden = Boolean(nomeDoPerfil());
     saudar();
-    avisar('Salvo! O site republica em 1–2 minutos.');
+    atualizarConta();
+    avisar('Configurações salvas! O site republica em 1–2 minutos.');
     atualizarStatusPublicacao();
   } catch (erro) {
     console.error(erro);
@@ -507,8 +649,9 @@ function sair() {
   localStorage.removeItem(CHAVE_TOKEN);
   token = '';
   el('campo-token').value = '';
+  fecharMenuConta();
   mostrarTelaToken();
-  avisar('Chave removida deste navegador.');
+  avisar('Sessão encerrada — a chave foi removida deste navegador.');
 }
 
 /* ====== Início ====== */
@@ -519,7 +662,31 @@ function configurarEventos() {
     if (evento.key === 'Enter') conectar(el('campo-token').value);
   });
   el('btn-sair').addEventListener('click', sair);
-  el('btn-salvar-estante').addEventListener('click', salvarCabecalho);
+  el('btn-salvar-estante').addEventListener('click', salvarConfiguracoes);
+  el('btn-concluir-cadastro').addEventListener('click', concluirCadastro);
+
+  el('btn-conta').addEventListener('click', abrirMenuConta);
+  el('conta-fechar').addEventListener('click', fecharMenuConta);
+  el('conta-fundo').addEventListener('click', fecharMenuConta);
+  for (const item of document.querySelectorAll('[data-fecha-menu]')) {
+    item.addEventListener('click', fecharMenuConta);
+  }
+  document.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Escape' && !el('conta-menu').hidden) fecharMenuConta();
+  });
+
+  el('btn-escolher-logo').addEventListener('click', () => el('campo-logo').click());
+  el('campo-logo').addEventListener('change', () => {
+    if (el('campo-logo').files[0]) escolherLogo(el('campo-logo').files[0]);
+    el('campo-logo').value = '';
+  });
+  el('btn-remover-logo').addEventListener('click', () => {
+    logoPendente = null;
+    removerLogo = true;
+    el('logo-previa').hidden = true;
+    el('btn-remover-logo').hidden = true;
+    avisar('A logomarca será removida ao salvar as configurações.');
+  });
 
   const zona = el('zona-envio');
   const campoArquivo = el('campo-arquivo');

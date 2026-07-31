@@ -147,6 +147,18 @@ async function iniciar() {
     document.getElementById('marca-texto').textContent = manifesto.titulo;
     document.title = manifesto.titulo;
   }
+  const identidade = manifesto.identidade || {};
+  if (identidade.cor) {
+    document.documentElement.style.setProperty('--realce', identidade.cor);
+    document.documentElement.style.setProperty('--cta', identidade.cor);
+  }
+  if (identidade.logo) {
+    const logo = document.createElement('img');
+    logo.className = 'marca-logo';
+    logo.src = identidade.logo;
+    logo.alt = '';
+    document.querySelector('.marca').prepend(logo);
+  }
   if (manifesto.descricao) {
     document.getElementById('descricao-estante').textContent = manifesto.descricao;
   }
