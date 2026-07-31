@@ -162,6 +162,7 @@ function mostrarTelaToken(mensagemErro = '') {
   document.body.classList.remove('conectado');
   el('tela-token').hidden = false;
   el('nome-repo-passo').textContent = `${dono}/${repo}`;
+  el('link-upload-github').href = `https://github.com/${dono}/${repo}/upload/${RAMO}/catalogos`;
   const erro = el('erro-token');
   erro.textContent = mensagemErro;
   erro.hidden = !mensagemErro;

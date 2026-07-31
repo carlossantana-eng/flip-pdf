@@ -620,6 +620,32 @@ section[id], div[id="inicio"] { scroll-margin-top: 78px; }
 
 .erro-campo { color: #a33a24; font-weight: 600; margin-top: 10px; }
 
+.divisor-ou {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 16px;
+  color: var(--tinta-suave);
+  font-size: 0.85rem;
+}
+
+.divisor-ou::before,
+.divisor-ou::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--borda);
+}
+
+.alternativa-envio {
+  background: #f6f4ee;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.alternativa-envio p { margin: 0 0 12px; }
+.alternativa-envio .dica { margin: 12px 0 0; font-size: 0.85rem; }
+
 .zona-envio {
   border: 2px dashed #c8c1b2;
   border-radius: 10px;
