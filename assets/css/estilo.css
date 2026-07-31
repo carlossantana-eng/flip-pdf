@@ -570,6 +570,13 @@ body.leitor {
 .lupa-corpo img {
   max-width: none;
   box-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
+  transition: width 0.25s ease;
+}
+
+.lupa-topo #lupa-zoom {
+  min-width: 52px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ====== Administração ====== */

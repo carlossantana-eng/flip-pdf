@@ -7,7 +7,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdf.worker.min.mjs', im
 
 const LARGURA_RENDER = Math.min(1440, Math.round(880 * Math.min(window.devicePixelRatio || 1, 2)));
 const LARGURA_LUPA = Math.min(2400, LARGURA_RENDER * 2);
-const NIVEIS_LUPA = [100, 140, 190, 260];
+const NIVEIS_LUPA = [100, 115, 130, 150, 170, 195, 225, 260];
 
 const el = (id) => document.getElementById(id);
 const indicador = el('indicador');
@@ -305,7 +305,7 @@ function montarLivro() {
 /* ====== Lupa (página ampliada) ====== */
 const lupa = el('lupa');
 let paginaLupa = 1;
-let nivelLupa = 1;
+let nivelLupa = 0;
 const cacheLupa = new Map();
 
 async function mostrarPaginaNaLupa(numero) {
@@ -327,6 +327,9 @@ async function mostrarPaginaNaLupa(numero) {
 
 function aplicarNivelLupa() {
   el('lupa-imagem').style.width = `${NIVEIS_LUPA[nivelLupa]}%`;
+  el('lupa-zoom').textContent = `${NIVEIS_LUPA[nivelLupa]}%`;
+  el('lupa-menos').disabled = nivelLupa === 0;
+  el('lupa-mais').disabled = nivelLupa === NIVEIS_LUPA.length - 1;
 }
 
 function abrirLupa() {
