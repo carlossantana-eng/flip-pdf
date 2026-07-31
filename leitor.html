@@ -14,19 +14,12 @@
     </a>
     <h1 id="titulo">Carregando…</h1>
     <div class="leitor-acoes">
-      <span class="indicador" id="indicador">– / –</span>
-      <button class="botao-icone" id="btn-ampliar" title="Ampliar página" aria-label="Ampliar página">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>
-      </button>
       <button class="botao-icone" id="btn-compartilhar" title="Compartilhar link" aria-label="Compartilhar link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>
       </button>
       <a class="botao-icone" id="btn-baixar" title="Baixar PDF" aria-label="Baixar PDF" download>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg>
       </a>
-      <button class="botao-icone" id="btn-tela-cheia" title="Tela cheia" aria-label="Tela cheia">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
-      </button>
     </div>
   </header>
 
@@ -52,6 +45,34 @@
       <a class="botao" href="./">Voltar para a estante</a>
     </div>
   </main>
+
+  <footer class="leitor-rodape">
+    <button class="botao-icone" id="btn-miniaturas" title="Miniaturas das páginas" aria-label="Miniaturas das páginas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    </button>
+    <button class="botao-icone" id="btn-ampliar" title="Ampliar página" aria-label="Ampliar página">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>
+    </button>
+    <button class="botao-icone" id="btn-som" title="Som da virada de página" aria-label="Som da virada de página" aria-pressed="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+    </button>
+    <button class="botao-icone botao-velocidade" id="btn-velocidade" title="Velocidade da animação" aria-label="Velocidade da animação">1×</button>
+    <span class="indicador" id="indicador">– / –</span>
+    <input type="range" class="controle-progresso" id="controle-progresso" min="1" max="1" step="1" value="1" aria-label="Ir para a página">
+    <button class="botao-icone" id="btn-tela-cheia" title="Tela cheia" aria-label="Tela cheia">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
+    </button>
+  </footer>
+
+  <div class="miniaturas" id="miniaturas" hidden>
+    <div class="miniaturas-topo">
+      <h2>Páginas</h2>
+      <button class="botao-icone" id="miniaturas-fechar" title="Fechar" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="miniaturas-grade" id="miniaturas-grade"></div>
+  </div>
 
   <div class="lupa" id="lupa" hidden>
     <div class="lupa-topo">

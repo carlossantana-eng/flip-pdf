@@ -441,6 +441,101 @@ body.leitor {
 
 @keyframes girar { to { transform: rotate(360deg); } }
 
+/* ====== Rodapé do leitor ====== */
+.leitor-rodape {
+  position: relative;
+  z-index: 20;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--leitor-topo);
+  padding: 6px 10px;
+  min-height: 52px;
+}
+
+.botao-velocidade {
+  font-size: 0.85rem;
+  font-weight: 700;
+  width: auto;
+  min-width: 44px;
+  padding: 0 6px;
+}
+
+.controle-progresso {
+  flex: 1;
+  min-width: 60px;
+  margin: 0 10px;
+  accent-color: var(--realce);
+  cursor: pointer;
+  height: 22px;
+}
+
+@media (max-width: 560px) {
+  .leitor-rodape { padding: 4px 6px; }
+  .leitor-rodape .botao-icone { width: 40px; }
+  .leitor-rodape #btn-tela-cheia { display: none; }
+  .leitor-rodape .indicador { padding: 0 4px; font-size: 0.8rem; }
+  .controle-progresso { margin: 0 4px; }
+}
+
+/* ====== Miniaturas ====== */
+.miniaturas {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(10, 12, 16, 0.97);
+  display: flex;
+  flex-direction: column;
+}
+
+.miniaturas-topo {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--leitor-topo);
+}
+
+.miniaturas-topo h2 { margin: 0; font-size: 1rem; color: var(--leitor-texto); }
+
+.miniaturas-grade {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 18px 14px;
+  padding: 18px;
+  align-content: start;
+}
+
+.miniatura {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #b9bfca;
+  font-size: 0.82rem;
+  border-radius: 6px;
+}
+
+.miniatura img {
+  width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.5);
+  display: block;
+}
+
+.miniatura:hover img { outline: 2px solid rgba(255, 255, 255, 0.5); }
+.miniatura.atual img { outline: 3px solid var(--realce); }
+.miniatura.atual { color: #fff; font-weight: 700; }
+.miniatura:focus-visible { outline: 2px solid #8ab4e8; outline-offset: 3px; }
+
 /* ====== Lupa (zoom) ====== */
 .lupa {
   position: fixed;

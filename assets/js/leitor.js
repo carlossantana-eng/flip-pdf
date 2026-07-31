@@ -62,6 +62,99 @@ function atualizarIndicador() {
   indicador.textContent = texto;
   el('btn-anterior').disabled = paginaAtual <= 0;
   el('btn-proximo').disabled = paginaAtual >= numPaginas - 1;
+  el('controle-progresso').value = String(atual);
+}
+
+/* ====== Som da virada de página ====== */
+const CHAVE_SOM = 'estante-leitor-som';
+let somLigado = localStorage.getItem(CHAVE_SOM) !== '0';
+let contextoAudio = null;
+
+// Sintetiza um "swish" curto de papel — sem arquivo de áudio.
+function tocarSomDeVirada() {
+  if (!somLigado) return;
+  try {
+    if (!contextoAudio) contextoAudio = new (window.AudioContext || window.webkitAudioContext)();
+    if (contextoAudio.state === 'suspended') contextoAudio.resume();
+    const duracao = 0.16;
+    const taxa = contextoAudio.sampleRate;
+    const buffer = contextoAudio.createBuffer(1, Math.round(taxa * duracao), taxa);
+    const dados = buffer.getChannelData(0);
+    for (let i = 0; i < dados.length; i += 1) dados[i] = Math.random() * 2 - 1;
+
+    const fonte = contextoAudio.createBufferSource();
+    fonte.buffer = buffer;
+    const filtro = contextoAudio.createBiquadFilter();
+    filtro.type = 'bandpass';
+    filtro.Q.value = 0.9;
+    filtro.frequency.setValueAtTime(900, contextoAudio.currentTime);
+    filtro.frequency.exponentialRampToValueAtTime(2600, contextoAudio.currentTime + duracao);
+    const ganho = contextoAudio.createGain();
+    ganho.gain.setValueAtTime(0.0001, contextoAudio.currentTime);
+    ganho.gain.exponentialRampToValueAtTime(0.16, contextoAudio.currentTime + 0.02);
+    ganho.gain.exponentialRampToValueAtTime(0.0001, contextoAudio.currentTime + duracao);
+    fonte.connect(filtro).connect(ganho).connect(contextoAudio.destination);
+    fonte.start();
+  } catch { /* áudio bloqueado — segue sem som */ }
+}
+
+function atualizarBotaoSom() {
+  const botao = el('btn-som');
+  botao.setAttribute('aria-pressed', String(somLigado));
+  botao.title = somLigado ? 'Silenciar virada de página' : 'Ativar som da virada';
+  botao.innerHTML = somLigado
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 5M21 9l-5 5"/></svg>';
+}
+
+/* ====== Velocidade da animação ====== */
+const CHAVE_VELOCIDADE = 'estante-leitor-velocidade';
+const VELOCIDADES = [
+  { rotulo: '0.5×', tempo: 2000 },
+  { rotulo: '1×', tempo: 1000 },
+  { rotulo: '1.5×', tempo: 650 },
+  { rotulo: '2×', tempo: 400 },
+];
+let indiceVelocidade = Math.min(
+  Math.max(parseInt(localStorage.getItem(CHAVE_VELOCIDADE) ?? '1', 10) || 1, 0),
+  VELOCIDADES.length - 1,
+);
+
+function aplicarVelocidade() {
+  el('btn-velocidade').textContent = VELOCIDADES[indiceVelocidade].rotulo;
+  // O StPageFlip lê flippingTime das configurações a cada virada,
+  // então dá para ajustar ao vivo.
+  if (livro) livro.getSettings().flippingTime = VELOCIDADES[indiceVelocidade].tempo;
+}
+
+/* ====== Miniaturas ====== */
+function abrirMiniaturas() {
+  const grade = el('miniaturas-grade');
+  grade.innerHTML = '';
+  for (let i = 0; i < numPaginas; i += 1) {
+    const botao = document.createElement('button');
+    botao.className = 'miniatura';
+    if (i === paginaAtual) botao.classList.add('atual');
+    const img = document.createElement('img');
+    img.src = imagens[i];
+    img.alt = `Página ${i + 1}`;
+    img.loading = 'lazy';
+    const rotulo = document.createElement('span');
+    rotulo.textContent = String(i + 1);
+    botao.append(img, rotulo);
+    botao.addEventListener('click', () => {
+      fecharMiniaturas();
+      if (livro) livro.flip(i);
+    });
+    grade.appendChild(botao);
+  }
+  el('miniaturas').hidden = false;
+  const atual = grade.children[paginaAtual];
+  if (atual) atual.scrollIntoView({ block: 'center' });
+}
+
+function fecharMiniaturas() {
+  el('miniaturas').hidden = true;
 }
 
 async function renderizarPagina(numero, largura) {
@@ -185,7 +278,9 @@ function montarLivro() {
   });
 
   livro.on('changeState', (evento) => {
+    const estadoAnterior = estadoLivro;
     estadoLivro = evento.data;
+    if (estadoLivro === 'flipping' && estadoAnterior !== 'flipping') tocarSomDeVirada();
     if (estadoLivro === 'read' && atualizacaoPendente) aplicarPaginas();
   });
 
@@ -195,6 +290,7 @@ function montarLivro() {
   });
 
   livro.loadFromImages(imagens);
+  aplicarVelocidade();
 
   // Permite colar um link #p=N com o leitor já aberto.
   window.addEventListener('hashchange', () => {
@@ -273,6 +369,36 @@ function configurarAcoes(entrada) {
     });
   }
 
+  el('btn-som').addEventListener('click', () => {
+    somLigado = !somLigado;
+    localStorage.setItem(CHAVE_SOM, somLigado ? '1' : '0');
+    atualizarBotaoSom();
+    if (somLigado) tocarSomDeVirada();
+  });
+  atualizarBotaoSom();
+
+  el('btn-velocidade').addEventListener('click', () => {
+    indiceVelocidade = (indiceVelocidade + 1) % VELOCIDADES.length;
+    localStorage.setItem(CHAVE_VELOCIDADE, String(indiceVelocidade));
+    aplicarVelocidade();
+    avisar(`Velocidade da animação: ${VELOCIDADES[indiceVelocidade].rotulo}`);
+  });
+  aplicarVelocidade();
+
+  el('btn-miniaturas').addEventListener('click', abrirMiniaturas);
+  el('miniaturas-fechar').addEventListener('click', fecharMiniaturas);
+
+  // Arrastar a barra vai direto à página (sem animação, bom para "varrer").
+  el('controle-progresso').addEventListener('input', (evento) => {
+    if (!livro) return;
+    const alvo = Math.min(Math.max(parseInt(evento.target.value, 10), 1), numPaginas) - 1;
+    if (alvo === paginaAtual) return;
+    livro.turnToPage(alvo);
+    paginaAtual = alvo;
+    gravarPaginaNoEndereco(paginaAtual);
+    atualizarIndicador();
+  });
+
   el('btn-ampliar').addEventListener('click', abrirLupa);
   el('lupa-fechar').addEventListener('click', fecharLupa);
   el('lupa-anterior').addEventListener('click', () => mostrarPaginaNaLupa(paginaLupa - 1));
@@ -287,6 +413,7 @@ function configurarAcoes(entrada) {
   });
 
   document.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Escape' && !el('miniaturas').hidden) { fecharMiniaturas(); return; }
     if (evento.key === 'Escape' && !lupa.hidden) { fecharLupa(); return; }
     if (!lupa.hidden) {
       if (evento.key === 'ArrowLeft') mostrarPaginaNaLupa(paginaLupa - 1);
@@ -338,6 +465,7 @@ async function iniciar() {
   }
 
   numPaginas = pdf.numPages;
+  el('controle-progresso').max = String(numPaginas);
   const primeira = await pdf.getPage(1);
   const base = primeira.getViewport({ scale: 1 });
   proporcao = base.height / base.width;
