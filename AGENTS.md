@@ -38,6 +38,12 @@ arquivo define as regras de trabalho.
    da estante e do leitor, mas o PDF permanece no repositório até a
    exclusão definitiva pela página de arquivos.
 
+10. **Contas de usuário são SIMULADAS** (`conta-simulada.js`,
+    localStorage): não prometem segurança nem multiusuário real. Não
+    misturar com a chave do GitHub (que é a autenticação de publicação).
+    A raiz é a landing da plataforma; a estante dos clientes é
+    `estante.html`.
+
 ## Testes manuais mínimos antes de entregar
 
 - `node scripts/gerar-manifesto.mjs --check` passa.

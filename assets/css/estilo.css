@@ -203,6 +203,191 @@ button { font: inherit; }
   .hero { padding: 46px 16px 54px; }
 }
 
+/* ====== Plataforma (home, autenticação, páginas) ====== */
+.barra-links { display: flex; gap: 4px; }
+.barra-links a {
+  color: var(--tinta-suave);
+  text-decoration: none;
+  font-size: 0.93rem;
+  font-weight: 600;
+  padding: 9px 10px;
+  border-radius: 8px;
+}
+.barra-links a:hover { color: #fff; background: #111; }
+.barra-links a[aria-current="page"] { color: var(--realce); }
+
+@media (max-width: 720px) {
+  .barra-links { display: none; }
+}
+
+.botao-nav { padding: 9px 16px; font-size: 0.95rem; }
+.ola-usuario { color: var(--tinta-suave); font-size: 0.9rem; white-space: nowrap; }
+.ola-usuario strong { color: #fff; }
+
+.selo-demo {
+  display: inline-block;
+  background: var(--realce-fraco);
+  border: 1px solid rgba(163, 230, 53, 0.4);
+  color: var(--realce);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 4px 12px;
+  margin: 0 0 18px;
+}
+
+.hero-acoes {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.botao-fantasma {
+  color: var(--tinta);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 13px 20px;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+}
+.botao-fantasma:hover { border-color: var(--realce); color: var(--realce); }
+
+.secao { max-width: 1020px; margin: 0 auto; padding: 56px 20px; }
+.secao-titulo {
+  text-align: center;
+  font-family: var(--fonte-marca);
+  font-size: clamp(1.3rem, 2.6vw, 1.8rem);
+  color: #fff;
+  margin: 0 0 32px;
+}
+
+.grade-recursos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.recurso {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 20px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.recurso:hover { border-color: rgba(163, 230, 53, 0.5); box-shadow: var(--brilho); }
+.recurso h3 { margin: 12px 0 6px; color: #fff; font-size: 1.02rem; }
+.recurso p { margin: 0; color: var(--tinta-suave); font-size: 0.92rem; line-height: 1.5; }
+
+.secao-passos { border-top: 1px solid var(--borda); }
+.grade-passos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.passo { text-align: center; padding: 12px; }
+.passo h3 { color: #fff; margin: 12px 0 6px; }
+.passo p { color: var(--tinta-suave); margin: 0; }
+
+.passo-numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--realce);
+  background: var(--realce-fraco);
+  color: var(--realce);
+  font-family: var(--fonte-marca);
+  font-weight: 700;
+  box-shadow: var(--brilho);
+}
+
+.secao-rodape { text-align: center; margin: 28px 0 0; }
+.secao-rodape a { color: var(--realce); text-decoration: none; font-weight: 600; }
+
+.secao-cta { text-align: center; border-top: 1px solid var(--borda); }
+
+.rodape-plataforma { padding: 26px 20px 40px; border-top: 1px solid var(--borda); }
+.rodape-plataforma nav { margin-bottom: 8px; }
+.rodape-plataforma a { color: var(--tinta-suave); text-decoration: none; margin: 0 4px; }
+.rodape-plataforma a:hover { color: var(--realce); }
+.rodape-plataforma p { margin: 0; }
+
+/* Autenticação */
+.autenticacao {
+  display: flex;
+  justify-content: center;
+  padding: 48px 20px 72px;
+}
+
+.cartao-autenticacao { width: min(430px, 100%); }
+.botao-largo { width: 100%; text-align: center; padding: 12px; margin-top: 4px; }
+.autenticacao-troca { text-align: center; margin-top: 16px !important; }
+.autenticacao-troca a, .autenticacao-nota a { color: var(--realce); }
+.autenticacao-nota { font-size: 0.82rem; text-align: center; margin-top: 10px !important; }
+
+/* Páginas de conteúdo */
+.pagina-conteudo { max-width: 860px; margin: 0 auto; padding: 44px 20px 64px; }
+.pagina-titulo {
+  font-family: var(--fonte-marca);
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  color: #fff;
+  margin: 0 0 8px;
+  text-align: center;
+}
+.pagina-subtitulo { text-align: center; color: var(--tinta-suave); margin: 0 0 40px; }
+
+.passos-detalhados { list-style: none; margin: 0 0 48px; padding: 0; display: flex; flex-direction: column; gap: 22px; }
+.passos-detalhados li {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 20px;
+}
+.passos-detalhados h2 { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; font-size: 1.1rem; color: #fff; }
+.passos-detalhados p { margin: 0; color: var(--tinta-suave); line-height: 1.6; }
+.passos-detalhados em { color: var(--realce); font-style: normal; }
+
+.faq { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.faq details {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.faq summary { cursor: pointer; font-weight: 600; color: var(--tinta); }
+.faq summary:hover { color: var(--realce); }
+.faq p { margin: 10px 0 0; color: var(--tinta-suave); line-height: 1.55; }
+
+/* Planos */
+.grade-planos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.plano {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 24px;
+  position: relative;
+}
+
+.plano-destaque { border-color: var(--realce); box-shadow: var(--brilho); }
+.plano-destaque > .selo-plano { position: absolute; top: -12px; left: 20px; background: var(--realce); color: #000; }
+
+.plano h2 { margin: 0 0 4px; color: #fff; font-family: var(--fonte-marca); font-size: 1.1rem; }
+.plano-preco { font-size: 1.9rem; font-weight: 800; color: #fff; margin: 0 0 16px; }
+.plano-preco span { font-size: 0.9rem; font-weight: 400; color: var(--tinta-suave); }
+.plano ul { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.plano li { color: var(--tinta-suave); font-size: 0.92rem; padding-left: 22px; position: relative; }
+.plano li::before { content: '✓'; position: absolute; left: 0; color: var(--realce); font-weight: 700; }
+
 /* ====== Estante ====== */
 .estante {
   max-width: 1100px;

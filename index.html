@@ -3,49 +3,114 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Catálogos</title>
-  <meta name="description" content="Estante virtual de catálogos em PDF.">
+  <title>FlipPDF — seus catálogos em flipbooks</title>
+  <meta name="description" content="Transforme PDFs em flipbooks profissionais e compartilhe uma estante virtual com seus clientes.">
   <link rel="stylesheet" href="assets/css/estilo.css?v=__VERSAO__">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
 </head>
 <body>
   <header class="barra-topo">
-    <a class="marca" href="./">
+    <a class="marca" href="index.html">
       <span class="marca-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
-      <span id="marca-texto">Catálogos</span><span class="ponto">.</span>
+      FlipPDF<span class="ponto">.</span>
     </a>
+    <nav class="barra-links">
+      <a href="como-funciona.html">Como funciona</a>
+      <a href="precos.html">Preços</a>
+      <a href="estante.html">Estante demo</a>
+    </nav>
     <div class="barra-acoes">
-      <div class="busca-barra">
-        <button class="icone-barra" id="btn-busca" aria-label="Buscar catálogo" aria-expanded="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        </button>
-        <input id="campo-busca" type="search" placeholder="Buscar catálogo…" aria-label="Buscar catálogo" hidden>
-      </div>
-      <a class="botao-publicar" href="admin.html" title="Enviar e editar catálogos">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.2A5 5 0 0 1 7 7a6 6 0 0 1 11.3 2.2A4.5 4.5 0 0 1 17.5 18H8"/><path d="M12 12v7"/><path d="m8.5 15 3.5-3.5L15.5 15"/></svg>
-        Publicar
-      </a>
+      <a class="botao-publicar" href="login.html" data-visitante>Entrar</a>
+      <a class="botao botao-nav" href="cadastro.html" data-visitante>Criar conta grátis</a>
+      <span class="ola-usuario" data-logado hidden>Olá, <strong id="nav-usuario"></strong></span>
+      <a class="botao botao-nav" href="admin.html" data-logado hidden>Meu painel</a>
+      <button class="botao-publicar" data-logado data-sair hidden>Sair</button>
     </div>
   </header>
 
   <section class="hero">
-    <h1 id="titulo-estante">Catálogos</h1>
-    <p id="descricao-estante">Folheie nossos catálogos direto no navegador — sem precisar baixar nada.</p>
-    <a class="botao-cta" href="#estante">Explorar catálogos
+    <p class="selo-demo">🧪 Demonstração — contas simuladas neste navegador</p>
+    <h1>Seus PDFs viram flipbooks profissionais</h1>
+    <p>Envie seus catálogos, monte a sua estante virtual e compartilhe um
+      link. Seus clientes folheiam no navegador, no computador ou no
+      celular — sem baixar nada.</p>
+    <div class="hero-acoes">
+      <a class="botao-cta" href="cadastro.html" data-visitante>Criar conta grátis
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </a>
+      <a class="botao-cta" href="admin.html" data-logado hidden>Ir para o meu painel
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </a>
+      <a class="botao-fantasma" href="leitor.html?c=catalogo-exemplo.pdf">Ver um flipbook de exemplo</a>
+    </div>
+  </section>
+
+  <section class="secao">
+    <h2 class="secao-titulo">Tudo o que a sua publicação precisa</h2>
+    <div class="grade-recursos">
+      <div class="recurso">
+        <span class="icone-acao icone-acao--lima"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg></span>
+        <h3>Flipbook realista</h3>
+        <p>Virada de página animada com som, página dupla no computador e única no celular.</p>
+      </div>
+      <div class="recurso">
+        <span class="icone-acao icone-acao--ciano"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span>
+        <h3>Estante com a sua marca</h3>
+        <p>Logomarca, cor de destaque e capas geradas automaticamente da primeira página.</p>
+      </div>
+      <div class="recurso">
+        <span class="icone-acao icone-acao--roxo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg></span>
+        <h3>Link direto de cada página</h3>
+        <p>Compartilhe o catálogo aberto na página certa — perfeito para promoções.</p>
+      </div>
+      <div class="recurso">
+        <span class="icone-acao icone-acao--rosa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></span>
+        <h3>Pastas e lixeira</h3>
+        <p>Organize as publicações, envie em lote e restaure o que excluiu por engano.</p>
+      </div>
+      <div class="recurso">
+        <span class="icone-acao icone-acao--lima"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
+        <h3>Feito para o celular</h3>
+        <p>Seus clientes recebem o link no WhatsApp e folheiam na hora, sem instalar nada.</p>
+      </div>
+      <div class="recurso">
+        <span class="icone-acao icone-acao--ciano"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+        <h3>Lupa e miniaturas</h3>
+        <p>Zoom gradual para tabelas de preço e navegação por miniaturas de página.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao secao-passos">
+    <h2 class="secao-titulo">Como funciona</h2>
+    <div class="grade-passos">
+      <div class="passo"><span class="passo-numero">1</span><h3>Crie sua conta</h3><p>Cadastro rápido, direto no navegador.</p></div>
+      <div class="passo"><span class="passo-numero">2</span><h3>Envie seus PDFs</h3><p>Arraste e solte — um ou vários de uma vez.</p></div>
+      <div class="passo"><span class="passo-numero">3</span><h3>Compartilhe o link</h3><p>A estante e cada catálogo têm endereço próprio.</p></div>
+    </div>
+    <p class="secao-rodape"><a href="como-funciona.html">Ver o passo a passo completo →</a></p>
+  </section>
+
+  <section class="secao secao-cta">
+    <h2 class="secao-titulo">Pronto para publicar seu primeiro catálogo?</h2>
+    <a class="botao-cta" href="cadastro.html">Começar agora — é grátis
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
     </a>
   </section>
 
-  <main class="estante" id="estante" aria-live="polite">
-    <div class="estado-estante" id="estado-inicial">
-      <p>Carregando catálogos…</p>
-    </div>
-  </main>
-
-  <footer class="rodape">
-    <span id="rodape-texto"></span>
+  <footer class="rodape rodape-plataforma">
+    <nav>
+      <a href="como-funciona.html">Como funciona</a> ·
+      <a href="precos.html">Preços</a> ·
+      <a href="estante.html">Estante demo</a> ·
+      <a href="login.html">Entrar</a>
+    </nav>
+    <p>FlipPDF — projeto em demonstração. Contas de usuário são simuladas neste navegador.</p>
   </footer>
 
-  <script type="module" src="assets/js/estante.js?v=__VERSAO__"></script>
+  <script type="module">
+    import { ajustarNavegacao } from './assets/js/conta-simulada.js';
+    ajustarNavegacao();
+  </script>
 </body>
 </html>

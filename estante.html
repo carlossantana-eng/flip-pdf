@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogos</title>
+  <meta name="description" content="Estante virtual de catálogos em PDF.">
+  <link rel="stylesheet" href="assets/css/estilo.css?v=__VERSAO__">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="barra-topo">
+    <a class="marca" href="index.html">
+      <span class="marca-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+      <span id="marca-texto">Catálogos</span><span class="ponto">.</span>
+    </a>
+    <div class="barra-acoes">
+      <div class="busca-barra">
+        <button class="icone-barra" id="btn-busca" aria-label="Buscar catálogo" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </button>
+        <input id="campo-busca" type="search" placeholder="Buscar catálogo…" aria-label="Buscar catálogo" hidden>
+      </div>
+      <a class="botao-publicar" href="admin.html" title="Enviar e editar catálogos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.2A5 5 0 0 1 7 7a6 6 0 0 1 11.3 2.2A4.5 4.5 0 0 1 17.5 18H8"/><path d="M12 12v7"/><path d="m8.5 15 3.5-3.5L15.5 15"/></svg>
+        Publicar
+      </a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1 id="titulo-estante">Catálogos</h1>
+    <p id="descricao-estante">Folheie nossos catálogos direto no navegador — sem precisar baixar nada.</p>
+    <a class="botao-cta" href="#estante">Explorar catálogos
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+    </a>
+  </section>
+
+  <main class="estante" id="estante" aria-live="polite">
+    <div class="estado-estante" id="estado-inicial">
+      <p>Carregando catálogos…</p>
+    </div>
+  </main>
+
+  <footer class="rodape">
+    <span id="rodape-texto"></span>
+  </footer>
+
+  <script type="module" src="assets/js/estante.js?v=__VERSAO__"></script>
+</body>
+</html>

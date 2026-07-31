@@ -1,6 +1,14 @@
-# Estante Virtual de Catálogos
+# FlipPDF — Estante Virtual de Catálogos
 
-Site estático que publica seus catálogos em PDF como uma **estante virtual**:
+Plataforma estática (em demonstração) que publica catálogos em PDF como
+**flipbooks** numa **estante virtual**. A raiz do site é a página inicial
+da plataforma (`index.html`), com cadastro/login **simulados no
+navegador** (`login.html`, `cadastro.html`, motor em
+`assets/js/conta-simulada.js`) — pensados para virar autenticação real
+quando o projeto for hospedado com backend. Há ainda `como-funciona.html`
+e `precos.html` (planos ilustrativos).
+
+A estante pública dos clientes fica em **`estante.html`**:
 os clientes acessam um link, veem as capas e folheiam o catálogo no navegador
 com efeito de virar página (flipbook) — no computador em página dupla, no
 celular em página única. Nada de mandar arquivo por WhatsApp ou e-mail.
@@ -99,7 +107,7 @@ O site é servido pelo **GitHub Pages**. Para ativar:
 3. Faça qualquer push na `main` (ou rode o workflow *Publicar estante*
    manualmente em **Actions**).
 
-O endereço do site será `https://<seu-usuario>.github.io/flip-pdf/`.
+A estante ficará em `https://<seu-usuario>.github.io/flip-pdf/estante.html`.
 É esse link que você manda para os clientes — ou o link direto de um
 catálogo, ex.: `https://<seu-usuario>.github.io/flip-pdf/leitor.html?c=catalogo-exemplo.pdf`.
 

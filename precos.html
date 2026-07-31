@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preços — FlipPDF</title>
+  <link rel="stylesheet" href="assets/css/estilo.css?v=__VERSAO__">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="barra-topo">
+    <a class="marca" href="index.html">
+      <span class="marca-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+      FlipPDF<span class="ponto">.</span>
+    </a>
+    <nav class="barra-links">
+      <a href="como-funciona.html">Como funciona</a>
+      <a href="precos.html" aria-current="page">Preços</a>
+      <a href="estante.html">Estante demo</a>
+    </nav>
+    <div class="barra-acoes">
+      <a class="botao-publicar" href="login.html" data-visitante>Entrar</a>
+      <a class="botao botao-nav" href="cadastro.html" data-visitante>Criar conta grátis</a>
+      <a class="botao botao-nav" href="admin.html" data-logado hidden>Meu painel</a>
+      <button class="botao-publicar" data-logado data-sair hidden>Sair</button>
+    </div>
+  </header>
+
+  <main class="pagina-conteudo">
+    <h1 class="pagina-titulo">Planos e preços</h1>
+    <p class="pagina-subtitulo selo-demo">🧪 Demonstração — valores ilustrativos, sem cobrança real.</p>
+
+    <div class="grade-planos">
+      <div class="plano">
+        <h2>Grátis</h2>
+        <p class="plano-preco">R$ 0<span>/mês</span></p>
+        <ul>
+          <li>Estante virtual pública</li>
+          <li>Flipbooks ilimitados (até 60 MB cada)</li>
+          <li>Leitor com lupa, som e miniaturas</li>
+          <li>Link direto por catálogo e por página</li>
+        </ul>
+        <a class="botao botao-largo" href="cadastro.html">Começar grátis</a>
+      </div>
+      <div class="plano plano-destaque">
+        <span class="selo-plano">Mais popular</span>
+        <h2>Pro</h2>
+        <p class="plano-preco">R$ 29<span>/mês</span></p>
+        <ul>
+          <li>Tudo do plano Grátis</li>
+          <li>Logomarca e cor da sua marca</li>
+          <li>Pastas, lixeira e envio em lote</li>
+          <li>Capas personalizadas</li>
+        </ul>
+        <a class="botao botao-largo" href="cadastro.html">Testar o Pro</a>
+      </div>
+      <div class="plano">
+        <h2>Empresa</h2>
+        <p class="plano-preco">Sob consulta</p>
+        <ul>
+          <li>Tudo do plano Pro</li>
+          <li>Domínio próprio</li>
+          <li>Login corporativo (M365)</li>
+          <li>Suporte dedicado</li>
+        </ul>
+        <a class="botao botao-largo botao-suave" href="cadastro.html">Falar com a gente</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="rodape rodape-plataforma">
+    <nav>
+      <a href="index.html">Início</a> ·
+      <a href="como-funciona.html">Como funciona</a> ·
+      <a href="estante.html">Estante demo</a>
+    </nav>
+    <p>FlipPDF — projeto em demonstração.</p>
+  </footer>
+
+  <script type="module">
+    import { ajustarNavegacao } from './assets/js/conta-simulada.js';
+    ajustarNavegacao();
+  </script>
+</body>
+</html>
