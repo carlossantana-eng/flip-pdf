@@ -1,0 +1,12 @@
+{
+  "titulo": "Catálogos",
+  "descricao": "Folheie nossos catálogos direto no navegador — sem precisar baixar nada.",
+  "catalogos": [
+    {
+      "arquivo": "catalogo-exemplo.pdf",
+      "titulo": "Catálogo de Exemplo",
+      "adicionadoEm": "2026-07-31",
+      "descricao": "Catálogo de demonstração — pode ser removido."
+    }
+  ]
+}

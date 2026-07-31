@@ -1,0 +1,26 @@
+name: Verificar
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Não exige manifesto em dia: quem regenera é o workflow da main.
+      # Aqui só validamos que o catalogos.json é válido e o script funciona.
+      - name: Validar manifesto e script
+        run: node scripts/gerar-manifesto.mjs && git diff --stat

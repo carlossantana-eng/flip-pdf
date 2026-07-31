@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogos</title>
+  <meta name="description" content="Estante virtual de catálogos em PDF.">
+  <link rel="stylesheet" href="assets/css/estilo.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+  <header class="estante-topo">
+    <div class="estante-topo-conteudo">
+      <div>
+        <h1 id="titulo-estante">Catálogos</h1>
+      </div>
+      <div class="busca" id="busca" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="campo-busca" type="search" placeholder="Buscar catálogo…" aria-label="Buscar catálogo">
+      </div>
+      <p id="descricao-estante" hidden></p>
+    </div>
+  </header>
+
+  <main class="estante" id="estante" aria-live="polite">
+    <div class="estado-estante" id="estado-inicial">
+      <p>Carregando catálogos…</p>
+    </div>
+  </main>
+
+  <footer class="rodape">
+    <span id="rodape-texto"></span>
+  </footer>
+
+  <script type="module" src="assets/js/estante.js"></script>
+</body>
+</html>

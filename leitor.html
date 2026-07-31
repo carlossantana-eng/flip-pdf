@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogo</title>
+  <link rel="stylesheet" href="assets/css/estilo.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+</head>
+<body class="leitor">
+  <header class="leitor-topo">
+    <a class="botao-icone" href="./" title="Voltar para a estante" aria-label="Voltar para a estante">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+    </a>
+    <h1 id="titulo">Carregando…</h1>
+    <div class="leitor-acoes">
+      <span class="indicador" id="indicador">– / –</span>
+      <button class="botao-icone" id="btn-ampliar" title="Ampliar página" aria-label="Ampliar página">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>
+      </button>
+      <button class="botao-icone" id="btn-compartilhar" title="Compartilhar link" aria-label="Compartilhar link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>
+      </button>
+      <a class="botao-icone" id="btn-baixar" title="Baixar PDF" aria-label="Baixar PDF" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M4 20h16"/></svg>
+      </a>
+      <button class="botao-icone" id="btn-tela-cheia" title="Tela cheia" aria-label="Tela cheia">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="progresso" id="progresso"><div class="progresso-barra" id="progresso-barra"></div></div>
+
+  <main class="palco" id="palco">
+    <button class="seta seta-anterior" id="btn-anterior" aria-label="Página anterior" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <div class="livro-moldura"><div id="livro"></div></div>
+    <button class="seta seta-proxima" id="btn-proximo" aria-label="Próxima página" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+    </button>
+
+    <div class="estado" id="carregando">
+      <div class="girador" aria-hidden="true"></div>
+      <p id="carregando-texto">Preparando o catálogo…</p>
+    </div>
+
+    <div class="estado" id="erro" hidden>
+      <h2 id="erro-titulo">Não foi possível abrir o catálogo</h2>
+      <p id="erro-texto">Verifique sua conexão e tente novamente.</p>
+      <a class="botao" href="./">Voltar para a estante</a>
+    </div>
+  </main>
+
+  <div class="lupa" id="lupa" hidden>
+    <div class="lupa-topo">
+      <button class="botao-icone" id="lupa-anterior" title="Página anterior" aria-label="Página anterior">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <span class="indicador" id="lupa-indicador">–</span>
+      <button class="botao-icone" id="lupa-proxima" title="Próxima página" aria-label="Próxima página">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+      <button class="botao-icone" id="lupa-menos" title="Reduzir" aria-label="Reduzir">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg>
+      </button>
+      <button class="botao-icone" id="lupa-mais" title="Ampliar" aria-label="Ampliar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <button class="botao-icone" id="lupa-fechar" title="Fechar" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="lupa-corpo" id="lupa-corpo"><img id="lupa-imagem" alt="Página ampliada"></div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="assets/vendor/page-flip.browser.js"></script>
+  <script type="module" src="assets/js/leitor.js"></script>
+</body>
+</html>
