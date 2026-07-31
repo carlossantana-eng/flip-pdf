@@ -139,6 +139,19 @@ button { font: inherit; }
 .marca-flip { color: var(--realce); }
 .marca-pdf { color: var(--texto-forte); }
 
+/* A marca fica sempre no centro da ilha; links e ações ocupam as laterais.
+   Em telas estreitas ela volta ao fluxo para não sobrepor busca e botões. */
+@media (min-width: 720px) {
+  .marca {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 40vw;
+  }
+  .barra-links { margin-left: 0; }
+}
+
 .barra-acoes {
   margin-left: auto;
   display: flex;
