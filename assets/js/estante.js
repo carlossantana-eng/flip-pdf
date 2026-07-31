@@ -13,6 +13,18 @@ function normalizar(texto) {
   return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
+// Aplica a cor de destaque da identidade, recalculando o brilho (glow).
+function aplicarCorDeDestaque(cor) {
+  const m = cor.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+  if (!m) return;
+  const [r, g, b] = [m[1], m[2], m[3]].map((h) => parseInt(h, 16));
+  const raiz = document.documentElement.style;
+  raiz.setProperty('--realce', cor);
+  raiz.setProperty('--cta', cor);
+  raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
+  raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
+}
+
 function mostrarEstado(html) {
   estante.innerHTML = `<div class="estado-estante">${html}</div>`;
 }
@@ -148,10 +160,7 @@ async function iniciar() {
     document.title = manifesto.titulo;
   }
   const identidade = manifesto.identidade || {};
-  if (identidade.cor) {
-    document.documentElement.style.setProperty('--realce', identidade.cor);
-    document.documentElement.style.setProperty('--cta', identidade.cor);
-  }
+  if (identidade.cor) aplicarCorDeDestaque(identidade.cor);
   if (identidade.logo) {
     const logo = document.createElement('img');
     logo.className = 'marca-logo';

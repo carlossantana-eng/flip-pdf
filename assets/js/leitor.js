@@ -457,7 +457,14 @@ async function iniciar() {
   document.title = `${entrada.titulo} · ${manifesto.titulo || 'Catálogos'}`;
   el('titulo').textContent = entrada.titulo;
   if (manifesto.identidade && manifesto.identidade.cor) {
-    document.documentElement.style.setProperty('--realce', manifesto.identidade.cor);
+    const m = manifesto.identidade.cor.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+    if (m) {
+      const [r, g, b] = [m[1], m[2], m[3]].map((h) => parseInt(h, 16));
+      const raiz = document.documentElement.style;
+      raiz.setProperty('--realce', manifesto.identidade.cor);
+      raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
+      raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
+    }
   }
   configurarAcoes(entrada);
 

@@ -200,6 +200,18 @@ function saudar() {
   el('saudacao-frase').textContent = frases[agora.getDay()];
 }
 
+// Aplica a cor de destaque da identidade também no painel.
+function aplicarCorDeDestaque(cor) {
+  const m = (cor || '').match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+  if (!m) return;
+  const [r, g, b] = [m[1], m[2], m[3]].map((h) => parseInt(h, 16));
+  const raiz = document.documentElement.style;
+  raiz.setProperty('--realce', cor);
+  raiz.setProperty('--cta', cor);
+  raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
+  raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
+}
+
 function iniciaisDoNome(nome) {
   const palavras = nome.split(/\s+/).filter(Boolean);
   if (palavras.length === 0) return '•';
@@ -246,6 +258,7 @@ async function mostrarTelaGestao() {
   el('tela-gestao').hidden = false;
   document.body.classList.add('conectado');
   await carregarManifesto();
+  if (manifesto.identidade && manifesto.identidade.cor) aplicarCorDeDestaque(manifesto.identidade.cor);
   saudar();
   atualizarConta();
   preencherConfiguracoes();

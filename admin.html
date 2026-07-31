@@ -10,7 +10,10 @@
 </head>
 <body class="admin">
   <header class="barra-topo">
-    <a class="marca" href="./">Painel<span class="ponto">.</span></a>
+    <a class="marca" href="./">
+      <span class="marca-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+      Painel<span class="ponto">.</span>
+    </a>
     <div class="barra-acoes">
       <a class="botao-publicar" href="./">← Ver a estante</a>
       <button class="avatar-conta" id="btn-conta" title="Minha conta" aria-label="Minha conta" hidden>WE</button>
@@ -146,27 +149,27 @@
 
         <div class="cartoes-acao">
           <button class="cartao-acao" id="acao-enviar">
-            <span class="icone-acao" style="background:#1b74e4">
+            <span class="icone-acao icone-acao--lima">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.2A5 5 0 0 1 7 7a6 6 0 0 1 11.3 2.2A4.5 4.5 0 0 1 17.5 18H8"/><path d="M12 12v7"/><path d="m8.5 15 3.5-3.5L15.5 15"/></svg>
             </span>
             <span class="texto-acao"><strong>Enviar arquivo</strong><small>PDF do catálogo</small></span>
             <span class="mais-acao" aria-hidden="true">+</span>
           </button>
           <button class="cartao-acao" id="acao-lote">
-            <span class="icone-acao" style="background:#7a4ae2">
+            <span class="icone-acao icone-acao--ciano">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17V9"/><path d="m5 12 3-3 3 3"/><path d="M16 17V9"/><path d="m13 12 3-3 3 3"/><path d="M3 21h18"/></svg>
             </span>
             <span class="texto-acao"><strong>Envio em lote</strong><small>vários PDFs de uma vez</small></span>
             <span class="mais-acao" aria-hidden="true">+</span>
           </button>
           <a class="cartao-acao" href="#config">
-            <span class="icone-acao" style="background:#2e9e6b">
+            <span class="icone-acao icone-acao--roxo">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
             </span>
             <span class="texto-acao"><strong>Configurações</strong><small>estante, perfil e identidade</small></span>
           </a>
           <a class="cartao-acao" href="./" target="_blank" rel="noopener">
-            <span class="icone-acao" style="background:#c05621">
+            <span class="icone-acao icone-acao--rosa">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
             </span>
             <span class="texto-acao"><strong>Ver estante</strong><small>como o cliente vê</small></span>
