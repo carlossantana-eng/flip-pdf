@@ -46,6 +46,10 @@ jobs:
 
       - name: Configurar o GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          # Ativa o Pages automaticamente na primeira execução
+          # (exige repositório público no plano gratuito do GitHub).
+          enablement: true
 
       - name: Empacotar o site
         uses: actions/upload-pages-artifact@v3
