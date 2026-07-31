@@ -83,18 +83,21 @@
       <button class="botao-icone" id="lupa-proxima" title="Próxima página" aria-label="Próxima página">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
       </button>
-      <button class="botao-icone" id="lupa-menos" title="Reduzir" aria-label="Reduzir">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg>
-      </button>
-      <span class="indicador" id="lupa-zoom">100%</span>
-      <button class="botao-icone" id="lupa-mais" title="Ampliar" aria-label="Ampliar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      </button>
       <button class="botao-icone" id="lupa-fechar" title="Fechar" aria-label="Fechar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
       </button>
     </div>
     <div class="lupa-corpo" id="lupa-corpo"><img id="lupa-imagem" alt="Página ampliada"></div>
+    <div class="lupa-zoom-lateral" aria-label="Controle de zoom">
+      <button class="botao-icone" id="lupa-mais" title="Ampliar" aria-label="Ampliar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <input type="range" id="lupa-controle" min="100" max="300" step="5" value="100" aria-label="Nível de zoom">
+      <button class="botao-icone" id="lupa-menos" title="Reduzir" aria-label="Reduzir">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg>
+      </button>
+      <span class="indicador" id="lupa-zoom">100%</span>
+    </div>
   </div>
 
   <div class="toast" id="toast" hidden></div>

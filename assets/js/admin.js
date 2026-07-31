@@ -41,6 +41,8 @@ function mostrarErroGeral(texto) {
 function mostrarTelaToken(mensagemErro = '') {
   el('tela-gestao').hidden = true;
   el('btn-conta').hidden = true;
+  el('btn-notificacoes').hidden = true;
+  el('painel-notificacoes').hidden = true;
   fecharMenuConta();
   document.body.classList.remove('conectado');
   el('tela-token').hidden = false;
@@ -124,8 +126,10 @@ async function mostrarTelaGestao() {
   atualizarConta();
   preencherConfiguracoes();
   el('cartao-cadastro').hidden = Boolean(nomeDoPerfil());
+  el('btn-notificacoes').hidden = false;
   desenharLista();
   atualizarStatusPublicacao();
+  carregarNotificacoes();
 }
 
 /* ====== Lista de catálogos ====== */
@@ -336,6 +340,64 @@ async function enviarArquivos(listaDeArquivos) {
   }
 }
 
+/* ====== Notificações (publicações do site) ====== */
+
+const CHAVE_NOTIFICACOES = 'estante-notificacoes-vistas';
+let maisRecenteNotificacao = '';
+
+function textoDeRun(run) {
+  if (run.status !== 'completed') return { icone: '⏳', texto: 'Publicação em andamento…' };
+  if (run.conclusion === 'success') return { icone: '✅', texto: 'Site publicado com sucesso' };
+  return { icone: '⚠️', texto: 'A publicação falhou — veja os detalhes' };
+}
+
+async function carregarNotificacoes() {
+  try {
+    const dados = await gh(`actions/runs?branch=${RAMO}&per_page=6`);
+    const runs = dados.workflow_runs || [];
+    const lista = el('lista-notificacoes');
+    lista.innerHTML = '';
+    if (runs.length === 0) {
+      lista.innerHTML = '<li><span class="notificacao-texto">Nenhuma notificação ainda.</span></li>';
+      return;
+    }
+    maisRecenteNotificacao = runs[0].updated_at || '';
+    const vistoAte = localStorage.getItem(CHAVE_NOTIFICACOES) || '';
+    const naoLidas = runs.filter((r) => (r.updated_at || '') > vistoAte).length;
+    const selo = el('sino-selo');
+    selo.textContent = String(naoLidas);
+    selo.hidden = naoLidas === 0;
+
+    for (const run of runs) {
+      const { icone, texto } = textoDeRun(run);
+      const item = document.createElement('li');
+      const ligacao = document.createElement('a');
+      ligacao.href = run.html_url;
+      ligacao.target = '_blank';
+      ligacao.rel = 'noopener';
+      const quando = new Date(run.updated_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+      ligacao.innerHTML = `<span aria-hidden="true">${icone}</span><span>${texto}<span class="quando">${quando}</span></span>`;
+      item.appendChild(ligacao);
+      lista.appendChild(item);
+    }
+  } catch (erro) {
+    console.warn('Falha ao carregar notificações', erro);
+  }
+}
+
+function alternarNotificacoes() {
+  const painel = el('painel-notificacoes');
+  const abrir = painel.hidden;
+  painel.hidden = !abrir;
+  el('btn-notificacoes').setAttribute('aria-expanded', String(abrir));
+  if (abrir) {
+    // Abrir marca tudo como lido.
+    if (maisRecenteNotificacao) localStorage.setItem(CHAVE_NOTIFICACOES, maisRecenteNotificacao);
+    el('sino-selo').hidden = true;
+    carregarNotificacoes();
+  }
+}
+
 /* ====== Menu de conta ====== */
 
 function abrirMenuConta() {
@@ -542,6 +604,15 @@ function configurarEventos() {
   el('btn-sair').addEventListener('click', sair);
   el('btn-salvar-estante').addEventListener('click', salvarConfiguracoes);
   el('btn-concluir-cadastro').addEventListener('click', concluirCadastro);
+
+  el('btn-notificacoes').addEventListener('click', alternarNotificacoes);
+  document.addEventListener('click', (evento) => {
+    const painel = el('painel-notificacoes');
+    if (!painel.hidden && !evento.target.closest('.sino-caixa')) {
+      painel.hidden = true;
+      el('btn-notificacoes').setAttribute('aria-expanded', 'false');
+    }
+  });
 
   el('btn-conta').addEventListener('click', abrirMenuConta);
   el('conta-fechar').addEventListener('click', fecharMenuConta);

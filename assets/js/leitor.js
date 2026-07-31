@@ -6,8 +6,10 @@ import * as pdfjs from '../vendor/pdf.min.mjs';
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdf.worker.min.mjs', import.meta.url).toString();
 
 const LARGURA_RENDER = Math.min(1440, Math.round(880 * Math.min(window.devicePixelRatio || 1, 2)));
-const LARGURA_LUPA = Math.min(2400, LARGURA_RENDER * 2);
-const NIVEIS_LUPA = [100, 115, 130, 150, 170, 195, 225, 260];
+const LARGURA_LUPA = Math.min(2600, LARGURA_RENDER * 2);
+const ZOOM_MINIMO = 100;
+const ZOOM_MAXIMO = 300;
+const PASSO_ZOOM = 15;
 
 const el = (id) => document.getElementById(id);
 const indicador = el('indicador');
@@ -305,7 +307,7 @@ function montarLivro() {
 /* ====== Lupa (página ampliada) ====== */
 const lupa = el('lupa');
 let paginaLupa = 1;
-let nivelLupa = 0;
+let zoomLupa = ZOOM_MINIMO;
 const cacheLupa = new Map();
 
 async function mostrarPaginaNaLupa(numero) {
@@ -325,11 +327,16 @@ async function mostrarPaginaNaLupa(numero) {
   if (!lupa.hidden) imagem.src = cacheLupa.get(paginaLupa);
 }
 
-function aplicarNivelLupa() {
-  el('lupa-imagem').style.width = `${NIVEIS_LUPA[nivelLupa]}%`;
-  el('lupa-zoom').textContent = `${NIVEIS_LUPA[nivelLupa]}%`;
-  el('lupa-menos').disabled = nivelLupa === 0;
-  el('lupa-mais').disabled = nivelLupa === NIVEIS_LUPA.length - 1;
+// suave=true anima a transição (botões); false segue o dedo (barra).
+function aplicarNivelLupa(suave = false) {
+  zoomLupa = Math.min(Math.max(zoomLupa, ZOOM_MINIMO), ZOOM_MAXIMO);
+  const imagem = el('lupa-imagem');
+  imagem.classList.toggle('zoom-suave', suave);
+  imagem.style.width = `${zoomLupa}%`;
+  el('lupa-zoom').textContent = `${Math.round(zoomLupa)}%`;
+  el('lupa-controle').value = String(zoomLupa);
+  el('lupa-menos').disabled = zoomLupa <= ZOOM_MINIMO;
+  el('lupa-mais').disabled = zoomLupa >= ZOOM_MAXIMO;
 }
 
 function abrirLupa() {
@@ -407,12 +414,16 @@ function configurarAcoes(entrada) {
   el('lupa-anterior').addEventListener('click', () => mostrarPaginaNaLupa(paginaLupa - 1));
   el('lupa-proxima').addEventListener('click', () => mostrarPaginaNaLupa(paginaLupa + 1));
   el('lupa-mais').addEventListener('click', () => {
-    nivelLupa = Math.min(nivelLupa + 1, NIVEIS_LUPA.length - 1);
-    aplicarNivelLupa();
+    zoomLupa += PASSO_ZOOM;
+    aplicarNivelLupa(true);
   });
   el('lupa-menos').addEventListener('click', () => {
-    nivelLupa = Math.max(nivelLupa - 1, 0);
-    aplicarNivelLupa();
+    zoomLupa -= PASSO_ZOOM;
+    aplicarNivelLupa(true);
+  });
+  el('lupa-controle').addEventListener('input', (evento) => {
+    zoomLupa = parseInt(evento.target.value, 10);
+    aplicarNivelLupa(false);
   });
 
   document.addEventListener('keydown', (evento) => {

@@ -812,7 +812,50 @@ body.leitor {
 .lupa-corpo img {
   max-width: none;
   box-shadow: 0 6px 40px rgba(0, 0, 0, 0.8);
-  transition: width 0.25s ease;
+}
+
+/* Transição só nos botões −/+; a barra segue o dedo sem atraso. */
+.lupa-corpo img.zoom-suave { transition: width 0.2s ease; }
+
+.lupa-zoom-lateral {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 51;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(10, 12, 8, 0.88);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 10px 8px;
+}
+
+#lupa-controle {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 24px;
+  height: min(240px, 38vh);
+  accent-color: var(--realce);
+  cursor: pointer;
+  margin: 4px 0;
+}
+
+.lupa-zoom-lateral .indicador {
+  padding: 0;
+  font-family: var(--fonte-marca);
+  font-size: 0.78rem;
+  min-width: 44px;
+  text-align: center;
+}
+
+.lupa-zoom-lateral .botao-icone { width: 38px; height: 38px; }
+
+@media (max-width: 560px) {
+  .lupa-zoom-lateral { right: 6px; padding: 8px 5px; }
+  #lupa-controle { height: min(180px, 32vh); }
 }
 
 /* ====== Toast ====== */
@@ -1116,6 +1159,63 @@ section[id], div[id="inicio"] { scroll-margin-top: 78px; }
 
 .estado-admin { text-align: center; padding: 48px 16px; color: var(--tinta-suave); }
 .estado-admin h2 { color: #fff; }
+
+/* ====== Notificações (sino) ====== */
+.sino-caixa { position: relative; }
+
+.sino-selo {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: var(--perigo);
+  color: #fff;
+  font-size: 0.64rem;
+  font-weight: 800;
+  border-radius: 999px;
+  min-width: 16px;
+  padding: 1px 5px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.painel-notificacoes {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: min(320px, 86vw);
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 14px;
+  z-index: 45;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65);
+}
+
+.painel-notificacoes h3 {
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+  color: #fff;
+  font-family: var(--fonte-marca);
+}
+
+.painel-notificacoes ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+
+.painel-notificacoes li a,
+.painel-notificacoes li span.notificacao-texto {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 9px 6px;
+  border-radius: 8px;
+  color: var(--tinta);
+  text-decoration: none;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.painel-notificacoes li a:hover { background: var(--realce-fraco); }
+.painel-notificacoes li + li { border-top: 1px solid #161616; }
+.painel-notificacoes .quando { display: block; color: var(--tinta-suave); font-size: 0.75rem; }
 
 /* ====== Conta (avatar e gaveta) ====== */
 .avatar-conta {
