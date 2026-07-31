@@ -69,37 +69,6 @@ function atualizarIndicador() {
   el('controle-progresso').value = String(atual);
 }
 
-/* ====== Design do leitor (personalização por publicação) ====== */
-
-const BOTOES_DO_DESIGN = {
-  miniaturas: 'btn-miniaturas',
-  lupa: 'btn-ampliar',
-  som: 'btn-som',
-  velocidade: 'btn-velocidade',
-  progresso: 'controle-progresso',
-  compartilhar: 'btn-compartilhar',
-  telacheia: 'btn-tela-cheia',
-};
-
-function aplicarDesign(design) {
-  design = design || {};
-  const raiz = document.documentElement.style;
-  raiz.setProperty('--leitor-fundo', design.fundo || '#000000');
-  raiz.setProperty('--leitor-topo', design.barra || '#0b0d08');
-  const ocultar = new Set(design.ocultar || []);
-  for (const [chave, id] of Object.entries(BOTOES_DO_DESIGN)) {
-    el(id).hidden = ocultar.has(chave);
-  }
-  // "barra" desliga a barra de ferramentas inferior inteira.
-  document.querySelector('.leitor-rodape').hidden = ocultar.has('barra');
-}
-
-// O editor envia o design em tempo real para a prévia (mesma origem).
-window.addEventListener('message', (evento) => {
-  if (evento.origin !== location.origin) return;
-  if (evento.data && evento.data.tipo === 'design-previa') aplicarDesign(evento.data.design);
-});
-
 /* ====== Som da virada de página ====== */
 const CHAVE_SOM = 'estante-leitor-som';
 let somLigado = localStorage.getItem(CHAVE_SOM) !== '0';
@@ -406,7 +375,6 @@ function configurarAcoes(entrada) {
   } else {
     el('btn-baixar').href = `catalogos/${encodeURIComponent(entrada.arquivo)}`;
   }
-  aplicarDesign(entrada.leitor);
   if (entrada.estante) {
     document.querySelector('.leitor-topo .botao-icone').href = `estante.html?e=${encodeURIComponent(entrada.estante)}`;
   }

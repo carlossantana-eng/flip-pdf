@@ -83,55 +83,6 @@ function mostrarCapa(entrada) {
   }
 }
 
-/* ====== Design do leitor ====== */
-
-const FUNDO_PADRAO = '#000000';
-const BARRA_PADRAO = '#0b0d08';
-
-function coletarDesign() {
-  const design = {};
-  const fundo = el('design-fundo').value;
-  const barra = el('design-barra').value;
-  if (fundo.toLowerCase() !== FUNDO_PADRAO) design.fundo = fundo;
-  if (barra.toLowerCase() !== BARRA_PADRAO) design.barra = barra;
-  const ocultar = [...document.querySelectorAll('[data-botao]')]
-    .filter((caixa) => !caixa.checked)
-    .map((caixa) => caixa.dataset.botao);
-  if (ocultar.length > 0) design.ocultar = ocultar;
-  return Object.keys(design).length > 0 ? design : null;
-}
-
-function carregarDesign(entrada) {
-  const design = entrada.leitor || {};
-  el('design-fundo').value = design.fundo || FUNDO_PADRAO;
-  el('design-barra').value = design.barra || BARRA_PADRAO;
-  const ocultar = new Set(design.ocultar || []);
-  for (const caixa of document.querySelectorAll('[data-botao]')) {
-    caixa.checked = !ocultar.has(caixa.dataset.botao);
-  }
-}
-
-// Prévia em tempo real: envia o design para o leitor dentro do iframe.
-function enviarPrevia() {
-  const quadro = el('previa');
-  if (quadro.contentWindow) {
-    quadro.contentWindow.postMessage({ tipo: 'design-previa', design: coletarDesign() || {} }, location.origin);
-  }
-}
-
-function configurarDesign() {
-  for (const controle of document.querySelectorAll('[data-botao], #design-fundo, #design-barra')) {
-    controle.addEventListener('input', enviarPrevia);
-    controle.addEventListener('change', enviarPrevia);
-  }
-  el('btn-cores-padrao').addEventListener('click', () => {
-    el('design-fundo').value = FUNDO_PADRAO;
-    el('design-barra').value = BARRA_PADRAO;
-    enviarPrevia();
-  });
-  el('previa').addEventListener('load', enviarPrevia);
-}
-
 async function salvar() {
   const titulo = el('campo-titulo').value.trim();
   if (!titulo) { avisar('O título não pode ficar vazio.'); return; }
@@ -166,9 +117,7 @@ async function salvar() {
     if (estanteEscolhida && estanteEscolhida !== 'principal') entrada.estante = estanteEscolhida;
     else delete entrada.estante;
 
-    const design = coletarDesign();
-    if (design) entrada.leitor = design;
-    else delete entrada.leitor;
+    delete entrada.leitor; // personalização do leitor foi descontinuada
 
     if (capaNova) {
       const nomeBase = arquivo.replace(/\.pdf$/i, '');
@@ -293,8 +242,6 @@ async function iniciar() {
   preencherPastas(entrada.pasta);
   preencherEstantes(entrada.estante);
   mostrarCapa(entrada);
-  carregarDesign(entrada);
-  configurarDesign();
   configurarEventos(entrada);
 
   el('previa').src = `leitor.html?c=${encodeURIComponent(arquivo)}`;
