@@ -78,6 +78,19 @@ button { font: inherit; }
 
 .busca input:focus { outline: 3px solid rgba(255, 255, 255, 0.45); }
 
+.botao-gerenciar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  margin-left: auto;
+}
+
+.botao-gerenciar svg { width: 17px; height: 17px; }
+
+/* Com a busca visível, ela é quem empurra para a direita. */
+.busca:not([hidden]) ~ .botao-gerenciar { margin-left: 0; }
+
 .busca svg {
   position: absolute;
   left: 11px;
