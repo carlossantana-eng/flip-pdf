@@ -76,16 +76,25 @@ function tituloDoNome(nome) {
 /* ====== API do GitHub ====== */
 
 async function gh(caminho, { metodo = 'GET', corpo = null } = {}) {
-  const resposta = await fetch(`https://api.github.com/repos/${dono}/${repo}/${caminho}`, {
-    method: metodo,
-    headers: {
-      Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${token}`,
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...(corpo ? { 'Content-Type': 'application/json' } : {}),
-    },
-    body: corpo ? JSON.stringify(corpo) : undefined,
-  });
+  // Sem barra no fim quando caminho é vazio: a API rejeita ".../repo/" e a
+  // resposta de erro vem sem CORS, virando "Failed to fetch" no navegador.
+  const url = `https://api.github.com/repos/${dono}/${repo}${caminho ? `/${caminho}` : ''}`;
+  let resposta;
+  try {
+    resposta = await fetch(url, {
+      method: metodo,
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${token}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+        ...(corpo ? { 'Content-Type': 'application/json' } : {}),
+      },
+      body: corpo ? JSON.stringify(corpo) : undefined,
+    });
+  } catch {
+    throw new Error('sem conexão com api.github.com — verifique a internet, '
+      + 'bloqueadores de anúncio/antivírus ou a rede da empresa.');
+  }
   if (!resposta.ok) {
     let detalhe = '';
     try { detalhe = (await resposta.json()).message || ''; } catch { /* sem corpo */ }
