@@ -1,6 +1,8 @@
 // Estante virtual: lista os catálogos do manifesto e desenha a capa
 // (1ª página do PDF) de cada um, sem baixar o arquivo inteiro.
+// O dono (com a chave salva neste navegador) vê um lápis de edição.
 import * as pdfjs from '../vendor/pdf.min.mjs';
+import { temToken } from './nucleo-admin.js';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdf.worker.min.mjs', import.meta.url).toString();
 
@@ -56,6 +58,22 @@ function criarCartao(catalogo) {
   info.append(titulo, meta);
 
   cartao.append(capa, info);
+
+  // Lápis de edição — só para o dono, sem aparecer para os clientes.
+  if (temToken()) {
+    const editar = document.createElement('button');
+    editar.className = 'botao-editar-capa';
+    editar.title = `Editar "${catalogo.titulo}"`;
+    editar.setAttribute('aria-label', `Editar ${catalogo.titulo}`);
+    editar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+    editar.addEventListener('click', (evento) => {
+      evento.preventDefault();
+      evento.stopPropagation();
+      location.href = `editor.html?c=${encodeURIComponent(catalogo.arquivo)}`;
+    });
+    cartao.appendChild(editar);
+  }
+
   return { cartao, capa, esqueleto, meta };
 }
 

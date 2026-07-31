@@ -1773,6 +1773,103 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 .ficha-acoes { display: flex; gap: 6px; }
 .ficha-acoes .botao { padding: 6px 10px; font-size: 0.8rem; }
 
+/* ====== Editor de publicação ====== */
+.editor-aviso { max-width: 560px; margin: 32px auto; }
+
+.editor-leiaute {
+  display: flex;
+  gap: 16px;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 16px 16px 40px;
+  align-items: stretch;
+}
+
+.editor-lateral {
+  flex: none;
+  width: 340px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  padding: 20px;
+  align-self: flex-start;
+  position: sticky;
+  top: 96px;
+}
+
+.editor-titulo {
+  margin: 0 0 16px;
+  font-family: var(--fonte-marca);
+  font-size: 1.15rem;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-rotulo {
+  display: block;
+  font-size: 0.86rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--tinta);
+}
+
+.editor-lateral .linha-logo { margin-bottom: 8px; }
+.editor-dica { margin: 10px 0 0; text-align: center; }
+
+.editor-perigo {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--borda);
+  text-align: center;
+}
+
+.editor-previa {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+}
+
+.editor-previa iframe {
+  display: block;
+  width: 100%;
+  height: max(560px, calc(100dvh - 140px));
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .editor-leiaute { flex-direction: column; }
+  .editor-lateral { width: 100%; position: static; }
+  .editor-previa iframe { height: 70vh; }
+}
+
+/* Botão de editar sobre a capa (só aparece para o dono) */
+.cartao { position: relative; }
+
+.botao-editar-capa {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--borda);
+  background: rgba(0, 0, 0, 0.8);
+  color: var(--tinta);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.botao-editar-capa:hover { border-color: var(--realce); color: var(--realce); box-shadow: var(--brilho); }
+.botao-editar-capa svg { width: 18px; height: 18px; }
+
 /* ====== Cadastro e configurações ====== */
 .cartao-cadastro {
   border: 1px solid rgba(163, 230, 53, 0.55);

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Editar publicação</title>
+  <link rel="stylesheet" href="assets/css/estilo.css?v=__VERSAO__">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+</head>
+<body class="admin">
+  <header class="barra-topo">
+    <a class="marca" href="arquivos.html">
+      <span class="marca-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+      Editor<span class="ponto">.</span>
+    </a>
+    <div class="barra-acoes">
+      <button class="botao-publicar" id="btn-copiar-link" hidden>Copiar link</button>
+      <a class="botao-publicar" id="btn-abrir" target="_blank" rel="noopener" hidden>Abrir</a>
+      <a class="botao-publicar" href="arquivos.html">← Meus arquivos</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="cartao-admin editor-aviso" id="sem-chave" hidden>
+      <h2>Conecte-se primeiro</h2>
+      <p>Esta página usa a mesma chave do painel. Conecte-se por lá e volte aqui.</p>
+      <a class="botao" href="admin.html">Abrir o painel</a>
+    </section>
+
+    <section class="cartao-admin editor-aviso" id="nao-encontrado" hidden>
+      <h2>Publicação não encontrada</h2>
+      <p id="nao-encontrado-texto">Ela pode ter sido excluída ou estar na lixeira.</p>
+      <a class="botao" href="arquivos.html">Ir para Meus arquivos</a>
+    </section>
+
+    <div class="editor-leiaute" id="editor" hidden>
+
+      <aside class="editor-lateral">
+        <h1 class="editor-titulo" id="editor-nome">Editar publicação</h1>
+
+        <label class="campo">
+          <span>Título da publicação</span>
+          <input id="campo-titulo" type="text" maxlength="90">
+        </label>
+
+        <label class="campo">
+          <span>Pasta</span>
+          <select id="campo-pasta"></select>
+        </label>
+
+        <label class="campo">
+          <span>Descrição (opcional)</span>
+          <input id="campo-descricao" type="text" maxlength="160">
+        </label>
+
+        <div class="campo">
+          <span class="editor-rotulo">Capa da estante</span>
+          <div class="linha-logo">
+            <img id="capa-previa" alt="" hidden>
+            <span class="publicacao-nota" id="capa-automatica">1ª página do PDF (automática)</span>
+          </div>
+          <div class="publicacao-controles-capa">
+            <button class="botao botao-suave" id="btn-escolher-capa" type="button">Escolher imagem…</button>
+            <button class="botao botao-suave" id="btn-capa-automatica" type="button" hidden>Usar a 1ª página</button>
+          </div>
+          <input id="campo-capa" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+        </div>
+
+        <label class="campo-check">
+          <input id="campo-download" type="checkbox" checked>
+          Permitir que os clientes baixem o PDF
+        </label>
+
+        <p class="publicacao-nota" id="editor-arquivo"></p>
+
+        <button class="botao botao-largo" id="btn-salvar">Salvar alterações</button>
+        <p class="dica editor-dica">As alterações entram no ar em 1–2 minutos após salvar.</p>
+
+        <div class="editor-perigo">
+          <button class="botao botao-perigo" id="btn-lixeira">Enviar para a lixeira</button>
+        </div>
+      </aside>
+
+      <section class="editor-previa">
+        <iframe id="previa" title="Pré-visualização do flipbook"></iframe>
+      </section>
+
+    </div>
+  </main>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script type="module" src="assets/js/editor.js?v=__VERSAO__"></script>
+</body>
+</html>

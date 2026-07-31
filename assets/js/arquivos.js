@@ -167,7 +167,12 @@ function desenharArquivos() {
     const acoes = document.createElement('div');
     acoes.className = 'arquivo-acoes';
     if (aba === 'arquivos') {
+      const editar = document.createElement('a');
+      editar.className = 'botao botao-suave';
+      editar.textContent = 'Editar';
+      editar.href = `editor.html?c=${encodeURIComponent(catalogo.arquivo)}`;
       acoes.append(
+        editar,
         botaoAcao('Mover', 'botao-suave', () => abrirMover(catalogo)),
         botaoAcao('Lixeira', 'botao-perigo', () => enviarParaLixeira(catalogo)),
       );
