@@ -16,6 +16,7 @@
   --leitor-fundo: #000000;
   --leitor-topo: #0b0d08;
   --leitor-texto: #ededed;
+  color-scheme: dark;              /* menus/controles nativos escuros */
 }
 
 * { box-sizing: border-box; }
@@ -73,7 +74,7 @@ button { font: inherit; }
   gap: 10px;
 }
 
-/* O ícone da logo desenha a própria moldura arredondada. */
+/* Ícone da logo: fichário isométrico com páginas em leque. */
 .marca-icone {
   flex: none;
   width: 38px;
@@ -93,6 +94,11 @@ button { font: inherit; }
 .marca .ponto { color: var(--realce); }
 .marca-flip { color: var(--realce); }
 .marca-pdf { color: #fff; }
+
+/* "PDF" vazado como na logomarca (com reserva sólida onde não há suporte) */
+@supports (-webkit-text-stroke: 1px #fff) {
+  .marca-pdf { color: transparent; -webkit-text-stroke: 1.2px #fff; }
+}
 
 .barra-acoes {
   margin-left: auto;
@@ -1191,7 +1197,8 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 
 .campo { display: block; margin-bottom: 12px; }
 .campo span { display: block; font-size: 0.86rem; font-weight: 600; margin-bottom: 4px; color: var(--tinta); }
-.campo input {
+.campo input,
+.campo select {
   font: inherit;
   padding: 9px 11px;
   border: 1px solid var(--borda);
@@ -1200,7 +1207,8 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
   background: #0d0d0d;
   color: var(--tinta);
 }
-.campo input:focus { outline: none; border-color: var(--realce); box-shadow: var(--brilho); }
+.campo input:focus,
+.campo select:focus { outline: none; border-color: var(--realce); box-shadow: var(--brilho); }
 .campo input::placeholder { color: #5c6355; }
 
 .cartao-status p { margin: 0 0 8px; }
@@ -2026,3 +2034,20 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
   background: #0d0d0d;
   cursor: pointer;
 }
+
+/* ====== Selects com a cara do tema (sem o visual nativo) ====== */
+.campo select,
+.publicacao-campos select,
+.arquivos-ferramentas select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 34px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%23a3e635' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 8px;
+  cursor: pointer;
+}
+
+.publicacao-campos select:focus,
+.arquivos-ferramentas select:focus { outline: none; border-color: var(--realce); box-shadow: var(--brilho); }
