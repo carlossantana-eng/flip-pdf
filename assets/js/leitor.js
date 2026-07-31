@@ -7,8 +7,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdf.worker.min.mjs', im
 
 const LARGURA_RENDER = Math.min(1440, Math.round(880 * Math.min(window.devicePixelRatio || 1, 2)));
 const LARGURA_LUPA = Math.min(2600, LARGURA_RENDER * 2);
-const ZOOM_MINIMO = 100;
-const ZOOM_MAXIMO = 300;
+// Escala de AMPLIAÇÃO: 0 = visão normal (página inteira na largura);
+// o valor é o quanto se amplia além dela, até +200.
+const ZOOM_MINIMO = 0;
+const ZOOM_MAXIMO = 200;
 const PASSO_ZOOM = 15;
 
 const el = (id) => document.getElementById(id);
@@ -332,8 +334,8 @@ function aplicarNivelLupa(suave = false) {
   zoomLupa = Math.min(Math.max(zoomLupa, ZOOM_MINIMO), ZOOM_MAXIMO);
   const imagem = el('lupa-imagem');
   imagem.classList.toggle('zoom-suave', suave);
-  imagem.style.width = `${zoomLupa}%`;
-  el('lupa-zoom').textContent = `${Math.round(zoomLupa)}%`;
+  imagem.style.width = `${100 + zoomLupa}%`;
+  el('lupa-zoom').textContent = zoomLupa === 0 ? '0' : `+${Math.round(zoomLupa)}`;
   el('lupa-controle').value = String(zoomLupa);
   el('lupa-menos').disabled = zoomLupa <= ZOOM_MINIMO;
   el('lupa-mais').disabled = zoomLupa >= ZOOM_MAXIMO;
