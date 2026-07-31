@@ -491,6 +491,11 @@ async function iniciar() {
 
   document.title = `${entrada.titulo} · ${manifesto.titulo || 'Catálogos'}`;
   el('titulo').textContent = entrada.titulo;
+  if (manifesto.identidade && manifesto.identidade.logo) {
+    const logo = el('leitor-logo');
+    logo.src = manifesto.identidade.logo;
+    logo.hidden = false;
+  }
   if (manifesto.identidade && manifesto.identidade.cor) {
     const m = manifesto.identidade.cor.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
     if (m) {

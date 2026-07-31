@@ -636,6 +636,15 @@ body.leitor {
   min-width: 0;
 }
 
+/* Logomarca do cliente (identidade visual) ao lado do título */
+.leitor-logo {
+  flex: none;
+  height: 34px;
+  max-width: 132px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
 .leitor-acoes { display: flex; align-items: center; gap: 4px; }
 
 .indicador {
