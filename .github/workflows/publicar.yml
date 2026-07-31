@@ -44,6 +44,14 @@ jobs:
             git push
           fi
 
+      # Cada publicação carimba os CSS/JS com o hash do commit, para o
+      # navegador nunca misturar HTML novo com arquivos antigos em cache.
+      - name: Carimbar versão nos arquivos estáticos
+        run: |
+          VERSAO="${GITHUB_SHA::7}"
+          sed -i "s/__VERSAO__/${VERSAO}/g" index.html leitor.html admin.html
+          grep -h "v=${VERSAO}" index.html leitor.html admin.html
+
       - name: Configurar o GitHub Pages
         uses: actions/configure-pages@v5
         with:
