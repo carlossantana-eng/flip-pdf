@@ -370,7 +370,11 @@ function configurarAcoes(entrada) {
   el('btn-anterior').addEventListener('click', () => livro && livro.flipPrev());
   el('btn-proximo').addEventListener('click', () => livro && livro.flipNext());
 
-  el('btn-baixar').href = `catalogos/${encodeURIComponent(entrada.arquivo)}`;
+  if (entrada.permitirDownload === false) {
+    el('btn-baixar').hidden = true;
+  } else {
+    el('btn-baixar').href = `catalogos/${encodeURIComponent(entrada.arquivo)}`;
+  }
 
   el('btn-compartilhar').addEventListener('click', async () => {
     const url = `${location.origin}${location.pathname}${location.search}`;

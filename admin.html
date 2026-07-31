@@ -75,9 +75,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1Z"/></svg>
         Início
       </a>
-      <a href="#envio">
+      <a href="publicar.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.2A5 5 0 0 1 7 7a6 6 0 0 1 11.3 2.2A4.5 4.5 0 0 1 17.5 18H8"/><path d="M12 12v7"/><path d="m8.5 15 3.5-3.5L15.5 15"/></svg>
-        Enviar
+        Publicar
       </a>
       <a href="arquivos.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
@@ -158,20 +158,20 @@
         </div>
 
         <div class="cartoes-acao">
-          <button class="cartao-acao" id="acao-enviar">
+          <a class="cartao-acao" href="publicar.html">
             <span class="icone-acao icone-acao--lima">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.2A5 5 0 0 1 7 7a6 6 0 0 1 11.3 2.2A4.5 4.5 0 0 1 17.5 18H8"/><path d="M12 12v7"/><path d="m8.5 15 3.5-3.5L15.5 15"/></svg>
             </span>
-            <span class="texto-acao"><strong>Enviar arquivo</strong><small>PDF do catálogo</small></span>
+            <span class="texto-acao"><strong>Publicar catálogo</strong><small>com revisão antes de enviar</small></span>
             <span class="mais-acao" aria-hidden="true">+</span>
-          </button>
-          <button class="cartao-acao" id="acao-lote">
+          </a>
+          <a class="cartao-acao" href="publicar.html">
             <span class="icone-acao icone-acao--ciano">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17V9"/><path d="m5 12 3-3 3 3"/><path d="M16 17V9"/><path d="m13 12 3-3 3 3"/><path d="M3 21h18"/></svg>
             </span>
             <span class="texto-acao"><strong>Envio em lote</strong><small>vários PDFs de uma vez</small></span>
             <span class="mais-acao" aria-hidden="true">+</span>
-          </button>
+          </a>
           <a class="cartao-acao" href="#config">
             <span class="icone-acao icone-acao--roxo">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
@@ -187,7 +187,9 @@
         </div>
 
         <section class="cartao-admin" id="envio">
-          <h2>Enviar catálogos (PDF)</h2>
+          <h2>Envio rápido (PDF)</h2>
+          <p class="dica">Publica na hora com título automático. Para revisar título, pasta,
+            capa e download antes, use o <a href="publicar.html">estúdio de publicação</a>.</p>
           <div class="zona-envio" id="zona-envio" tabindex="0" role="button"
                aria-label="Enviar arquivos PDF">
             <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></svg>

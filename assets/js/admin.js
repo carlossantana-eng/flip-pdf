@@ -643,8 +643,6 @@ function configurarEventos() {
   zona.addEventListener('keydown', (evento) => {
     if (evento.key === 'Enter' || evento.key === ' ') { evento.preventDefault(); campoArquivo.click(); }
   });
-  el('acao-enviar').addEventListener('click', () => campoArquivo.click());
-  el('acao-lote').addEventListener('click', () => campoArquivo.click());
   campoArquivo.addEventListener('change', () => {
     if (campoArquivo.files.length > 0) enviarArquivos(campoArquivo.files);
   });

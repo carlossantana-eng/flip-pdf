@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Publicar catálogos</title>
+  <link rel="stylesheet" href="assets/css/estilo.css?v=__VERSAO__">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+</head>
+<body class="admin">
+  <header class="barra-topo">
+    <a class="marca" href="admin.html">
+      <span class="marca-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+      Publicar<span class="ponto">.</span>
+    </a>
+    <div class="barra-acoes">
+      <a class="botao-publicar" href="admin.html">← Voltar ao painel</a>
+    </div>
+  </header>
+
+  <main class="publicar-corpo">
+
+    <section class="cartao-admin" id="sem-chave" hidden>
+      <h2>Conecte-se primeiro</h2>
+      <p>Esta página usa a mesma chave do painel. Conecte-se por lá e volte aqui.</p>
+      <a class="botao" href="admin.html">Abrir o painel</a>
+    </section>
+
+    <!-- Etapa 1: escolher os arquivos -->
+    <section id="etapa-escolha" hidden>
+      <div class="zona-gigante" id="zona-gigante" tabindex="0" role="button" aria-label="Enviar arquivos PDF">
+        <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.2A5 5 0 0 1 7 7a6 6 0 0 1 11.3 2.2A4.5 4.5 0 0 1 17.5 18H8"/><path d="M12 12v7"/><path d="m8.5 15 3.5-3.5L15.5 15"/></svg>
+        <h1>Arraste e solte PDFs aqui</h1>
+        <p class="dica">PDF · até 60 MB por arquivo · um ou vários de uma vez</p>
+        <button class="botao botao-grande" id="btn-selecionar" type="button">Selecionar arquivos do computador</button>
+        <p class="dica dica-rodape">O catálogo só é publicado depois que você revisar título,
+          pasta e descrição na próxima etapa.</p>
+      </div>
+      <input id="campo-arquivo" type="file" accept="application/pdf,.pdf" multiple hidden>
+    </section>
+
+    <!-- Etapa 2: configurar antes de publicar -->
+    <section id="etapa-config" hidden>
+      <h1 class="publicar-titulo">Configurar publicação</h1>
+      <p class="publicar-subtitulo">Revise cada catálogo antes de publicar. A capa é a 1ª página do PDF.</p>
+      <div id="lista-publicacoes" class="lista-publicacoes"></div>
+      <div class="publicar-rodape">
+        <button class="botao botao-suave" id="btn-voltar-escolha">← Escolher outros arquivos</button>
+        <button class="botao botao-grande" id="btn-publicar-agora">✓ Publicar agora</button>
+      </div>
+    </section>
+
+    <!-- Etapa 3: enviando/publicando -->
+    <section id="etapa-envio" class="etapa-central" hidden>
+      <div class="anel" aria-hidden="true">
+        <svg viewBox="0 0 120 120">
+          <circle class="anel-fundo" cx="60" cy="60" r="52"/>
+          <circle class="anel-barra" id="anel-barra" cx="60" cy="60" r="52"/>
+        </svg>
+        <span id="anel-percentual">0%</span>
+      </div>
+      <h1 id="envio-fase">ENVIANDO</h1>
+      <p class="publicar-subtitulo" id="envio-detalhe">Preparando os arquivos…</p>
+      <div class="fichas-arquivos" id="fichas-arquivos"></div>
+      <p class="dica" id="envio-nota" hidden>A publicação continua no servidor — você já pode
+        sair desta página e conferir depois.</p>
+    </section>
+
+    <!-- Etapa 4: concluído -->
+    <section id="etapa-sucesso" class="etapa-central" hidden>
+      <div class="anel anel-completo" aria-hidden="true">
+        <svg viewBox="0 0 120 120">
+          <circle class="anel-fundo" cx="60" cy="60" r="52"/>
+          <circle class="anel-barra anel-cheio" cx="60" cy="60" r="52"/>
+        </svg>
+        <span>✓</span>
+      </div>
+      <h1>Publicado!</h1>
+      <p class="publicar-subtitulo">Seus catálogos já estão na estante.</p>
+      <div class="fichas-arquivos" id="fichas-sucesso"></div>
+      <div class="publicar-rodape publicar-rodape-central">
+        <button class="botao botao-suave" id="btn-enviar-mais">Publicar mais</button>
+        <a class="botao botao-suave" href="arquivos.html">Meus arquivos</a>
+        <a class="botao" href="estante.html" target="_blank" rel="noopener">Ver a estante</a>
+      </div>
+    </section>
+
+    <div class="estado-admin" id="erro-geral" hidden>
+      <h2>Algo deu errado</h2>
+      <p id="erro-geral-texto"></p>
+      <button class="botao" onclick="location.reload()">Recarregar</button>
+    </div>
+
+  </main>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script type="module" src="assets/js/publicar.js?v=__VERSAO__"></script>
+</body>
+</html>

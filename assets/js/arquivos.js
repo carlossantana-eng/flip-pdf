@@ -200,7 +200,7 @@ function desenharArquivos() {
       el('btn-enviar-agora').hidden = true;
     } else {
       el('vazio-titulo').textContent = 'Ainda não há arquivos';
-      el('vazio-texto').textContent = 'Envie o primeiro catálogo pelo painel.';
+      el('vazio-texto').textContent = 'Publique o primeiro catálogo pelo estúdio.';
       el('btn-enviar-agora').hidden = false;
     }
   }
