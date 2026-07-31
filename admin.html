@@ -10,93 +10,157 @@
 </head>
 <body class="admin">
   <header class="barra-topo">
-    <a class="marca" href="./">Gerenciar catálogos</a>
+    <a class="marca" href="./">Painel<span class="ponto">.</span></a>
     <div class="barra-acoes">
       <a class="botao-publicar" href="./">← Ver a estante</a>
       <button class="botao-publicar" id="btn-sair" hidden>Sair</button>
     </div>
   </header>
 
-  <main class="admin-corpo">
+  <div class="admin-leiaute">
 
-    <!-- Passo 1: chave de acesso -->
-    <section class="cartao-admin" id="tela-token" hidden>
-      <h2>Conectar ao repositório</h2>
-      <p>Para enviar e editar catálogos por esta página, cole abaixo uma
-        <strong>chave de acesso do GitHub</strong> (fine-grained token). Ela fica salva
-        <strong>somente neste navegador</strong> — nunca é enviada para outro lugar além do próprio GitHub.</p>
-      <details class="passo-a-passo">
-        <summary>Como criar a chave (passo a passo)</summary>
-        <ol>
-          <li>Abra <a id="link-token" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (entre na sua conta se pedir).</li>
-          <li>Em <em>Token name</em>, escreva algo como <code>estante-catalogos</code>.</li>
-          <li>Em <em>Expiration</em>, escolha a validade (ex.: 90 dias — quando vencer, crie outra e cole aqui de novo).</li>
-          <li>Em <em>Repository access</em>, marque <em>Only select repositories</em> e escolha <strong id="nome-repo-passo">este repositório</strong>.</li>
-          <li>Em <em>Permissions → Repository permissions</em>, defina <strong>Contents: Read and write</strong>. Nada mais é necessário.</li>
-          <li>Clique em <em>Generate token</em> e copie o código que aparece (começa com <code>github_pat_</code>).</li>
-        </ol>
-      </details>
-      <div class="campo-token">
-        <input id="campo-token" type="password" placeholder="Cole aqui a chave (github_pat_…)" autocomplete="off">
-        <button class="botao" id="btn-conectar">Conectar</button>
+    <aside class="admin-menu" aria-label="Seções do painel">
+      <a href="#inicio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1Z"/></svg>
+        Início
+      </a>
+      <a href="#envio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.2A5 5 0 0 1 7 7a6 6 0 0 1 11.3 2.2A4.5 4.5 0 0 1 17.5 18H8"/><path d="M12 12v7"/><path d="m8.5 15 3.5-3.5L15.5 15"/></svg>
+        Enviar
+      </a>
+      <a href="#catalogos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+        Catálogos
+      </a>
+      <a href="#estante-config">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+        Estante
+      </a>
+      <a href="#publicacao">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15v3M11 11v7M15 7v11M19 5v13"/></svg>
+        Publicação
+      </a>
+    </aside>
+
+    <main class="admin-corpo">
+
+      <!-- Passo 1: chave de acesso -->
+      <section class="cartao-admin" id="tela-token" hidden>
+        <h2>Conectar ao repositório</h2>
+        <p>Para enviar e editar catálogos por esta página, cole abaixo uma
+          <strong>chave de acesso do GitHub</strong> (fine-grained token). Ela fica salva
+          <strong>somente neste navegador</strong> — nunca é enviada para outro lugar além do próprio GitHub.</p>
+        <details class="passo-a-passo">
+          <summary>Como criar a chave (passo a passo)</summary>
+          <ol>
+            <li>Abra <a id="link-token" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (entre na sua conta se pedir).</li>
+            <li>Em <em>Token name</em>, escreva algo como <code>estante-catalogos</code>.</li>
+            <li>Em <em>Expiration</em>, escolha a validade (ex.: 90 dias — quando vencer, crie outra e cole aqui de novo).</li>
+            <li>Em <em>Repository access</em>, marque <em>Only select repositories</em> e escolha <strong id="nome-repo-passo">este repositório</strong>.</li>
+            <li>Em <em>Permissions → Repository permissions</em>, defina <strong>Contents: Read and write</strong>. Nada mais é necessário.</li>
+            <li>Clique em <em>Generate token</em> e copie o código que aparece (começa com <code>github_pat_</code>).</li>
+          </ol>
+        </details>
+        <div class="campo-token">
+          <input id="campo-token" type="password" placeholder="Cole aqui a chave (github_pat_…)" autocomplete="off">
+          <button class="botao" id="btn-conectar">Conectar</button>
+        </div>
+        <p class="erro-campo" id="erro-token" hidden></p>
+      </section>
+
+      <!-- Passo 2: painel -->
+      <div id="tela-gestao" hidden>
+
+        <div class="saudacao" id="inicio">
+          <h2 id="saudacao-titulo">Bom dia!</h2>
+          <p><span aria-hidden="true">👋</span> <span id="saudacao-frase">Que seu dia seja cheio de alegria e conquistas!</span></p>
+        </div>
+
+        <div class="cartoes-acao">
+          <button class="cartao-acao" id="acao-enviar">
+            <span class="icone-acao" style="background:#1b74e4">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.2A5 5 0 0 1 7 7a6 6 0 0 1 11.3 2.2A4.5 4.5 0 0 1 17.5 18H8"/><path d="M12 12v7"/><path d="m8.5 15 3.5-3.5L15.5 15"/></svg>
+            </span>
+            <span class="texto-acao"><strong>Enviar arquivo</strong><small>PDF do catálogo</small></span>
+            <span class="mais-acao" aria-hidden="true">+</span>
+          </button>
+          <button class="cartao-acao" id="acao-lote">
+            <span class="icone-acao" style="background:#7a4ae2">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17V9"/><path d="m5 12 3-3 3 3"/><path d="M16 17V9"/><path d="m13 12 3-3 3 3"/><path d="M3 21h18"/></svg>
+            </span>
+            <span class="texto-acao"><strong>Envio em lote</strong><small>vários PDFs de uma vez</small></span>
+            <span class="mais-acao" aria-hidden="true">+</span>
+          </button>
+          <a class="cartao-acao" href="#estante-config">
+            <span class="icone-acao" style="background:#2e9e6b">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </span>
+            <span class="texto-acao"><strong>Editar estante</strong><small>título e descrição</small></span>
+          </a>
+          <a class="cartao-acao" href="./" target="_blank" rel="noopener">
+            <span class="icone-acao" style="background:#c05621">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+            <span class="texto-acao"><strong>Ver estante</strong><small>como o cliente vê</small></span>
+          </a>
+        </div>
+
+        <section class="cartao-admin" id="envio">
+          <h2>Enviar catálogos (PDF)</h2>
+          <div class="zona-envio" id="zona-envio" tabindex="0" role="button"
+               aria-label="Enviar arquivos PDF">
+            <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></svg>
+            <p><strong>Clique para escolher</strong> ou arraste PDFs até aqui (pode ser mais de um)</p>
+            <p class="dica">Os catálogos entram na estante automaticamente em 1–2 minutos.</p>
+          </div>
+          <input id="campo-arquivo" type="file" accept="application/pdf,.pdf" multiple hidden>
+          <div class="envio-progresso" id="envio-progresso" hidden>
+            <div class="girador girador-escuro" aria-hidden="true"></div>
+            <span id="envio-texto">Enviando…</span>
+          </div>
+        </section>
+
+        <section class="cartao-admin" id="catalogos">
+          <h2>Catálogos publicados</h2>
+          <ul class="lista-admin" id="lista-catalogos" aria-live="polite">
+            <li class="lista-vazia" id="lista-carregando">Carregando…</li>
+          </ul>
+        </section>
+
+        <section class="cartao-admin" id="estante-config">
+          <h2>Estante</h2>
+          <label class="campo">
+            <span>Título do site</span>
+            <input id="campo-titulo-estante" type="text" maxlength="80">
+          </label>
+          <label class="campo">
+            <span>Descrição (opcional)</span>
+            <input id="campo-descricao-estante" type="text" maxlength="160">
+          </label>
+          <label class="campo">
+            <span>Nome na saudação do painel (opcional)</span>
+            <input id="campo-nome-painel" type="text" maxlength="60" placeholder="Ex.: WE Consultoria">
+          </label>
+          <button class="botao" id="btn-salvar-estante">Salvar</button>
+        </section>
+
+        <section class="cartao-admin cartao-status" id="publicacao">
+          <h2>Publicação</h2>
+          <p id="status-publicacao">Verificando…</p>
+          <p class="dica">Cada alteração dispara a republicação automática do site.
+            <a id="link-site" href="./" target="_blank" rel="noopener">Abrir a estante</a></p>
+        </section>
+
       </div>
-      <p class="erro-campo" id="erro-token" hidden></p>
-    </section>
 
-    <!-- Passo 2: gestão -->
-    <div id="tela-gestao" hidden>
+      <div class="estado-admin" id="erro-geral" hidden>
+        <h2>Algo deu errado</h2>
+        <p id="erro-geral-texto"></p>
+        <button class="botao" onclick="location.reload()">Recarregar</button>
+      </div>
 
-      <section class="cartao-admin">
-        <h2>Enviar catálogo (PDF)</h2>
-        <div class="zona-envio" id="zona-envio" tabindex="0" role="button"
-             aria-label="Enviar arquivo PDF">
-          <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></svg>
-          <p><strong>Clique para escolher</strong> ou arraste o PDF até aqui</p>
-          <p class="dica">O catálogo entra na estante automaticamente em 1–2 minutos.</p>
-        </div>
-        <input id="campo-arquivo" type="file" accept="application/pdf,.pdf" hidden>
-        <div class="envio-progresso" id="envio-progresso" hidden>
-          <div class="girador girador-escuro" aria-hidden="true"></div>
-          <span id="envio-texto">Enviando…</span>
-        </div>
-      </section>
-
-      <section class="cartao-admin">
-        <h2>Catálogos publicados</h2>
-        <ul class="lista-admin" id="lista-catalogos" aria-live="polite">
-          <li class="lista-vazia" id="lista-carregando">Carregando…</li>
-        </ul>
-      </section>
-
-      <section class="cartao-admin">
-        <h2>Cabeçalho da estante</h2>
-        <label class="campo">
-          <span>Título do site</span>
-          <input id="campo-titulo-estante" type="text" maxlength="80">
-        </label>
-        <label class="campo">
-          <span>Descrição (opcional)</span>
-          <input id="campo-descricao-estante" type="text" maxlength="160">
-        </label>
-        <button class="botao" id="btn-salvar-estante">Salvar cabeçalho</button>
-      </section>
-
-      <section class="cartao-admin cartao-status">
-        <h2>Publicação</h2>
-        <p id="status-publicacao">Verificando…</p>
-        <p class="dica">Cada alteração dispara a republicação automática do site.
-          <a id="link-site" href="./" target="_blank" rel="noopener">Abrir a estante</a></p>
-      </section>
-
-    </div>
-
-    <div class="estado-admin" id="erro-geral" hidden>
-      <h2>Algo deu errado</h2>
-      <p id="erro-geral-texto"></p>
-      <button class="botao" onclick="location.reload()">Recarregar</button>
-    </div>
-
-  </main>
+    </main>
+  </div>
 
   <div class="toast" id="toast" hidden></div>
 

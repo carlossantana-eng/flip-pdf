@@ -12,13 +12,15 @@ próprio repositório, de graça, no GitHub Pages.
 
 ### Pela página de gestão (recomendado)
 
-Abra **`/admin.html`** no site publicado (há um link "Gerenciar" no rodapé
-da estante). Por lá você:
+Abra **`/admin.html`** no site publicado (botão "Publicar" na barra da
+estante). O painel tem saudação, cartões de ação e menu lateral. Por lá você:
 
-- **envia PDFs** (clique ou arraste e solte);
+- **envia PDFs** (clique ou arraste e solte) — inclusive **em lote**:
+  vários arquivos de uma vez, publicados num único commit;
 - **edita título e descrição** de cada catálogo;
 - **exclui** catálogos;
-- edita o **título e a descrição da estante**;
+- edita o **título e a descrição da estante** e o **nome exibido na
+  saudação do painel**;
 - acompanha o **status de publicação**.
 
 Na primeira vez, a página pede uma **chave de acesso do GitHub**

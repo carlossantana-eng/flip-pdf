@@ -478,7 +478,111 @@ body.leitor {
 }
 
 /* ====== Administração ====== */
+.admin-leiaute {
+  max-width: 1020px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+}
+
+.admin-menu {
+  display: none;
+  position: sticky;
+  top: 78px;
+  flex: none;
+  width: 96px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 8px;
+}
+
+/* O menu lateral só aparece conectado e em tela larga. */
+@media (min-width: 920px) {
+  body.conectado .admin-menu { display: flex; }
+}
+
+.admin-menu a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--tinta-suave);
+  text-decoration: none;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 10px 4px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.admin-menu a:hover { background: #eae7de; color: var(--tinta); }
+.admin-menu svg { width: 21px; height: 21px; }
+
+section[id], div[id="inicio"] { scroll-margin-top: 78px; }
+
+.saudacao { padding: 4px 2px 0; }
+.saudacao h2 {
+  margin: 0 0 6px;
+  font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.saudacao p { margin: 0; color: var(--tinta-suave); }
+
+.cartoes-acao {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+  gap: 12px;
+}
+
+.cartao-acao {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.cartao-acao:hover {
+  box-shadow: var(--sombra);
+  transform: translateY(-2px);
+}
+
+.icone-acao {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex: none;
+}
+
+.icone-acao svg { width: 22px; height: 22px; }
+
+.texto-acao { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.texto-acao strong { font-size: 0.94rem; }
+.texto-acao small { font-size: 0.78rem; color: var(--tinta-suave); }
+
+.mais-acao {
+  margin-left: auto;
+  color: #b6b0a2;
+  font-size: 1.35rem;
+  font-weight: 300;
+}
+
 .admin-corpo {
+  flex: 1;
+  min-width: 0;
   max-width: 760px;
   margin: 0 auto;
   padding: 24px 20px 56px;

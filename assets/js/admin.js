@@ -159,6 +159,7 @@ function mostrarErroGeral(texto) {
 function mostrarTelaToken(mensagemErro = '') {
   el('tela-gestao').hidden = true;
   el('btn-sair').hidden = true;
+  document.body.classList.remove('conectado');
   el('tela-token').hidden = false;
   el('nome-repo-passo').textContent = `${dono}/${repo}`;
   const erro = el('erro-token');
@@ -166,14 +167,35 @@ function mostrarTelaToken(mensagemErro = '') {
   erro.hidden = !mensagemErro;
 }
 
+function saudar() {
+  const agora = new Date();
+  const hora = agora.getHours();
+  const periodo = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+  const nome = (manifesto.painelNome || '').trim();
+  el('saudacao-titulo').textContent = nome ? `${periodo}, ${nome}!` : `${periodo}!`;
+  const frases = [
+    'Que seu dia seja leve e produtivo!',
+    'Semana começando — bons negócios!',
+    'Que seu dia seja cheio de alegria e conquistas!',
+    'Seus catálogos estão a um clique dos clientes.',
+    'Um bom catálogo vende sozinho — capriche!',
+    'Quase fim de semana, bora fechar bem!',
+    'Bom descanso — a estante trabalha por você.',
+  ];
+  el('saudacao-frase').textContent = frases[agora.getDay()];
+}
+
 async function mostrarTelaGestao() {
   el('tela-token').hidden = true;
   el('tela-gestao').hidden = false;
   el('btn-sair').hidden = false;
+  document.body.classList.add('conectado');
   await carregarManifesto();
+  saudar();
   desenharLista();
   el('campo-titulo-estante').value = manifesto.titulo || '';
   el('campo-descricao-estante').value = manifesto.descricao || '';
+  el('campo-nome-painel').value = manifesto.painelNome || '';
   atualizarStatusPublicacao();
 }
 
@@ -298,54 +320,76 @@ async function excluirCatalogo(catalogo, botao) {
   }
 }
 
-/* ====== Envio de PDF ====== */
+/* ====== Envio de PDFs (um ou vários, num único commit) ====== */
 
-async function enviarArquivo(arquivo) {
-  if (!/\.pdf$/i.test(arquivo.name)) {
-    avisar('Envie um arquivo PDF.');
-    return;
-  }
+async function enviarArquivos(listaDeArquivos) {
   const LIMITE = 60 * 1024 * 1024;
-  if (arquivo.size > LIMITE) {
-    avisar('Arquivo acima de 60 MB — comprima o PDF antes de enviar.', true);
+  const pdfs = [...listaDeArquivos].filter((a) => /\.pdf$/i.test(a.name));
+  if (pdfs.length === 0) {
+    avisar('Envie arquivos PDF.');
+    return;
+  }
+  const grandes = pdfs.filter((a) => a.size > LIMITE);
+  if (grandes.length > 0) {
+    avisar(`Acima de 60 MB (comprima antes): ${grandes.map((a) => a.name).join(', ')}`, true);
     return;
   }
 
-  const nome = nomeSeguro(arquivo.name);
   await carregarManifesto();
-  const existente = manifesto.catalogos.find((c) => c.arquivo === nome);
-  if (existente) {
-    const substituir = window.confirm(
-      `Já existe um catálogo com o arquivo ${nome} ("${existente.titulo}").\n\nSubstituir pelo novo PDF?`);
-    if (!substituir) return;
+  const aceitos = [];
+  const nomesNoLote = new Set();
+  for (const arquivo of pdfs) {
+    const nome = nomeSeguro(arquivo.name);
+    if (nomesNoLote.has(nome)) {
+      avisar(`Dois arquivos do lote têm o mesmo nome (${nome}) — enviado só o primeiro.`, true);
+      continue;
+    }
+    const existente = manifesto.catalogos.find((c) => c.arquivo === nome);
+    if (existente) {
+      const substituir = window.confirm(
+        `Já existe um catálogo com o arquivo ${nome} ("${existente.titulo}").\n\nSubstituir pelo novo PDF?`);
+      if (!substituir) continue;
+    }
+    nomesNoLote.add(nome);
+    aceitos.push({ arquivo, nome, existente: Boolean(existente) });
   }
+  if (aceitos.length === 0) return;
 
   const progresso = el('envio-progresso');
   const textoProgresso = el('envio-texto');
   progresso.hidden = false;
   el('zona-envio').classList.add('desativada');
   try {
-    textoProgresso.textContent = `Preparando ${arquivo.name}…`;
-    const conteudo = await arquivoParaBase64(arquivo);
-
-    if (!existente) {
-      manifesto.catalogos.push({
-        arquivo: nome,
-        titulo: tituloDoNome(arquivo.name),
-        adicionadoEm: new Date().toISOString().slice(0, 10),
-      });
+    const mudancas = [];
+    for (let i = 0; i < aceitos.length; i += 1) {
+      const { arquivo, nome, existente } = aceitos[i];
+      textoProgresso.textContent = aceitos.length === 1
+        ? `Preparando ${nome}…`
+        : `Preparando ${i + 1} de ${aceitos.length} (${nome})…`;
+      mudancas.push({ caminho: `catalogos/${nome}`, conteudoBase64: await arquivoParaBase64(arquivo) });
+      if (!existente) {
+        manifesto.catalogos.push({
+          arquivo: nome,
+          titulo: tituloDoNome(arquivo.name),
+          adicionadoEm: new Date().toISOString().slice(0, 10),
+        });
+      }
     }
+    mudancas.push({ caminho: 'catalogos.json', conteudoBase64: manifestoBase64() });
 
-    textoProgresso.textContent = `Enviando ${nome}… (arquivos grandes podem demorar)`;
+    textoProgresso.textContent = aceitos.length === 1
+      ? `Enviando ${aceitos[0].nome}… (arquivos grandes podem demorar)`
+      : `Enviando ${aceitos.length} catálogos… (arquivos grandes podem demorar)`;
     await commitar(
-      [
-        { caminho: `catalogos/${nome}`, conteudoBase64: conteudo },
-        { caminho: 'catalogos.json', conteudoBase64: manifestoBase64() },
-      ],
-      existente ? `Substitui o PDF de ${nome}` : `Adiciona o catálogo ${nome}`,
+      mudancas,
+      aceitos.length === 1
+        ? (aceitos[0].existente ? `Substitui o PDF de ${aceitos[0].nome}` : `Adiciona o catálogo ${aceitos[0].nome}`)
+        : `Adiciona ${aceitos.length} catálogos em lote`,
     );
     desenharLista();
-    avisar('Catálogo enviado! Ele aparece na estante em 1–2 minutos.', true);
+    avisar(aceitos.length === 1
+      ? 'Catálogo enviado! Ele aparece na estante em 1–2 minutos.'
+      : `${aceitos.length} catálogos enviados! Eles aparecem na estante em 1–2 minutos.`, true);
     atualizarStatusPublicacao();
   } catch (erro) {
     console.error(erro);
@@ -370,11 +414,15 @@ async function salvarCabecalho() {
     const descricao = el('campo-descricao-estante').value.trim();
     if (descricao) manifesto.descricao = descricao;
     else delete manifesto.descricao;
+    const nomePainel = el('campo-nome-painel').value.trim();
+    if (nomePainel) manifesto.painelNome = nomePainel;
+    else delete manifesto.painelNome;
     await commitar(
       [{ caminho: 'catalogos.json', conteudoBase64: manifestoBase64() }],
       'Atualiza o cabeçalho da estante',
     );
-    avisar('Cabeçalho salvo! O site republica em 1–2 minutos.');
+    saudar();
+    avisar('Salvo! O site republica em 1–2 minutos.');
     atualizarStatusPublicacao();
   } catch (erro) {
     console.error(erro);
@@ -469,8 +517,10 @@ function configurarEventos() {
   zona.addEventListener('keydown', (evento) => {
     if (evento.key === 'Enter' || evento.key === ' ') { evento.preventDefault(); campoArquivo.click(); }
   });
+  el('acao-enviar').addEventListener('click', () => campoArquivo.click());
+  el('acao-lote').addEventListener('click', () => campoArquivo.click());
   campoArquivo.addEventListener('change', () => {
-    if (campoArquivo.files[0]) enviarArquivo(campoArquivo.files[0]);
+    if (campoArquivo.files.length > 0) enviarArquivos(campoArquivo.files);
   });
   zona.addEventListener('dragover', (evento) => {
     evento.preventDefault();
@@ -480,7 +530,7 @@ function configurarEventos() {
   zona.addEventListener('drop', (evento) => {
     evento.preventDefault();
     zona.classList.remove('arrastando');
-    if (evento.dataTransfer.files[0]) enviarArquivo(evento.dataTransfer.files[0]);
+    if (evento.dataTransfer.files.length > 0) enviarArquivos(evento.dataTransfer.files);
   });
 }
 
