@@ -37,19 +37,25 @@ button { font: inherit; }
 
 ::selection { background: var(--realce); color: #000; }
 
-/* ====== Barra superior ====== */
+/* ====== Barra superior — "ilha" flutuante ====== */
 .barra-topo {
-  background: #000;
   color: #fff;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 0 20px;
-  min-height: 62px;
+  gap: 12px;
+  padding: 8px 10px 8px 12px;
+  min-height: 60px;
   position: sticky;
-  top: 0;
+  top: 12px;
   z-index: 30;
-  border-bottom: 1px solid var(--borda);
+  width: min(1080px, calc(100% - 24px));
+  margin: 12px auto 4px;
+  background: rgba(8, 10, 5, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(163, 230, 53, 0.22);
+  border-radius: 999px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.55), inset 0 0 30px rgba(163, 230, 53, 0.05);
 }
 
 .marca {
@@ -133,7 +139,7 @@ button { font: inherit; }
   text-decoration: none;
   background: transparent;
   border: 1px solid rgba(163, 230, 53, 0.55);
-  border-radius: 10px;
+  border-radius: 999px;
   padding: 9px 16px;
   font: inherit;
   font-weight: 600;
@@ -141,6 +147,8 @@ button { font: inherit; }
   cursor: pointer;
   white-space: nowrap;
 }
+
+.barra-topo .botao { border-radius: 999px; }
 
 .botao-publicar:hover { background: var(--realce-fraco); box-shadow: var(--brilho); }
 .botao-publicar svg { width: 18px; height: 18px; }
@@ -198,23 +206,32 @@ button { font: inherit; }
 }
 
 @media (max-width: 480px) {
-  .barra-topo { padding: 0 12px; gap: 8px; }
+  .barra-topo { padding: 6px 8px; gap: 8px; top: 8px; margin-top: 8px; width: calc(100% - 16px); }
   .botao-publicar { padding: 8px 12px; }
-  .hero { padding: 46px 16px 54px; }
+  .hero { padding: 40px 16px 54px; }
 }
 
+
 /* ====== Plataforma (home, autenticação, páginas) ====== */
-.barra-links { display: flex; gap: 4px; }
+.barra-links {
+  display: flex;
+  gap: 2px;
+  margin-left: 6px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+}
 .barra-links a {
   color: var(--tinta-suave);
   text-decoration: none;
-  font-size: 0.93rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  padding: 9px 10px;
-  border-radius: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
 }
-.barra-links a:hover { color: #fff; background: #111; }
-.barra-links a[aria-current="page"] { color: var(--realce); }
+.barra-links a:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+.barra-links a[aria-current="page"] { color: #000; background: var(--realce); }
 
 @media (max-width: 720px) {
   .barra-links { display: none; }
@@ -885,7 +902,7 @@ body.leitor {
 .admin-menu {
   display: none;
   position: sticky;
-  top: 78px;
+  top: 96px;
   flex: none;
   width: 96px;
   flex-direction: column;
@@ -915,7 +932,7 @@ body.leitor {
 .admin-menu a:hover { background: var(--realce-fraco); color: var(--realce); }
 .admin-menu svg { width: 21px; height: 21px; }
 
-section[id], div[id="inicio"] { scroll-margin-top: 78px; }
+section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 
 .saudacao { padding: 4px 2px 0; }
 .saudacao h2 {
