@@ -1,28 +1,22 @@
-// Página de gestão da estante: envia, edita e remove catálogos direto do
-// navegador, gravando no repositório pela API do GitHub. A chave de acesso
-// (fine-grained token, só Contents: read/write deste repositório) fica
-// exclusivamente no localStorage deste navegador.
+// Página de gestão da estante (painel): usa o núcleo compartilhado para
+// falar com a API do GitHub. A chave de acesso fica só neste navegador.
+import {
+  dono, repo, RAMO, gh, commitar, buscarManifesto, manifestoParaBase64,
+  arquivoParaBase64, nomeSeguro, tituloDoNome, definirToken, temToken,
+  ultimoCommit, aplicarCorDeDestaque,
+} from './nucleo-admin.js';
 
-const CHAVE_TOKEN = 'estante-chave-github';
-const RAMO = 'main';
-
-// Detecta dono/repositório pela URL do GitHub Pages
-// (https://<dono>.github.io/<repo>/...); em ambiente local usa o padrão.
-function detectarRepositorio() {
-  const m = location.hostname.match(/^([^.]+)\.github\.io$/);
-  if (m) {
-    const partes = location.pathname.split('/').filter(Boolean);
-    if (partes.length > 0) return { dono: m[1], repo: partes[0] };
-  }
-  return { dono: 'carlossantana-eng', repo: 'flip-pdf' };
-}
-
-const { dono, repo } = detectarRepositorio();
 const el = (id) => document.getElementById(id);
 
-let token = localStorage.getItem(CHAVE_TOKEN) || '';
 let manifesto = null;
-let shaUltimoCommit = null;
+
+async function carregarManifesto() {
+  manifesto = await buscarManifesto();
+}
+
+function manifestoBase64() {
+  return manifestoParaBase64(manifesto);
+}
 
 /* ====== Utilidades ====== */
 
@@ -33,127 +27,6 @@ function avisar(texto, demorado = false) {
   toast.hidden = false;
   clearTimeout(temporizadorToast);
   temporizadorToast = setTimeout(() => { toast.hidden = true; }, demorado ? 6000 : 3000);
-}
-
-function deBase64(b64) {
-  const binario = atob(b64.replace(/\s/g, ''));
-  const bytes = Uint8Array.from(binario, (c) => c.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
-}
-
-function textoParaBase64(texto) {
-  const bytes = new TextEncoder().encode(texto);
-  let binario = '';
-  for (let i = 0; i < bytes.length; i += 0x8000) {
-    binario += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-  }
-  return btoa(binario);
-}
-
-function arquivoParaBase64(arquivo) {
-  return new Promise((resolver, rejeitar) => {
-    const leitor = new FileReader();
-    leitor.onload = () => resolver(String(leitor.result).split(',')[1]);
-    leitor.onerror = () => rejeitar(new Error('Falha ao ler o arquivo.'));
-    leitor.readAsDataURL(arquivo);
-  });
-}
-
-function nomeSeguro(nome) {
-  const base = nome.replace(/\.pdf$/i, '')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
-  return `${base || 'catalogo'}.pdf`;
-}
-
-function tituloDoNome(nome) {
-  const titulo = nome.replace(/\.pdf$/i, '').replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
-  return titulo.charAt(0).toUpperCase() + titulo.slice(1);
-}
-
-/* ====== API do GitHub ====== */
-
-async function gh(caminho, { metodo = 'GET', corpo = null } = {}) {
-  // Sem barra no fim quando caminho é vazio: a API rejeita ".../repo/" e a
-  // resposta de erro vem sem CORS, virando "Failed to fetch" no navegador.
-  const url = `https://api.github.com/repos/${dono}/${repo}${caminho ? `/${caminho}` : ''}`;
-  let resposta;
-  try {
-    resposta = await fetch(url, {
-      method: metodo,
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${token}`,
-        'X-GitHub-Api-Version': '2022-11-28',
-        ...(corpo ? { 'Content-Type': 'application/json' } : {}),
-      },
-      body: corpo ? JSON.stringify(corpo) : undefined,
-    });
-  } catch {
-    throw new Error('sem conexão com api.github.com — verifique a internet, '
-      + 'bloqueadores de anúncio/antivírus ou a rede da empresa.');
-  }
-  if (!resposta.ok) {
-    let detalhe = '';
-    try { detalhe = (await resposta.json()).message || ''; } catch { /* sem corpo */ }
-    const erro = new Error(`${resposta.status} ${detalhe}`.trim());
-    erro.status = resposta.status;
-    throw erro;
-  }
-  return resposta.status === 204 ? null : resposta.json();
-}
-
-// Grava um conjunto de mudanças como UM único commit na main.
-// mudancas: [{ caminho, conteudoBase64 }] — conteudoBase64 null remove o arquivo.
-async function commitar(mudancas, mensagem) {
-  let ultimoErro = null;
-  for (let tentativa = 0; tentativa < 3; tentativa += 1) {
-    try {
-      const ref = await gh(`git/ref/heads/${RAMO}`);
-      const shaBase = ref.object.sha;
-      const commitBase = await gh(`git/commits/${shaBase}`);
-      const itens = [];
-      for (const mudanca of mudancas) {
-        if (mudanca.conteudoBase64 != null) {
-          const blob = await gh('git/blobs', {
-            metodo: 'POST',
-            corpo: { content: mudanca.conteudoBase64, encoding: 'base64' },
-          });
-          itens.push({ path: mudanca.caminho, mode: '100644', type: 'blob', sha: blob.sha });
-        } else {
-          itens.push({ path: mudanca.caminho, mode: '100644', type: 'blob', sha: null });
-        }
-      }
-      const arvore = await gh('git/trees', {
-        metodo: 'POST',
-        corpo: { base_tree: commitBase.tree.sha, tree: itens },
-      });
-      const commit = await gh('git/commits', {
-        metodo: 'POST',
-        corpo: { message: mensagem, tree: arvore.sha, parents: [shaBase] },
-      });
-      await gh(`git/refs/heads/${RAMO}`, { metodo: 'PATCH', corpo: { sha: commit.sha } });
-      shaUltimoCommit = commit.sha;
-      return commit.sha;
-    } catch (erro) {
-      ultimoErro = erro;
-      // 409/422: a main andou (ex.: commit do robô) — tenta de novo do zero.
-      if (erro.status !== 409 && erro.status !== 422) throw erro;
-    }
-  }
-  throw ultimoErro;
-}
-
-async function carregarManifesto() {
-  const resposta = await gh(`contents/catalogos.json?ref=${RAMO}`);
-  manifesto = JSON.parse(deBase64(resposta.content));
-  manifesto.catalogos = manifesto.catalogos || [];
-}
-
-function manifestoBase64() {
-  return textoParaBase64(`${JSON.stringify(manifesto, null, 2)}\n`);
 }
 
 /* ====== Telas ====== */
@@ -198,18 +71,6 @@ function saudar() {
     'Bom descanso — a estante trabalha por você.',
   ];
   el('saudacao-frase').textContent = frases[agora.getDay()];
-}
-
-// Aplica a cor de destaque da identidade também no painel.
-function aplicarCorDeDestaque(cor) {
-  const m = (cor || '').match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-  if (!m) return;
-  const [r, g, b] = [m[1], m[2], m[3]].map((h) => parseInt(h, 16));
-  const raiz = document.documentElement.style;
-  raiz.setProperty('--realce', cor);
-  raiz.setProperty('--cta', cor);
-  raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
-  raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
 }
 
 function iniciaisDoNome(nome) {
@@ -272,11 +133,12 @@ async function mostrarTelaGestao() {
 function desenharLista() {
   const lista = el('lista-catalogos');
   lista.innerHTML = '';
-  if (manifesto.catalogos.length === 0) {
+  const ativos = manifesto.catalogos.filter((c) => !c.lixeira);
+  if (ativos.length === 0) {
     lista.innerHTML = '<li class="lista-vazia">Nenhum catálogo ainda — envie o primeiro PDF acima.</li>';
     return;
   }
-  const ordenados = [...manifesto.catalogos].sort((a, b) =>
+  const ordenados = ativos.sort((a, b) =>
     (b.adicionadoEm || '').localeCompare(a.adicionadoEm || '') ||
     a.titulo.localeCompare(b.titulo, 'pt-BR'));
 
@@ -435,6 +297,11 @@ async function enviarArquivos(listaDeArquivos) {
         ? `Preparando ${nome}…`
         : `Preparando ${i + 1} de ${aceitos.length} (${nome})…`;
       mudancas.push({ caminho: `catalogos/${nome}`, conteudoBase64: await arquivoParaBase64(arquivo) });
+      if (existente) {
+        // Substituir um arquivo que estava na lixeira o traz de volta.
+        const entrada = manifesto.catalogos.find((c) => c.arquivo === nome);
+        if (entrada) { delete entrada.lixeira; delete entrada.lixeiraEm; }
+      }
       if (!existente) {
         manifesto.catalogos.push({
           arquivo: nome,
@@ -612,7 +479,7 @@ async function atualizarStatusPublicacao() {
       alvo.textContent = '⏳ Publicando as alterações…';
       temporizadorStatus = setTimeout(atualizarStatusPublicacao, 10000);
     } else if (run.conclusion === 'success') {
-      const pendente = shaUltimoCommit && run.head_sha !== shaUltimoCommit;
+      const pendente = ultimoCommit() && run.head_sha !== ultimoCommit();
       if (pendente) {
         alvo.textContent = '⏳ Alteração enviada — aguardando a publicação começar…';
         temporizadorStatus = setTimeout(atualizarStatusPublicacao, 8000);
@@ -630,8 +497,8 @@ async function atualizarStatusPublicacao() {
 /* ====== Conexão ====== */
 
 async function conectar(novaChave) {
-  token = novaChave.trim();
-  if (!token) { mostrarTelaToken('Cole a chave antes de conectar.'); return; }
+  definirToken(novaChave);
+  if (!temToken()) { mostrarTelaToken('Cole a chave antes de conectar.'); return; }
   const botao = el('btn-conectar');
   botao.disabled = true;
   botao.textContent = 'Verificando…';
@@ -640,12 +507,11 @@ async function conectar(novaChave) {
     if (!repositorio.permissions || !repositorio.permissions.push) {
       throw new Error('A chave não tem permissão de escrita (Contents: Read and write) neste repositório.');
     }
-    localStorage.setItem(CHAVE_TOKEN, token);
     await mostrarTelaGestao();
     avisar('Conectado!');
   } catch (erro) {
     console.error(erro);
-    token = '';
+    definirToken('');
     const texto = erro.status === 401
       ? 'Chave inválida ou expirada. Confira se copiou o código completo.'
       : erro.status === 404
@@ -659,8 +525,7 @@ async function conectar(novaChave) {
 }
 
 function sair() {
-  localStorage.removeItem(CHAVE_TOKEN);
-  token = '';
+  definirToken('');
   el('campo-token').value = '';
   fecharMenuConta();
   mostrarTelaToken();
@@ -726,7 +591,7 @@ function configurarEventos() {
 
 async function iniciar() {
   configurarEventos();
-  if (!token) {
+  if (!temToken()) {
     mostrarTelaToken();
     return;
   }
@@ -735,8 +600,7 @@ async function iniciar() {
   } catch (erro) {
     console.error(erro);
     if (erro.status === 401) {
-      localStorage.removeItem(CHAVE_TOKEN);
-      token = '';
+      definirToken('');
       mostrarTelaToken('A chave salva expirou ou foi revogada. Crie uma nova e cole abaixo.');
     } else {
       mostrarErroGeral(`Não foi possível carregar os dados: ${erro.message}`);

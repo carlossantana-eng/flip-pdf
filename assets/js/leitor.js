@@ -448,7 +448,7 @@ async function iniciar() {
     return;
   }
 
-  const entrada = (manifesto.catalogos || []).find((c) => c.arquivo === arquivo);
+  const entrada = (manifesto.catalogos || []).find((c) => c.arquivo === arquivo && !c.lixeira);
   if (!entrada) {
     mostrarErro('Catálogo não encontrado', 'Ele pode ter sido removido ou o link está incorreto.');
     return;

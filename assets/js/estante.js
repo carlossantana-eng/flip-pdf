@@ -174,7 +174,7 @@ async function iniciar() {
   document.getElementById('rodape-texto').textContent =
     `${document.title} · atualizado em ${new Date().toLocaleDateString('pt-BR')}`;
 
-  const catalogos = [...(manifesto.catalogos || [])].sort((a, b) =>
+  const catalogos = (manifesto.catalogos || []).filter((c) => !c.lixeira).sort((a, b) =>
     (b.adicionadoEm || '').localeCompare(a.adicionadoEm || '') ||
     a.titulo.localeCompare(b.titulo, 'pt-BR'));
 

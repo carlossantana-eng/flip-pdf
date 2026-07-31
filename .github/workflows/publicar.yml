@@ -49,8 +49,8 @@ jobs:
       - name: Carimbar versão nos arquivos estáticos
         run: |
           VERSAO="${GITHUB_SHA::7}"
-          sed -i "s/__VERSAO__/${VERSAO}/g" index.html leitor.html admin.html
-          grep -h "v=${VERSAO}" index.html leitor.html admin.html
+          sed -i "s/__VERSAO__/${VERSAO}/g" index.html leitor.html admin.html arquivos.html
+          grep -h "v=${VERSAO}" index.html leitor.html admin.html arquivos.html
 
       - name: Configurar o GitHub Pages
         uses: actions/configure-pages@v5

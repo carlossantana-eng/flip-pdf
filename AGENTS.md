@@ -29,9 +29,14 @@ arquivo define as regras de trabalho.
    próprio navegador (localStorage) — o token nunca aparece em código,
    commit ou log; nunca peça o valor dele, apenas confirmação de que
    foi criado com escopo mínimo (Contents: read/write deste repo).
-8. **admin.html grava na main via API do GitHub** (Git Data API, um
-   commit por ação). O `gerar-manifesto.mjs` preserva as entradas que
-   a página cria; mudanças nesse contrato exigem atualizar os dois.
+8. **admin.html e arquivos.html gravam na main via API do GitHub**
+   (Git Data API, um commit por ação), compartilhando o módulo
+   `assets/js/nucleo-admin.js`. O `gerar-manifesto.mjs` preserva TODOS
+   os campos extras das entradas (pasta, lixeira, descrição etc.) —
+   mudanças nesse contrato exigem atualizar script e páginas juntos.
+9. **Lixeira**: catálogo com `lixeira: true` no manifesto fica oculto
+   da estante e do leitor, mas o PDF permanece no repositório até a
+   exclusão definitiva pela página de arquivos.
 
 ## Testes manuais mínimos antes de entregar
 

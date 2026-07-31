@@ -68,14 +68,17 @@ const pdfs = existsSync(pastaCatalogos)
 
 const catalogos = pdfs.map((arquivo) => {
   const anterior = existentes.get(arquivo);
+  // Preserva todos os campos já existentes (pasta, lixeira, descrição etc.);
+  // só completa o que falta e recalcula a capa.
   const entrada = {
+    ...(anterior || {}),
     arquivo,
     titulo: anterior?.titulo || tituloDoArquivo(arquivo),
     adicionadoEm: anterior?.adicionadoEm || dataDeAdicao(arquivo),
   };
-  if (anterior?.descricao) entrada.descricao = anterior.descricao;
   const capa = capaDoArquivo(arquivo);
   if (capa) entrada.capa = capa;
+  else delete entrada.capa;
   return entrada;
 });
 

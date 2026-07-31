@@ -23,6 +23,17 @@ estante). O painel tem saudação, cartões de ação e menu lateral. Por lá vo
   saudação do painel**;
 - acompanha o **status de publicação**.
 
+Em **`/arquivos.html`** ("Meus Arquivos", acessível pelo menu do painel)
+você organiza as publicações como no FlipHTML5:
+
+- **pastas** para agrupar catálogos (criar, renomear, excluir — os
+  arquivos nunca são apagados junto);
+- **busca** por nome e **ordenação** (recentes ou A–Z);
+- **lixeira**: excluir manda o catálogo para a lixeira (ele some da
+  estante mas continua no repositório); de lá dá para **restaurar** ou
+  **excluir definitivamente**. Pastas e lixeira ficam registradas no
+  `catalogos.json` (campos `pasta` e `lixeira`).
+
 Na primeira vez, a página pede uma **chave de acesso do GitHub**
 (fine-grained token). O passo a passo aparece na própria página; em resumo:
 
