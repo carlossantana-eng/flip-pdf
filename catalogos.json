@@ -11,7 +11,9 @@
     {
       "arquivo": "we-connect-identidade-visual.pdf",
       "titulo": "WE Connect identidade visual",
-      "adicionadoEm": "2026-07-31"
+      "adicionadoEm": "2026-07-31",
+      "lixeira": true,
+      "lixeiraEm": "2026-07-31"
     }
   ]
 }
