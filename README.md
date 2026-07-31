@@ -10,16 +10,43 @@ próprio repositório, de graça, no GitHub Pages.
 
 ## Como adicionar um catálogo
 
+### Pela página de gestão (recomendado)
+
+Abra **`/admin.html`** no site publicado (há um link "Gerenciar" no rodapé
+da estante). Por lá você:
+
+- **envia PDFs** (clique ou arraste e solte);
+- **edita título e descrição** de cada catálogo;
+- **exclui** catálogos;
+- edita o **título e a descrição da estante**;
+- acompanha o **status de publicação**.
+
+Na primeira vez, a página pede uma **chave de acesso do GitHub**
+(fine-grained token). O passo a passo aparece na própria página; em resumo:
+
+1. Crie a chave em <https://github.com/settings/personal-access-tokens/new>.
+2. Em *Repository access*, selecione **apenas este repositório**.
+3. Em *Permissions → Contents*, escolha **Read and write** (nada mais).
+4. Copie o código (`github_pat_…`) e cole na página.
+
+A chave fica salva **somente no navegador em que você colou** (localStorage)
+e conversa apenas com a API do GitHub. Quando expirar, crie outra e cole de
+novo. Para revogar: <https://github.com/settings/personal-access-tokens>
+(rotina de rotação: revogar a antiga → criar nova → colar na página).
+
+### Pelo GitHub (alternativa)
+
 1. Abra a pasta [`catalogos/`](catalogos/) aqui no GitHub.
 2. Clique em **Add file → Upload files** e envie o PDF.
 3. Faça o commit na branch `main`.
 
-Pronto. O GitHub Actions atualiza o `catalogos.json` e republica o site
-sozinho em 1–2 minutos. O título do catálogo é derivado do nome do arquivo
+O GitHub Actions atualiza o `catalogos.json` e republica o site sozinho em
+1–2 minutos. O título do catálogo é derivado do nome do arquivo
 (`tabela-precos-2026.pdf` → "Tabela precos 2026").
 
 > Dica: use nomes de arquivo sem acentos e sem espaços
-> (ex.: `catalogo-lupulos-2026.pdf`).
+> (ex.: `catalogo-lupulos-2026.pdf`). A página de gestão já normaliza o
+> nome automaticamente.
 
 ### Ajustar título ou descrição
 
@@ -85,6 +112,7 @@ catálogo, ex.: `https://<seu-usuario>.github.io/flip-pdf/leitor.html?c=catalogo
 | `catalogos.json` | Manifesto da estante (gerado/atualizado pelo CI) |
 | `index.html` + `assets/js/estante.js` | A estante (grade de capas) |
 | `leitor.html` + `assets/js/leitor.js` | O leitor flipbook |
+| `admin.html` + `assets/js/admin.js` | Página de gestão (upload/edição pelo navegador, via API do GitHub) |
 | `assets/vendor/` | PDF.js e StPageFlip hospedados localmente (sem CDN) |
 | `scripts/gerar-manifesto.mjs` | Sincroniza o manifesto com a pasta `catalogos/` (Node, sem dependências) |
 | `.github/workflows/publicar.yml` | Atualiza o manifesto e publica no Pages a cada push na `main` |

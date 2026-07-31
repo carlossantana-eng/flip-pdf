@@ -1,0 +1,507 @@
+// Página de gestão da estante: envia, edita e remove catálogos direto do
+// navegador, gravando no repositório pela API do GitHub. A chave de acesso
+// (fine-grained token, só Contents: read/write deste repositório) fica
+// exclusivamente no localStorage deste navegador.
+
+const CHAVE_TOKEN = 'estante-chave-github';
+const RAMO = 'main';
+
+// Detecta dono/repositório pela URL do GitHub Pages
+// (https://<dono>.github.io/<repo>/...); em ambiente local usa o padrão.
+function detectarRepositorio() {
+  const m = location.hostname.match(/^([^.]+)\.github\.io$/);
+  if (m) {
+    const partes = location.pathname.split('/').filter(Boolean);
+    if (partes.length > 0) return { dono: m[1], repo: partes[0] };
+  }
+  return { dono: 'carlossantana-eng', repo: 'flip-pdf' };
+}
+
+const { dono, repo } = detectarRepositorio();
+const el = (id) => document.getElementById(id);
+
+let token = localStorage.getItem(CHAVE_TOKEN) || '';
+let manifesto = null;
+let shaUltimoCommit = null;
+
+/* ====== Utilidades ====== */
+
+let temporizadorToast = null;
+function avisar(texto, demorado = false) {
+  const toast = el('toast');
+  toast.textContent = texto;
+  toast.hidden = false;
+  clearTimeout(temporizadorToast);
+  temporizadorToast = setTimeout(() => { toast.hidden = true; }, demorado ? 6000 : 3000);
+}
+
+function deBase64(b64) {
+  const binario = atob(b64.replace(/\s/g, ''));
+  const bytes = Uint8Array.from(binario, (c) => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+function textoParaBase64(texto) {
+  const bytes = new TextEncoder().encode(texto);
+  let binario = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binario += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binario);
+}
+
+function arquivoParaBase64(arquivo) {
+  return new Promise((resolver, rejeitar) => {
+    const leitor = new FileReader();
+    leitor.onload = () => resolver(String(leitor.result).split(',')[1]);
+    leitor.onerror = () => rejeitar(new Error('Falha ao ler o arquivo.'));
+    leitor.readAsDataURL(arquivo);
+  });
+}
+
+function nomeSeguro(nome) {
+  const base = nome.replace(/\.pdf$/i, '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
+  return `${base || 'catalogo'}.pdf`;
+}
+
+function tituloDoNome(nome) {
+  const titulo = nome.replace(/\.pdf$/i, '').replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return titulo.charAt(0).toUpperCase() + titulo.slice(1);
+}
+
+/* ====== API do GitHub ====== */
+
+async function gh(caminho, { metodo = 'GET', corpo = null } = {}) {
+  const resposta = await fetch(`https://api.github.com/repos/${dono}/${repo}/${caminho}`, {
+    method: metodo,
+    headers: {
+      Accept: 'application/vnd.github+json',
+      Authorization: `Bearer ${token}`,
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(corpo ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: corpo ? JSON.stringify(corpo) : undefined,
+  });
+  if (!resposta.ok) {
+    let detalhe = '';
+    try { detalhe = (await resposta.json()).message || ''; } catch { /* sem corpo */ }
+    const erro = new Error(`${resposta.status} ${detalhe}`.trim());
+    erro.status = resposta.status;
+    throw erro;
+  }
+  return resposta.status === 204 ? null : resposta.json();
+}
+
+// Grava um conjunto de mudanças como UM único commit na main.
+// mudancas: [{ caminho, conteudoBase64 }] — conteudoBase64 null remove o arquivo.
+async function commitar(mudancas, mensagem) {
+  let ultimoErro = null;
+  for (let tentativa = 0; tentativa < 3; tentativa += 1) {
+    try {
+      const ref = await gh(`git/ref/heads/${RAMO}`);
+      const shaBase = ref.object.sha;
+      const commitBase = await gh(`git/commits/${shaBase}`);
+      const itens = [];
+      for (const mudanca of mudancas) {
+        if (mudanca.conteudoBase64 != null) {
+          const blob = await gh('git/blobs', {
+            metodo: 'POST',
+            corpo: { content: mudanca.conteudoBase64, encoding: 'base64' },
+          });
+          itens.push({ path: mudanca.caminho, mode: '100644', type: 'blob', sha: blob.sha });
+        } else {
+          itens.push({ path: mudanca.caminho, mode: '100644', type: 'blob', sha: null });
+        }
+      }
+      const arvore = await gh('git/trees', {
+        metodo: 'POST',
+        corpo: { base_tree: commitBase.tree.sha, tree: itens },
+      });
+      const commit = await gh('git/commits', {
+        metodo: 'POST',
+        corpo: { message: mensagem, tree: arvore.sha, parents: [shaBase] },
+      });
+      await gh(`git/refs/heads/${RAMO}`, { metodo: 'PATCH', corpo: { sha: commit.sha } });
+      shaUltimoCommit = commit.sha;
+      return commit.sha;
+    } catch (erro) {
+      ultimoErro = erro;
+      // 409/422: a main andou (ex.: commit do robô) — tenta de novo do zero.
+      if (erro.status !== 409 && erro.status !== 422) throw erro;
+    }
+  }
+  throw ultimoErro;
+}
+
+async function carregarManifesto() {
+  const resposta = await gh(`contents/catalogos.json?ref=${RAMO}`);
+  manifesto = JSON.parse(deBase64(resposta.content));
+  manifesto.catalogos = manifesto.catalogos || [];
+}
+
+function manifestoBase64() {
+  return textoParaBase64(`${JSON.stringify(manifesto, null, 2)}\n`);
+}
+
+/* ====== Telas ====== */
+
+function mostrarErroGeral(texto) {
+  el('tela-token').hidden = true;
+  el('tela-gestao').hidden = true;
+  el('erro-geral-texto').textContent = texto;
+  el('erro-geral').hidden = false;
+}
+
+function mostrarTelaToken(mensagemErro = '') {
+  el('tela-gestao').hidden = true;
+  el('btn-sair').hidden = true;
+  el('tela-token').hidden = false;
+  el('nome-repo-passo').textContent = `${dono}/${repo}`;
+  const erro = el('erro-token');
+  erro.textContent = mensagemErro;
+  erro.hidden = !mensagemErro;
+}
+
+async function mostrarTelaGestao() {
+  el('tela-token').hidden = true;
+  el('tela-gestao').hidden = false;
+  el('btn-sair').hidden = false;
+  await carregarManifesto();
+  desenharLista();
+  el('campo-titulo-estante').value = manifesto.titulo || '';
+  el('campo-descricao-estante').value = manifesto.descricao || '';
+  atualizarStatusPublicacao();
+}
+
+/* ====== Lista de catálogos ====== */
+
+function desenharLista() {
+  const lista = el('lista-catalogos');
+  lista.innerHTML = '';
+  if (manifesto.catalogos.length === 0) {
+    lista.innerHTML = '<li class="lista-vazia">Nenhum catálogo ainda — envie o primeiro PDF acima.</li>';
+    return;
+  }
+  const ordenados = [...manifesto.catalogos].sort((a, b) =>
+    (b.adicionadoEm || '').localeCompare(a.adicionadoEm || '') ||
+    a.titulo.localeCompare(b.titulo, 'pt-BR'));
+
+  for (const catalogo of ordenados) {
+    const item = document.createElement('li');
+    item.className = 'item-admin';
+
+    const info = document.createElement('div');
+    info.className = 'item-campos';
+
+    const campoTitulo = document.createElement('input');
+    campoTitulo.type = 'text';
+    campoTitulo.value = catalogo.titulo;
+    campoTitulo.maxLength = 90;
+    campoTitulo.setAttribute('aria-label', `Título de ${catalogo.arquivo}`);
+
+    const campoDescricao = document.createElement('input');
+    campoDescricao.type = 'text';
+    campoDescricao.value = catalogo.descricao || '';
+    campoDescricao.placeholder = 'Descrição (opcional)';
+    campoDescricao.maxLength = 160;
+    campoDescricao.setAttribute('aria-label', `Descrição de ${catalogo.arquivo}`);
+
+    const nomeArquivo = document.createElement('p');
+    nomeArquivo.className = 'item-arquivo';
+    nomeArquivo.textContent = `${catalogo.arquivo} · adicionado em ${catalogo.adicionadoEm || '—'}`;
+
+    info.append(campoTitulo, campoDescricao, nomeArquivo);
+
+    const acoes = document.createElement('div');
+    acoes.className = 'item-acoes';
+
+    const btnVer = document.createElement('a');
+    btnVer.className = 'botao botao-suave';
+    btnVer.textContent = 'Abrir';
+    btnVer.target = '_blank';
+    btnVer.rel = 'noopener';
+    btnVer.href = `leitor.html?c=${encodeURIComponent(catalogo.arquivo)}`;
+
+    const btnSalvar = document.createElement('button');
+    btnSalvar.className = 'botao';
+    btnSalvar.textContent = 'Salvar';
+    btnSalvar.addEventListener('click', () =>
+      salvarCatalogo(catalogo, campoTitulo.value, campoDescricao.value, btnSalvar));
+
+    const btnExcluir = document.createElement('button');
+    btnExcluir.className = 'botao botao-perigo';
+    btnExcluir.textContent = 'Excluir';
+    btnExcluir.addEventListener('click', () => excluirCatalogo(catalogo, btnExcluir));
+
+    acoes.append(btnVer, btnSalvar, btnExcluir);
+    item.append(info, acoes);
+    lista.appendChild(item);
+  }
+}
+
+async function salvarCatalogo(catalogo, novoTitulo, novaDescricao, botao) {
+  novoTitulo = novoTitulo.trim();
+  if (!novoTitulo) { avisar('O título não pode ficar vazio.'); return; }
+  botao.disabled = true;
+  botao.textContent = 'Salvando…';
+  try {
+    await carregarManifesto();
+    const entrada = manifesto.catalogos.find((c) => c.arquivo === catalogo.arquivo);
+    if (!entrada) throw new Error('Catálogo não encontrado no manifesto.');
+    entrada.titulo = novoTitulo;
+    if (novaDescricao.trim()) entrada.descricao = novaDescricao.trim();
+    else delete entrada.descricao;
+    await commitar(
+      [{ caminho: 'catalogos.json', conteudoBase64: manifestoBase64() }],
+      `Atualiza dados de "${novoTitulo}"`,
+    );
+    desenharLista();
+    avisar('Salvo! O site republica em 1–2 minutos.');
+    atualizarStatusPublicacao();
+  } catch (erro) {
+    console.error(erro);
+    avisar(`Não foi possível salvar: ${erro.message}`, true);
+  } finally {
+    botao.disabled = false;
+    botao.textContent = 'Salvar';
+  }
+}
+
+async function excluirCatalogo(catalogo, botao) {
+  const confirmar = window.confirm(
+    `Excluir "${catalogo.titulo}"?\n\nO arquivo ${catalogo.arquivo} sai da estante e do repositório.`);
+  if (!confirmar) return;
+  botao.disabled = true;
+  botao.textContent = 'Excluindo…';
+  try {
+    await carregarManifesto();
+    manifesto.catalogos = manifesto.catalogos.filter((c) => c.arquivo !== catalogo.arquivo);
+    await commitar(
+      [
+        { caminho: `catalogos/${catalogo.arquivo}`, conteudoBase64: null },
+        { caminho: 'catalogos.json', conteudoBase64: manifestoBase64() },
+      ],
+      `Remove o catálogo "${catalogo.titulo}"`,
+    );
+    desenharLista();
+    avisar('Catálogo excluído. O site republica em 1–2 minutos.');
+    atualizarStatusPublicacao();
+  } catch (erro) {
+    console.error(erro);
+    avisar(`Não foi possível excluir: ${erro.message}`, true);
+    botao.disabled = false;
+    botao.textContent = 'Excluir';
+  }
+}
+
+/* ====== Envio de PDF ====== */
+
+async function enviarArquivo(arquivo) {
+  if (!/\.pdf$/i.test(arquivo.name)) {
+    avisar('Envie um arquivo PDF.');
+    return;
+  }
+  const LIMITE = 60 * 1024 * 1024;
+  if (arquivo.size > LIMITE) {
+    avisar('Arquivo acima de 60 MB — comprima o PDF antes de enviar.', true);
+    return;
+  }
+
+  const nome = nomeSeguro(arquivo.name);
+  await carregarManifesto();
+  const existente = manifesto.catalogos.find((c) => c.arquivo === nome);
+  if (existente) {
+    const substituir = window.confirm(
+      `Já existe um catálogo com o arquivo ${nome} ("${existente.titulo}").\n\nSubstituir pelo novo PDF?`);
+    if (!substituir) return;
+  }
+
+  const progresso = el('envio-progresso');
+  const textoProgresso = el('envio-texto');
+  progresso.hidden = false;
+  el('zona-envio').classList.add('desativada');
+  try {
+    textoProgresso.textContent = `Preparando ${arquivo.name}…`;
+    const conteudo = await arquivoParaBase64(arquivo);
+
+    if (!existente) {
+      manifesto.catalogos.push({
+        arquivo: nome,
+        titulo: tituloDoNome(arquivo.name),
+        adicionadoEm: new Date().toISOString().slice(0, 10),
+      });
+    }
+
+    textoProgresso.textContent = `Enviando ${nome}… (arquivos grandes podem demorar)`;
+    await commitar(
+      [
+        { caminho: `catalogos/${nome}`, conteudoBase64: conteudo },
+        { caminho: 'catalogos.json', conteudoBase64: manifestoBase64() },
+      ],
+      existente ? `Substitui o PDF de ${nome}` : `Adiciona o catálogo ${nome}`,
+    );
+    desenharLista();
+    avisar('Catálogo enviado! Ele aparece na estante em 1–2 minutos.', true);
+    atualizarStatusPublicacao();
+  } catch (erro) {
+    console.error(erro);
+    avisar(`Falha no envio: ${erro.message}`, true);
+  } finally {
+    progresso.hidden = true;
+    el('zona-envio').classList.remove('desativada');
+    el('campo-arquivo').value = '';
+  }
+}
+
+/* ====== Cabeçalho da estante ====== */
+
+async function salvarCabecalho() {
+  const botao = el('btn-salvar-estante');
+  const titulo = el('campo-titulo-estante').value.trim();
+  if (!titulo) { avisar('O título do site não pode ficar vazio.'); return; }
+  botao.disabled = true;
+  try {
+    await carregarManifesto();
+    manifesto.titulo = titulo;
+    const descricao = el('campo-descricao-estante').value.trim();
+    if (descricao) manifesto.descricao = descricao;
+    else delete manifesto.descricao;
+    await commitar(
+      [{ caminho: 'catalogos.json', conteudoBase64: manifestoBase64() }],
+      'Atualiza o cabeçalho da estante',
+    );
+    avisar('Cabeçalho salvo! O site republica em 1–2 minutos.');
+    atualizarStatusPublicacao();
+  } catch (erro) {
+    console.error(erro);
+    avisar(`Não foi possível salvar: ${erro.message}`, true);
+  } finally {
+    botao.disabled = false;
+  }
+}
+
+/* ====== Status de publicação ====== */
+
+let temporizadorStatus = null;
+async function atualizarStatusPublicacao() {
+  clearTimeout(temporizadorStatus);
+  const alvo = el('status-publicacao');
+  try {
+    const dados = await gh(`actions/runs?branch=${RAMO}&per_page=1`);
+    const run = dados.workflow_runs && dados.workflow_runs[0];
+    if (!run) { alvo.textContent = 'Nenhuma publicação registrada ainda.'; return; }
+    const quando = new Date(run.updated_at).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    if (run.status !== 'completed') {
+      alvo.textContent = '⏳ Publicando as alterações…';
+      temporizadorStatus = setTimeout(atualizarStatusPublicacao, 10000);
+    } else if (run.conclusion === 'success') {
+      const pendente = shaUltimoCommit && run.head_sha !== shaUltimoCommit;
+      if (pendente) {
+        alvo.textContent = '⏳ Alteração enviada — aguardando a publicação começar…';
+        temporizadorStatus = setTimeout(atualizarStatusPublicacao, 8000);
+      } else {
+        alvo.textContent = `✅ Site publicado (última publicação: ${quando}).`;
+      }
+    } else {
+      alvo.textContent = `⚠️ A última publicação falhou (${quando}). Veja a aba Actions do repositório.`;
+    }
+  } catch {
+    alvo.textContent = 'Não foi possível consultar o status de publicação.';
+  }
+}
+
+/* ====== Conexão ====== */
+
+async function conectar(novaChave) {
+  token = novaChave.trim();
+  if (!token) { mostrarTelaToken('Cole a chave antes de conectar.'); return; }
+  const botao = el('btn-conectar');
+  botao.disabled = true;
+  botao.textContent = 'Verificando…';
+  try {
+    const repositorio = await gh('');
+    if (!repositorio.permissions || !repositorio.permissions.push) {
+      throw new Error('A chave não tem permissão de escrita (Contents: Read and write) neste repositório.');
+    }
+    localStorage.setItem(CHAVE_TOKEN, token);
+    await mostrarTelaGestao();
+    avisar('Conectado!');
+  } catch (erro) {
+    console.error(erro);
+    token = '';
+    const texto = erro.status === 401
+      ? 'Chave inválida ou expirada. Confira se copiou o código completo.'
+      : erro.status === 404
+        ? 'A chave não dá acesso a este repositório. Confira o repositório selecionado ao criar a chave.'
+        : `Não foi possível conectar: ${erro.message}`;
+    mostrarTelaToken(texto);
+  } finally {
+    botao.disabled = false;
+    botao.textContent = 'Conectar';
+  }
+}
+
+function sair() {
+  localStorage.removeItem(CHAVE_TOKEN);
+  token = '';
+  el('campo-token').value = '';
+  mostrarTelaToken();
+  avisar('Chave removida deste navegador.');
+}
+
+/* ====== Início ====== */
+
+function configurarEventos() {
+  el('btn-conectar').addEventListener('click', () => conectar(el('campo-token').value));
+  el('campo-token').addEventListener('keydown', (evento) => {
+    if (evento.key === 'Enter') conectar(el('campo-token').value);
+  });
+  el('btn-sair').addEventListener('click', sair);
+  el('btn-salvar-estante').addEventListener('click', salvarCabecalho);
+
+  const zona = el('zona-envio');
+  const campoArquivo = el('campo-arquivo');
+  zona.addEventListener('click', () => campoArquivo.click());
+  zona.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Enter' || evento.key === ' ') { evento.preventDefault(); campoArquivo.click(); }
+  });
+  campoArquivo.addEventListener('change', () => {
+    if (campoArquivo.files[0]) enviarArquivo(campoArquivo.files[0]);
+  });
+  zona.addEventListener('dragover', (evento) => {
+    evento.preventDefault();
+    zona.classList.add('arrastando');
+  });
+  zona.addEventListener('dragleave', () => zona.classList.remove('arrastando'));
+  zona.addEventListener('drop', (evento) => {
+    evento.preventDefault();
+    zona.classList.remove('arrastando');
+    if (evento.dataTransfer.files[0]) enviarArquivo(evento.dataTransfer.files[0]);
+  });
+}
+
+async function iniciar() {
+  configurarEventos();
+  if (!token) {
+    mostrarTelaToken();
+    return;
+  }
+  try {
+    await mostrarTelaGestao();
+  } catch (erro) {
+    console.error(erro);
+    if (erro.status === 401) {
+      localStorage.removeItem(CHAVE_TOKEN);
+      token = '';
+      mostrarTelaToken('A chave salva expirou ou foi revogada. Crie uma nova e cole abaixo.');
+    } else {
+      mostrarErroGeral(`Não foi possível carregar os dados: ${erro.message}`);
+    }
+  }
+}
+
+iniciar();

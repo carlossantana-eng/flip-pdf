@@ -25,6 +25,13 @@ arquivo define as regras de trabalho.
    falham alto por design — não use `continue-on-error`.
 7. **Sem segredos**: este projeto não usa credenciais além do
    `GITHUB_TOKEN` padrão dos workflows. Não adicione tokens ou chaves.
+   A página `admin.html` usa um fine-grained token que o dono cola no
+   próprio navegador (localStorage) — o token nunca aparece em código,
+   commit ou log; nunca peça o valor dele, apenas confirmação de que
+   foi criado com escopo mínimo (Contents: read/write deste repo).
+8. **admin.html grava na main via API do GitHub** (Git Data API, um
+   commit por ação). O `gerar-manifesto.mjs` preserva as entradas que
+   a página cria; mudanças nesse contrato exigem atualizar os dois.
 
 ## Testes manuais mínimos antes de entregar
 
