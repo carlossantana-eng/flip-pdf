@@ -98,34 +98,40 @@ async function processarCapas() {
 
 function listaVisivel() {
   let itens = manifesto.catalogos.filter((c) => Boolean(c.lixeira) === (aba === 'lixeira'));
+  // "Todas as pastas" (pastaAtual = null) mostra tudo; uma pasta filtra.
   if (aba === 'arquivos' && pastaAtual) itens = itens.filter((c) => c.pasta === pastaAtual);
-  if (aba === 'arquivos' && !pastaAtual && !termoBusca) itens = itens.filter((c) => !c.pasta);
   if (termoBusca) itens = itens.filter((c) => normalizar(c.titulo).includes(normalizar(termoBusca)));
   return itens.sort((a, b) => ordem === 'nome'
     ? a.titulo.localeCompare(b.titulo, 'pt-BR')
     : (b.adicionadoEm || '').localeCompare(a.adicionadoEm || '') || a.titulo.localeCompare(b.titulo, 'pt-BR'));
 }
 
-function desenharPastas() {
-  const grade = el('grade-pastas');
-  grade.innerHTML = '';
-  const mostrar = aba === 'arquivos' && !pastaAtual && !termoBusca;
-  grade.hidden = !mostrar;
-  if (!mostrar) return;
+// Barra lateral de pastas (estilo Calameo): "Todas as pastas" + lista.
+function desenharLateral() {
+  const lista = el('lista-pastas');
+  lista.innerHTML = '';
+
+  const criarItem = (rotulo, valor, quantidade) => {
+    const item = document.createElement('button');
+    item.className = 'pasta-item';
+    if ((pastaAtual || null) === valor) item.classList.add('ativa');
+    item.innerHTML = valor === null
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 11h18"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>';
+    const nome = document.createElement('span');
+    nome.className = 'pasta-nome';
+    nome.textContent = rotulo;
+    const conta = document.createElement('span');
+    conta.className = 'pasta-conta';
+    conta.textContent = String(quantidade);
+    item.append(nome, conta);
+    item.addEventListener('click', () => { pastaAtual = valor; desenhar(); });
+    lista.appendChild(item);
+  };
+
+  criarItem('Todas as pastas', null, manifesto.catalogos.filter((c) => !c.lixeira).length);
   for (const nome of [...pastas()].sort((a, b) => a.localeCompare(b, 'pt-BR'))) {
-    const cartao = document.createElement('button');
-    cartao.className = 'cartao-pasta';
-    cartao.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>';
-    const rotulo = document.createElement('span');
-    rotulo.className = 'pasta-nome';
-    rotulo.textContent = nome;
-    const quantidade = document.createElement('span');
-    quantidade.className = 'pasta-conta';
-    const n = catalogosDe(nome).length;
-    quantidade.textContent = n === 1 ? '1 arquivo' : `${n} arquivos`;
-    cartao.append(rotulo, quantidade);
-    cartao.addEventListener('click', () => { pastaAtual = nome; desenhar(); });
-    grade.appendChild(cartao);
+    criarItem(nome, nome, catalogosDe(nome).length);
   }
 }
 
@@ -188,8 +194,7 @@ function desenharArquivos() {
   }
 
   const vazio = el('vazio');
-  const temPastasVisiveis = !el('grade-pastas').hidden && el('grade-pastas').children.length > 0;
-  vazio.hidden = itens.length > 0 || temPastasVisiveis;
+  vazio.hidden = itens.length > 0;
   if (!vazio.hidden) {
     if (termoBusca) {
       el('vazio-titulo').textContent = 'Nada encontrado';
@@ -220,10 +225,10 @@ function desenhar() {
 
   el('trilha').hidden = !(aba === 'arquivos' && pastaAtual);
   if (pastaAtual) el('pasta-atual').textContent = pastaAtual;
-  el('btn-nova-pasta').hidden = aba === 'lixeira' || Boolean(pastaAtual);
+  el('pastas-lateral').hidden = aba === 'lixeira';
   el('rodape-lixeira').hidden = !(aba === 'lixeira' && naLixeira > 0);
 
-  desenharPastas();
+  desenharLateral();
   desenharArquivos();
 }
 
@@ -395,7 +400,6 @@ function moverPara(catalogo, destino, criarPasta = false) {
 function configurarEventos() {
   el('aba-arquivos').addEventListener('click', () => { aba = 'arquivos'; pastaAtual = null; desenhar(); });
   el('aba-lixeira').addEventListener('click', () => { aba = 'lixeira'; pastaAtual = null; desenhar(); });
-  el('voltar-raiz').addEventListener('click', () => { pastaAtual = null; desenhar(); });
   el('busca-arquivos').addEventListener('input', (evento) => {
     termoBusca = evento.target.value.trim();
     desenhar();

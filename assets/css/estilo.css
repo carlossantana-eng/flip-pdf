@@ -61,9 +61,8 @@ button { font: inherit; }
 .marca {
   color: #fff;
   text-decoration: none;
-  font-family: var(--fonte-marca);
-  font-weight: 700;
-  font-size: 1.2rem;
+  font-weight: 800;
+  font-size: 1.3rem;
   letter-spacing: -0.02em;
   white-space: nowrap;
   overflow: hidden;
@@ -74,23 +73,26 @@ button { font: inherit; }
   gap: 10px;
 }
 
+/* O ícone da logo desenha a própria moldura arredondada. */
 .marca-icone {
   flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  border: 1px solid var(--realce);
-  background: var(--realce-fraco);
+  width: 38px;
+  height: 38px;
   color: var(--realce);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--brilho);
 }
 
-.marca-icone svg { width: 18px; height: 18px; }
+.marca-icone svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 8px rgba(163, 230, 53, 0.45));
+}
 
 .marca .ponto { color: var(--realce); }
+.marca-flip { color: var(--realce); }
+.marca-pdf { color: #fff; }
 
 .barra-acoes {
   margin-left: auto;
@@ -1429,31 +1431,58 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 .trilha { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .trilha h2 { margin: 0; font-size: 1.1rem; color: #fff; font-family: var(--fonte-marca); flex: 1; }
 
-.grade-pastas {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 12px;
+.arquivos-leiaute {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
 }
 
-.cartao-pasta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.pastas-lateral {
+  flex: none;
+  width: 240px;
+  position: sticky;
+  top: 96px;
   background: var(--superficie);
   border: 1px solid var(--borda);
   border-radius: 12px;
-  padding: 14px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pastas-lateral .botao-largo { margin-top: 8px; }
+
+.pasta-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  border-radius: 9px;
+  padding: 10px 10px;
   color: var(--tinta);
   font: inherit;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
 }
 
-.cartao-pasta:hover { border-color: rgba(163, 230, 53, 0.55); box-shadow: var(--brilho); }
-.cartao-pasta svg { width: 26px; height: 26px; color: var(--realce); flex: none; }
+.pasta-item:hover { background: #131313; }
+.pasta-item.ativa { background: var(--realce-fraco); color: var(--realce); }
+.pasta-item.ativa .pasta-nome { color: var(--realce); }
+.pasta-item svg { width: 20px; height: 20px; color: var(--realce); flex: none; }
 .pasta-nome { font-weight: 600; color: #fff; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.pasta-conta { font-size: 0.78rem; color: var(--tinta-suave); white-space: nowrap; }
+.pasta-conta { font-size: 0.76rem; color: var(--tinta-suave); white-space: nowrap; }
+
+.arquivos-conteudo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+
+@media (max-width: 760px) {
+  .arquivos-leiaute { flex-direction: column; }
+  .pastas-lateral { width: 100%; position: static; flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .pasta-item { width: auto; }
+  .pastas-lateral .botao-largo { margin-top: 0; width: auto; }
+}
 
 .grade-arquivos {
   display: grid;
