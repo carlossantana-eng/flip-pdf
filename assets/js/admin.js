@@ -5,6 +5,7 @@ import {
   arquivoParaBase64, nomeSeguro, tituloDoNome, definirToken, temToken,
   ultimoCommit, aplicarCorDeDestaque,
 } from './nucleo-admin.js';
+import { confirmar } from './dialogo.js';
 
 const el = (id) => document.getElementById(id);
 
@@ -228,9 +229,13 @@ async function salvarCatalogo(catalogo, novoTitulo, novaDescricao, botao) {
 }
 
 async function excluirCatalogo(catalogo, botao) {
-  const confirmar = window.confirm(
-    `Excluir "${catalogo.titulo}"?\n\nO arquivo ${catalogo.arquivo} sai da estante e do repositório.`);
-  if (!confirmar) return;
+  const aceitou = await confirmar({
+    titulo: `Excluir "${catalogo.titulo}"?`,
+    texto: `O arquivo ${catalogo.arquivo} sai da estante e do repositório.`,
+    confirmarRotulo: 'Excluir',
+    perigo: true,
+  });
+  if (!aceitou) return;
   botao.disabled = true;
   botao.textContent = 'Excluindo…';
   try {
@@ -280,8 +285,11 @@ async function enviarArquivos(listaDeArquivos) {
     }
     const existente = manifesto.catalogos.find((c) => c.arquivo === nome);
     if (existente) {
-      const substituir = window.confirm(
-        `Já existe um catálogo com o arquivo ${nome} ("${existente.titulo}").\n\nSubstituir pelo novo PDF?`);
+      const substituir = await confirmar({
+        titulo: 'Substituir catálogo?',
+        texto: `Já existe um catálogo com o arquivo ${nome} ("${existente.titulo}").`,
+        confirmarRotulo: 'Substituir pelo novo',
+      });
       if (!substituir) continue;
     }
     nomesNoLote.add(nome);

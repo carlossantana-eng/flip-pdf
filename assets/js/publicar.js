@@ -5,6 +5,7 @@ import {
   temToken, buscarManifesto, manifestoParaBase64, commitar, gh, RAMO,
   arquivoParaBase64, nomeSeguro, tituloDoNome, aplicarCorDeDestaque, ultimoCommit,
 } from './nucleo-admin.js';
+import { pedirTexto } from './dialogo.js';
 import * as pdfjs from '../vendor/pdf.min.mjs';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdf.worker.min.mjs', import.meta.url).toString();
@@ -13,6 +14,15 @@ const LIMITE_TAMANHO = 60 * 1024 * 1024;
 const LIMITE_CAPA = 2 * 1024 * 1024;
 const EXTENSOES_CAPA = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
 const el = (id) => document.getElementById(id);
+
+let publicando = false;
+
+// Fechar ou sair no meio do envio abortaria a publicação — avisa antes.
+window.addEventListener('beforeunload', (evento) => {
+  if (!publicando) return;
+  evento.preventDefault();
+  evento.returnValue = '';
+});
 
 let manifesto = null;
 let selecionados = [];   // [{ arquivo: File, nome, titulo, pasta, descricao, substitui }]
@@ -70,9 +80,13 @@ function opcoesDePasta(selecionada) {
   }
   select.appendChild(new Option('+ Nova pasta…', '__nova__'));
   select.value = selecionada || '';
-  select.addEventListener('change', () => {
+  select.addEventListener('change', async () => {
     if (select.value !== '__nova__') return;
-    const nome = (window.prompt('Nome da nova pasta:') || '').trim();
+    const nome = await pedirTexto({
+      titulo: 'Nova pasta',
+      rotulo: 'Nome da pasta',
+      confirmarRotulo: 'Criar pasta',
+    });
     if (nome) {
       if (!(manifesto.pastas || []).includes(nome)) {
         manifesto.pastas = [...(manifesto.pastas || []), nome];
@@ -263,6 +277,7 @@ async function publicarAgora() {
     if (!item.titulo.trim()) { avisar('Todo catálogo precisa de um título.'); return; }
   }
   mostrarEtapa('etapa-envio');
+  publicando = true;
   el('envio-fase').textContent = 'ENVIANDO';
   el('envio-nota').hidden = true;
   fichas('fichas-arquivos');
@@ -318,6 +333,7 @@ async function publicarAgora() {
     await commitar(mudancas, selecionados.length === 1
       ? `Publica o catálogo ${selecionados[0].nome}`
       : `Publica ${selecionados.length} catálogos`);
+    publicando = false; // gravado: o site republica sozinho a partir daqui
     definirProgresso(72);
 
     // Acompanha a publicação do site (workflow) até concluir.
@@ -365,6 +381,7 @@ async function publicarAgora() {
     mostrarEtapa('etapa-sucesso');
   } catch (erro) {
     console.error(erro);
+    publicando = false;
     avisar(`Falha na publicação: ${erro.message}`, true);
     mostrarEtapa('etapa-config');
   }
@@ -402,6 +419,7 @@ async function iniciar() {
     el('sem-chave').hidden = false;
     return;
   }
+  document.body.classList.add('conectado');
   configurarEventos();
   try {
     manifesto = await buscarManifesto();

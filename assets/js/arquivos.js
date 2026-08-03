@@ -2,7 +2,9 @@
 // ordenação e lixeira (enviar, restaurar e excluir definitivamente).
 import {
   temToken, buscarManifesto, manifestoParaBase64, commitar, aplicarCorDeDestaque,
+  dataLegivel,
 } from './nucleo-admin.js';
+import { pedirTexto, confirmar } from './dialogo.js';
 import * as pdfjs from '../vendor/pdf.min.mjs';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdf.worker.min.mjs', import.meta.url).toString();
@@ -24,6 +26,20 @@ function avisar(texto, demorado = false) {
   toast.hidden = false;
   clearTimeout(temporizadorToast);
   temporizadorToast = setTimeout(() => { toast.hidden = true; }, demorado ? 6000 : 3000);
+}
+
+// Toast com um botão de ação (ex.: "Desfazer") — some sozinho em 8s.
+function avisarComAcao(texto, rotulo, acao) {
+  const toast = el('toast');
+  toast.textContent = texto;
+  const botao = document.createElement('button');
+  botao.className = 'toast-acao';
+  botao.textContent = rotulo;
+  botao.addEventListener('click', () => { toast.hidden = true; acao(); });
+  toast.appendChild(botao);
+  toast.hidden = false;
+  clearTimeout(temporizadorToast);
+  temporizadorToast = setTimeout(() => { toast.hidden = true; }, 8000);
 }
 
 function normalizar(texto) {
@@ -166,8 +182,8 @@ function desenharArquivos() {
     titulo.textContent = catalogo.titulo;
     const meta = document.createElement('p');
     meta.textContent = catalogo.lixeira
-      ? `na lixeira desde ${catalogo.lixeiraEm || '—'}`
-      : `${catalogo.adicionadoEm || '—'}${catalogo.pasta && !pastaAtual ? ` · ${catalogo.pasta}` : ''}`;
+      ? `na lixeira desde ${dataLegivel(catalogo.lixeiraEm)}`
+      : `${dataLegivel(catalogo.adicionadoEm)}${catalogo.pasta && !pastaAtual ? ` · ${catalogo.pasta}` : ''}`;
     info.append(titulo, meta);
 
     const acoes = document.createElement('div');
@@ -252,7 +268,7 @@ function enviarParaLixeira(catalogo) {
     entrada.lixeira = true;
     entrada.lixeiraEm = new Date().toISOString().slice(0, 10);
     await salvarManifesto(`Envia "${entrada.titulo}" para a lixeira`);
-    avisar('Enviado para a lixeira — some da estante em 1–2 minutos.');
+    avisarComAcao('Enviado para a lixeira.', 'Desfazer', () => restaurar(entrada));
   });
 }
 
@@ -268,8 +284,14 @@ function restaurar(catalogo) {
   });
 }
 
-function excluirDefinitivo(catalogo) {
-  if (!window.confirm(`Excluir "${catalogo.titulo}" DEFINITIVAMENTE?\n\nO PDF sai do repositório e não dá para desfazer.`)) return;
+async function excluirDefinitivo(catalogo) {
+  const aceitou = await confirmar({
+    titulo: 'Excluir definitivamente?',
+    texto: `"${catalogo.titulo}" sai do repositório e não dá para desfazer.`,
+    confirmarRotulo: 'Excluir para sempre',
+    perigo: true,
+  });
+  if (!aceitou) return;
   executar('Não foi possível excluir', async () => {
     manifesto = await buscarManifesto();
     manifesto.catalogos = manifesto.catalogos.filter((c) => c.arquivo !== catalogo.arquivo);
@@ -281,10 +303,16 @@ function excluirDefinitivo(catalogo) {
   });
 }
 
-function esvaziarLixeira() {
+async function esvaziarLixeira() {
   const presos = manifesto.catalogos.filter((c) => c.lixeira);
   if (presos.length === 0) return;
-  if (!window.confirm(`Excluir DEFINITIVAMENTE os ${presos.length} item(ns) da lixeira?\n\nNão dá para desfazer.`)) return;
+  const aceitou = await confirmar({
+    titulo: 'Esvaziar a lixeira?',
+    texto: `Os ${presos.length} item(ns) serão excluídos definitivamente — não dá para desfazer.`,
+    confirmarRotulo: 'Esvaziar',
+    perigo: true,
+  });
+  if (!aceitou) return;
   executar('Não foi possível esvaziar a lixeira', async () => {
     manifesto = await buscarManifesto();
     const naLixeira = manifesto.catalogos.filter((c) => c.lixeira);
@@ -299,13 +327,15 @@ function esvaziarLixeira() {
 
 /* ====== Pastas ====== */
 
-function novaPasta() {
-  const nome = (window.prompt('Nome da nova pasta:') || '').trim();
+async function novaPasta() {
+  const nome = await pedirTexto({
+    titulo: 'Nova pasta',
+    rotulo: 'Nome da pasta',
+    confirmarRotulo: 'Criar pasta',
+    validar: (valor) => (pastas().some((p) => p.toLowerCase() === valor.toLowerCase())
+      ? 'Já existe uma pasta com esse nome.' : null),
+  });
   if (!nome) return;
-  if (pastas().some((p) => p.toLowerCase() === nome.toLowerCase())) {
-    avisar('Já existe uma pasta com esse nome.');
-    return;
-  }
   executar('Não foi possível criar a pasta', async () => {
     manifesto = await buscarManifesto();
     manifesto.pastas = [...(manifesto.pastas || []), nome];
@@ -314,8 +344,13 @@ function novaPasta() {
   });
 }
 
-function renomearPasta() {
-  const novo = (window.prompt('Novo nome da pasta:', pastaAtual) || '').trim();
+async function renomearPasta() {
+  const novo = await pedirTexto({
+    titulo: 'Renomear pasta',
+    rotulo: 'Novo nome',
+    valor: pastaAtual,
+    confirmarRotulo: 'Renomear',
+  });
   if (!novo || novo === pastaAtual) return;
   executar('Não foi possível renomear', async () => {
     const antigo = pastaAtual;
@@ -328,12 +363,17 @@ function renomearPasta() {
   });
 }
 
-function excluirPasta() {
+async function excluirPasta() {
   const quantos = catalogosDe(pastaAtual).length;
-  const aviso = quantos > 0
-    ? `Excluir a pasta "${pastaAtual}"?\n\nOs ${quantos} arquivo(s) dela voltam para "Meus Arquivos" (nada é apagado).`
-    : `Excluir a pasta vazia "${pastaAtual}"?`;
-  if (!window.confirm(aviso)) return;
+  const aceitou = await confirmar({
+    titulo: `Excluir a pasta "${pastaAtual}"?`,
+    texto: quantos > 0
+      ? `Os ${quantos} arquivo(s) dela voltam para "Meus Arquivos" — nada é apagado.`
+      : 'A pasta está vazia.',
+    confirmarRotulo: 'Excluir pasta',
+    perigo: true,
+  });
+  if (!aceitou) return;
   executar('Não foi possível excluir a pasta', async () => {
     const alvo = pastaAtual;
     manifesto = await buscarManifesto();
@@ -368,9 +408,13 @@ function abrirMover(catalogo) {
   const nova = document.createElement('button');
   nova.className = 'opcao-pasta opcao-nova';
   nova.textContent = '+ Nova pasta…';
-  nova.addEventListener('click', () => {
+  nova.addEventListener('click', async () => {
     el('dialogo-mover').close();
-    const nome = (window.prompt('Nome da nova pasta:') || '').trim();
+    const nome = await pedirTexto({
+      titulo: 'Nova pasta',
+      rotulo: 'Nome da pasta',
+      confirmarRotulo: 'Criar e mover',
+    });
     if (nome) moverPara(catalogo, nome, true);
   });
   opcoes.appendChild(nova);
@@ -417,6 +461,7 @@ async function iniciar() {
     el('sem-chave').hidden = false;
     return;
   }
+  document.body.classList.add('conectado');
   configurarEventos();
   try {
     manifesto = await buscarManifesto();

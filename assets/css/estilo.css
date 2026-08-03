@@ -42,9 +42,9 @@ html[data-tema="claro"] {
   --tinta: #262b20;
   --tinta-suave: #626a58;
   --borda: #dfe2d6;
-  --realce: #5f9c0a;               /* lima escurecido para ler bem no claro */
-  --realce-fraco: rgba(101, 163, 13, 0.12);
-  --brilho: 0 0 22px rgba(101, 163, 13, 0.2);
+  --realce: #4d7c0f;               /* lima escurecido para ler bem no claro */
+  --realce-fraco: rgba(77, 124, 15, 0.12);
+  --brilho: 0 0 22px rgba(77, 124, 15, 0.2);
   --texto-forte: #14170f;
   --texto-fraco: #8b937d;
   --campo-fundo: #ffffff;
@@ -52,7 +52,7 @@ html[data-tema="claro"] {
   --hover-fundo: #eef0e5;
   --borda-forte: #c6cbb8;
   --linha-suave: rgba(25, 32, 12, 0.08);
-  --realce-borda: rgba(101, 163, 13, 0.45);
+  --realce-borda: rgba(77, 124, 15, 0.45);
   --realce-texto: #ffffff;
   --barra-fundo: rgba(255, 255, 255, 0.78);
   --barra-links-fundo: rgba(25, 32, 12, 0.05);
@@ -577,6 +577,7 @@ button { font: inherit; }
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: 2.6em;   /* reserva 2 linhas: capas e prateleiras alinhadas */
 }
 
 .cartao-info .meta {
@@ -1035,6 +1036,7 @@ body.leitor {
 }
 
 .admin-menu a:hover { background: var(--realce-fraco); color: var(--realce); }
+.admin-menu a[aria-current="page"] { background: var(--realce-fraco); color: var(--realce); }
 .admin-menu svg { width: 21px; height: 21px; }
 
 section[id], div[id="inicio"] { scroll-margin-top: 96px; }
@@ -2111,5 +2113,53 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 html[data-tema="claro"] .campo select,
 html[data-tema="claro"] .publicacao-campos select,
 html[data-tema="claro"] .arquivos-ferramentas select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%235f9c0a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%234d7c0f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* ====== Ajustes de usabilidade (auditoria UX) ====== */
+
+/* Toast com ação (ex.: Desfazer) */
+.toast-acao {
+  background: none;
+  border: none;
+  color: var(--realce);
+  font: inherit;
+  font-weight: 700;
+  margin-left: 14px;
+  padding: 2px 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+}
+.toast-acao:hover { text-decoration: underline; }
+
+/* Meta dos cartões da estante mantém a linha mesmo vazia (alinhamento) */
+.cartao-info .meta { min-height: 1.25em; }
+
+/* Editor no mobile: só os ícones dos botões do topo (sem estourar) */
+@media (max-width: 720px) {
+  .barra-acoes .rotulo-acao { display: none; }
+  .barra-acoes .botao-publicar svg + .rotulo-acao { margin: 0; }
+}
+
+/* Alvos de toque confortáveis nos controles deslizantes */
+@media (pointer: coarse) {
+  .controle-progresso { height: 40px; }
+  #lupa-controle { width: 40px; }
+}
+
+/* Instrução de envio adequada ao dispositivo (arrastar não existe no toque) */
+.so-toque { display: none; }
+@media (pointer: coarse) {
+  .so-mouse { display: none; }
+  .so-toque { display: inline; }
+}
+
+/* Estante no celular: hero compacto para os catálogos aparecerem na 1ª dobra */
+@media (max-width: 560px) {
+  .hero-estante { padding: 26px 16px 32px; }
+  .hero-estante h1 { font-size: 1.45rem; margin-bottom: 8px; }
+  .hero-estante p { margin-bottom: 16px; font-size: 0.95rem; }
+  .hero-estante .botao-cta { padding: 10px 18px; font-size: 0.92rem; }
 }

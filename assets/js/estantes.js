@@ -2,7 +2,9 @@
 // Cada catálogo pertence a uma estante (sem o campo = principal).
 import {
   temToken, buscarManifesto, manifestoParaBase64, commitar, aplicarCorDeDestaque,
+  dataLegivel,
 } from './nucleo-admin.js';
+import { pedirTexto, pedirNomeDescricao, confirmar } from './dialogo.js';
 
 const el = (id) => document.getElementById(id);
 
@@ -81,7 +83,7 @@ function linhaDeEstante(info, ehPrincipal) {
   ligacao.textContent = url.replace(/^https?:\/\//, '');
   const meta = document.createElement('p');
   const quantos = catalogosDe(info.id).length;
-  meta.textContent = `${quantos === 1 ? '1 catálogo' : `${quantos} catálogos`}${info.criadaEm ? ` · criada em ${info.criadaEm}` : ''}`;
+  meta.textContent = `${quantos === 1 ? '1 catálogo' : `${quantos} catálogos`}${info.criadaEm ? ` · criada em ${dataLegivel(info.criadaEm)}` : ''}`;
   textos.append(nome, ligacao, meta);
   identidade.append(icone, textos);
 
@@ -129,8 +131,13 @@ function desenhar() {
 
 /* ====== Ações ====== */
 
-function novaEstante() {
-  const nome = (window.prompt('Nome da nova estante:') || '').trim();
+async function novaEstante() {
+  const nome = await pedirTexto({
+    titulo: 'Nova estante',
+    rotulo: 'Nome da estante',
+    confirmarRotulo: 'Criar estante',
+    texto: 'Ela ganha um link próprio para compartilhar com os clientes.',
+  });
   if (!nome) return;
   executar('Não foi possível criar a estante', async () => {
     manifesto = await buscarManifesto();
@@ -148,35 +155,46 @@ function novaEstante() {
   });
 }
 
-function personalizar(info, ehPrincipal) {
-  const nome = (window.prompt('Nome da estante:', info.nome) || '').trim();
-  if (!nome) return;
+async function personalizar(info, ehPrincipal) {
   const descricaoAtual = ehPrincipal ? (manifesto.descricao || '') : (info.descricao || '');
-  const descricao = window.prompt('Descrição (opcional):', descricaoAtual);
+  const resposta = await pedirNomeDescricao({
+    titulo: `Personalizar "${info.nome}"`,
+    valorNome: info.nome,
+    valorDescricao: descricaoAtual,
+    confirmarRotulo: 'Salvar',
+    texto: 'O nome e a descrição aparecem no topo da estante pública.',
+  });
+  if (!resposta) return;
+  const { nome, descricao } = resposta;
   executar('Não foi possível personalizar', async () => {
     manifesto = await buscarManifesto();
     if (ehPrincipal) {
       manifesto.titulo = nome;
-      if (descricao && descricao.trim()) manifesto.descricao = descricao.trim();
-      else if (descricao !== null) delete manifesto.descricao;
+      if (descricao) manifesto.descricao = descricao;
+      else delete manifesto.descricao;
     } else {
       const alvo = estantes().find((e) => e.id === info.id);
       if (!alvo) throw new Error('estante não encontrada.');
       alvo.nome = nome;
-      if (descricao && descricao.trim()) alvo.descricao = descricao.trim();
-      else if (descricao !== null) delete alvo.descricao;
+      if (descricao) alvo.descricao = descricao;
+      else delete alvo.descricao;
     }
     await salvarManifesto(`Personaliza a estante "${nome}"`);
     avisar('Estante atualizada!');
   });
 }
 
-function excluir(info) {
+async function excluir(info) {
   const quantos = catalogosDe(info.id).length;
-  const aviso = quantos > 0
-    ? `Excluir a estante "${info.nome}"?\n\nOs ${quantos} catálogo(s) dela voltam para a estante principal (nada é apagado).`
-    : `Excluir a estante vazia "${info.nome}"?`;
-  if (!window.confirm(aviso)) return;
+  const aceitou = await confirmar({
+    titulo: `Excluir a estante "${info.nome}"?`,
+    texto: quantos > 0
+      ? `Os ${quantos} catálogo(s) dela voltam para a estante principal — nada é apagado.`
+      : 'A estante está vazia.',
+    confirmarRotulo: 'Excluir estante',
+    perigo: true,
+  });
+  if (!aceitou) return;
   executar('Não foi possível excluir', async () => {
     manifesto = await buscarManifesto();
     manifesto.estantes = estantes().filter((e) => e.id !== info.id);
@@ -239,6 +257,7 @@ async function iniciar() {
     el('sem-chave').hidden = false;
     return;
   }
+  document.body.classList.add('conectado');
   el('busca-estantes').addEventListener('input', (evento) => {
     termoBusca = evento.target.value.trim();
     desenhar();

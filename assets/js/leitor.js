@@ -380,7 +380,8 @@ function configurarAcoes(entrada) {
   }
 
   el('btn-compartilhar').addEventListener('click', async () => {
-    const url = `${location.origin}${location.pathname}${location.search}`;
+    // Inclui o #p=N: quem recebe o link abre direto na página atual.
+    const url = `${location.origin}${location.pathname}${location.search}${location.hash}`;
     if (navigator.share) {
       try { await navigator.share({ title: entrada.titulo, url }); } catch { /* cancelado */ }
       return;

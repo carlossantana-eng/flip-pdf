@@ -2,8 +2,9 @@
 // direita. Salvar grava no repositório num único commit.
 import {
   temToken, buscarManifesto, manifestoParaBase64, commitar,
-  arquivoParaBase64, aplicarCorDeDestaque,
+  arquivoParaBase64, aplicarCorDeDestaque, dataLegivel,
 } from './nucleo-admin.js';
+import { pedirTexto, confirmar } from './dialogo.js';
 
 const EXTENSOES_CAPA = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
 const LIMITE_CAPA = 2 * 1024 * 1024;
@@ -11,6 +12,14 @@ const el = (id) => document.getElementById(id);
 
 const arquivo = new URLSearchParams(location.search).get('c');
 let manifesto = null;
+let alteracoesPendentes = false;
+
+// Evita perder edições sem querer: avisa ao sair com mudanças não salvas.
+window.addEventListener('beforeunload', (evento) => {
+  if (!alteracoesPendentes) return;
+  evento.preventDefault();
+  evento.returnValue = '';
+});
 let capaNova = null;      // File escolhido, ainda não salvo
 let removerCapa = false;
 
@@ -36,9 +45,13 @@ function preencherPastas(selecionada) {
   }
   select.appendChild(new Option('+ Nova pasta…', '__nova__'));
   select.value = selecionada || '';
-  select.addEventListener('change', () => {
+  select.addEventListener('change', async () => {
     if (select.value !== '__nova__') return;
-    const nome = (window.prompt('Nome da nova pasta:') || '').trim();
+    const nome = await pedirTexto({
+      titulo: 'Nova pasta',
+      rotulo: 'Nome da pasta',
+      confirmarRotulo: 'Criar pasta',
+    });
     if (nome) {
       if (!(manifesto.pastas || []).includes(nome)) {
         manifesto.pastas = [...(manifesto.pastas || []), nome];
@@ -137,6 +150,7 @@ async function salvar() {
 
     capaNova = null;
     removerCapa = false;
+    alteracoesPendentes = false;
     mostrarCapa(entrada);
     el('editor-nome').textContent = titulo;
     avisar('Salvo! As alterações entram no ar em 1–2 minutos.', true);
@@ -151,7 +165,14 @@ async function salvar() {
 
 async function enviarParaLixeira() {
   const entrada = entradaAtual();
-  if (!window.confirm(`Enviar "${entrada.titulo}" para a lixeira?\n\nEle sai da estante, mas pode ser restaurado em Meus Arquivos.`)) return;
+  const aceitou = await confirmar({
+    titulo: `Enviar "${entrada.titulo}" para a lixeira?`,
+    texto: 'Ele sai da estante, mas pode ser restaurado em Meus Arquivos.',
+    confirmarRotulo: 'Enviar para a lixeira',
+    perigo: true,
+  });
+  if (!aceitou) return;
+  alteracoesPendentes = false;
   try {
     manifesto = await buscarManifesto();
     const alvo = entradaAtual();
@@ -171,6 +192,10 @@ async function enviarParaLixeira() {
 }
 
 function configurarEventos(entrada) {
+  for (const campo of ['campo-titulo', 'campo-descricao', 'campo-pasta', 'campo-estante', 'campo-download']) {
+    el(campo).addEventListener('input', () => { alteracoesPendentes = true; });
+    el(campo).addEventListener('change', () => { alteracoesPendentes = true; });
+  }
   el('btn-salvar').addEventListener('click', salvar);
   el('btn-lixeira').addEventListener('click', enviarParaLixeira);
 
@@ -183,11 +208,13 @@ function configurarEventos(entrada) {
     if (imagem.size > LIMITE_CAPA) { avisar('A capa deve ter até 2 MB.'); return; }
     capaNova = imagem;
     removerCapa = false;
+    alteracoesPendentes = true;
     mostrarCapa(entrada);
   });
   el('btn-capa-automatica').addEventListener('click', () => {
     capaNova = null;
     removerCapa = true;
+    alteracoesPendentes = true;
     mostrarCapa(entrada);
     avisar('A capa volta a ser a 1ª página ao salvar.');
   });
@@ -238,7 +265,7 @@ async function iniciar() {
   el('campo-titulo').value = entrada.titulo;
   el('campo-descricao').value = entrada.descricao || '';
   el('campo-download').checked = entrada.permitirDownload !== false;
-  el('editor-arquivo').textContent = `Arquivo: ${entrada.arquivo} · adicionado em ${entrada.adicionadoEm || '—'}`;
+  el('editor-arquivo').textContent = `Arquivo: ${entrada.arquivo} · adicionado em ${dataLegivel(entrada.adicionadoEm)}`;
   preencherPastas(entrada.pasta);
   preencherEstantes(entrada.estante);
   mostrarCapa(entrada);

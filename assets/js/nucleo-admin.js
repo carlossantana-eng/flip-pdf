@@ -168,3 +168,10 @@ export function aplicarCorDeDestaque(cor) {
   raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
   raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
 }
+
+// "2026-07-30" -> "30/07/2026" (datas do manifesto são AAAA-MM-DD).
+export function dataLegivel(iso) {
+  if (!iso) return '—';
+  const partes = String(iso).split('-');
+  return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : iso;
+}
