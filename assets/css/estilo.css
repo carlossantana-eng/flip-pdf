@@ -2239,3 +2239,9 @@ html[data-tema="claro"] .arquivos-ferramentas select {
   object-fit: cover;
   border-radius: inherit;
 }
+
+/* Logomarca oficial em PNG: troca automática pela versão do tema */
+.marca-imagem { height: 40px; width: auto; display: none; }
+html:not([data-tema="claro"]) .marca-imagem--escuro { display: block; }
+html[data-tema="claro"] .marca-imagem--claro { display: block; }
+.logo-central .marca-imagem { height: 34px; }
