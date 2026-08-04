@@ -2,7 +2,7 @@
 // falar com a API do GitHub. A chave de acesso fica só neste navegador.
 import {
   dono, repo, RAMO, gh, commitar, buscarManifesto, manifestoParaBase64,
-  definirToken, temToken, ultimoCommit, aplicarCorDeDestaque,
+  definirToken, temToken, ultimoCommit,
 } from './nucleo-admin.js';
 
 const el = (id) => document.getElementById(id);
@@ -97,7 +97,6 @@ async function mostrarTelaGestao() {
   el('tela-gestao').hidden = false;
   document.body.classList.add('conectado');
   await carregarManifesto();
-  if (manifesto.identidade && manifesto.identidade.cor) aplicarCorDeDestaque(manifesto.identidade.cor);
   saudar();
   atualizarConta();
   el('cartao-cadastro').hidden = Boolean(nomeDoPerfil());

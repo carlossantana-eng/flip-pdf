@@ -156,21 +156,6 @@ export function manifestoParaBase64(manifesto) {
   return textoParaBase64(`${JSON.stringify(manifesto, null, 2)}\n`);
 }
 
-/* ====== Identidade ====== */
-
-export function aplicarCorDeDestaque(cor) {
-  const m = (cor || '').match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-  if (!m) return;
-  const [r, g, b] = [m[1], m[2], m[3]].map((h) => parseInt(h, 16));
-  const raiz = document.documentElement.style;
-  raiz.setProperty('--realce', cor);
-  raiz.setProperty('--cta', cor);
-  raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
-  raiz.setProperty('--realce-borda', `rgba(${r}, ${g}, ${b}, 0.5)`);
-  raiz.setProperty('--realce-texto', corDeTexto(cor));
-  raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
-}
-
 // "2026-07-30" -> "30/07/2026" (datas do manifesto são AAAA-MM-DD).
 export function dataLegivel(iso) {
   if (!iso) return '—';

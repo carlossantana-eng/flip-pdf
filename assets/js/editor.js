@@ -2,7 +2,7 @@
 // direita. Salvar grava no repositório num único commit.
 import {
   temToken, buscarManifesto, manifestoParaBase64, commitar,
-  arquivoParaBase64, aplicarCorDeDestaque, dataLegivel,
+  arquivoParaBase64, dataLegivel,
 } from './nucleo-admin.js';
 import { confirmar } from './dialogo.js';
 
@@ -262,7 +262,6 @@ async function iniciar() {
     el('nao-encontrado').hidden = false;
     return;
   }
-  if (manifesto.identidade && manifesto.identidade.cor) aplicarCorDeDestaque(manifesto.identidade.cor);
 
   const entrada = entradaAtual();
   if (!entrada) {

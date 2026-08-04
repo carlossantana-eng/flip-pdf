@@ -1,7 +1,7 @@
 // Meus Arquivos: gerenciador de publicações do painel — pastas, busca,
 // ordenação e lixeira (enviar, restaurar e excluir definitivamente).
 import {
-  temToken, buscarManifesto, manifestoParaBase64, commitar, aplicarCorDeDestaque,
+  temToken, buscarManifesto, manifestoParaBase64, commitar,
   dataLegivel,
 } from './nucleo-admin.js';
 import { pedirTexto, confirmar } from './dialogo.js';
@@ -471,7 +471,6 @@ async function iniciar() {
     el('erro-geral').hidden = false;
     return;
   }
-  if (manifesto.identidade && manifesto.identidade.cor) aplicarCorDeDestaque(manifesto.identidade.cor);
   el('gerenciador').hidden = false;
   desenhar();
 }

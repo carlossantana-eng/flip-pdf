@@ -3,7 +3,7 @@
 // acompanhar o envio e a publicação do site até o fim.
 import {
   temToken, buscarManifesto, manifestoParaBase64, commitar, gh, RAMO,
-  arquivoParaBase64, nomeSeguro, tituloDoNome, aplicarCorDeDestaque, ultimoCommit,
+  arquivoParaBase64, nomeSeguro, tituloDoNome, ultimoCommit,
 } from './nucleo-admin.js';
 import { pedirTexto } from './dialogo.js';
 import * as pdfjs from '../vendor/pdf.min.mjs';
@@ -429,7 +429,6 @@ async function iniciar() {
     el('erro-geral').hidden = false;
     return;
   }
-  if (manifesto.identidade && manifesto.identidade.cor) aplicarCorDeDestaque(manifesto.identidade.cor);
   mostrarEtapa('etapa-escolha');
 }
 

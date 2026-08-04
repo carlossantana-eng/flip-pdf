@@ -2,7 +2,7 @@
 // própria, separada do Início do painel.
 import {
   temToken, buscarManifesto, manifestoParaBase64, commitar,
-  arquivoParaBase64, aplicarCorDeDestaque,
+  arquivoParaBase64,
 } from './nucleo-admin.js';
 
 const EXTENSOES_LOGO = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/svg+xml': 'svg' };
@@ -111,7 +111,6 @@ async function salvar() {
     logoPendente = null;
     removerLogo = false;
     alteracoesPendentes = false;
-    if (manifesto.identidade.cor) aplicarCorDeDestaque(manifesto.identidade.cor);
     avisar('Configurações salvas! O site republica em 1–2 minutos.', true);
   } catch (erro) {
     console.error(erro);
@@ -158,7 +157,6 @@ async function iniciar() {
     el('erro-geral').hidden = false;
     return;
   }
-  if (manifesto.identidade && manifesto.identidade.cor) aplicarCorDeDestaque(manifesto.identidade.cor);
   preencher();
   el('gerenciador').hidden = false;
 }
