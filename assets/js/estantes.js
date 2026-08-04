@@ -118,6 +118,9 @@ function linhaDeEstante(info, ehPrincipal) {
   };
 
   criarBotao('Adicionar flipbooks', 'botao-suave', () => abrirDialogoCatalogos(info, ehPrincipal));
+  if (quantos > 1) {
+    criarBotao('Organizar', 'botao-suave', () => abrirDialogoOrdenar(info));
+  }
   criarBotao('Personalizar', 'botao-suave', () => personalizar(info, ehPrincipal));
   criarBotao('Copiar link', 'botao-suave', async () => {
     try { await navigator.clipboard.writeText(url); avisar('Link copiado!'); } catch { avisar(url, true); }
@@ -324,6 +327,110 @@ async function excluir(info) {
   });
 }
 
+/* ====== Organizar a sequência ====== */
+
+// Mesma ordem da estante pública: "ordem" crescente; sem ela, mais recentes primeiro.
+function compararOrdem(a, b) {
+  const MAX = Number.MAX_SAFE_INTEGER;
+  const oa = Number.isFinite(a.ordem) ? a.ordem : MAX;
+  const ob = Number.isFinite(b.ordem) ? b.ordem : MAX;
+  return (oa - ob) ||
+    (b.adicionadoEm || '').localeCompare(a.adicionadoEm || '') ||
+    a.titulo.localeCompare(b.titulo, 'pt-BR');
+}
+
+let itemArrastado = null;
+
+function linhaOrdenar(catalogo) {
+  const linha = document.createElement('div');
+  linha.className = 'item-ordenar';
+  linha.dataset.arquivo = catalogo.arquivo;
+  linha.draggable = true;
+  linha.innerHTML =
+    '<span class="alca" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8h16M4 16h16"/></svg></span>';
+  const titulo = document.createElement('strong');
+  titulo.textContent = catalogo.titulo;
+  const setas = document.createElement('span');
+  setas.className = 'setas-ordenar';
+  const criarSeta = (rotulo, simbolo, passo) => {
+    const botao = document.createElement('button');
+    botao.type = 'button';
+    botao.className = 'botao-icone';
+    botao.title = rotulo;
+    botao.setAttribute('aria-label', `${rotulo}: ${catalogo.titulo}`);
+    botao.textContent = simbolo;
+    botao.addEventListener('click', () => {
+      const alvo = passo < 0 ? linha.previousElementSibling : linha.nextElementSibling;
+      if (!alvo) return;
+      if (passo < 0) alvo.before(linha);
+      else alvo.after(linha);
+      atualizarSetasOrdenar();
+      botao.focus();
+    });
+    setas.appendChild(botao);
+    return botao;
+  };
+  criarSeta('Mover para cima', '↑', -1);
+  criarSeta('Mover para baixo', '↓', 1);
+  linha.append(titulo, setas);
+
+  linha.addEventListener('dragstart', (evento) => {
+    itemArrastado = linha;
+    linha.classList.add('arrastando');
+    evento.dataTransfer.effectAllowed = 'move';
+    evento.dataTransfer.setData('text/plain', catalogo.arquivo);
+  });
+  linha.addEventListener('dragend', () => {
+    linha.classList.remove('arrastando');
+    itemArrastado = null;
+    atualizarSetasOrdenar();
+  });
+  linha.addEventListener('dragover', (evento) => {
+    if (!itemArrastado || itemArrastado === linha) return;
+    evento.preventDefault();
+    const caixa = linha.getBoundingClientRect();
+    if (evento.clientY < caixa.top + caixa.height / 2) linha.before(itemArrastado);
+    else linha.after(itemArrastado);
+  });
+  return linha;
+}
+
+function atualizarSetasOrdenar() {
+  const linhas = [...el('lista-ordenar').children];
+  linhas.forEach((linha, indice) => {
+    const [subir, descer] = linha.querySelectorAll('.setas-ordenar button');
+    subir.disabled = indice === 0;
+    descer.disabled = indice === linhas.length - 1;
+  });
+}
+
+function abrirDialogoOrdenar(info) {
+  estanteDoDialogo = { info };
+  el('ordenar-titulo').textContent = `Organizar "${info.nome}"`;
+  const lista = el('lista-ordenar');
+  lista.innerHTML = '';
+  for (const catalogo of catalogosDe(info.id).sort(compararOrdem)) {
+    lista.appendChild(linhaOrdenar(catalogo));
+  }
+  atualizarSetasOrdenar();
+  el('dialogo-ordenar').showModal();
+}
+
+function salvarOrdenar() {
+  const { info } = estanteDoDialogo;
+  const sequencia = [...el('lista-ordenar').children].map((linha) => linha.dataset.arquivo);
+  el('dialogo-ordenar').close();
+  executar('Não foi possível salvar a ordem', async () => {
+    manifesto = await buscarManifesto();
+    sequencia.forEach((arquivo, indice) => {
+      const entrada = manifesto.catalogos.find((c) => c.arquivo === arquivo);
+      if (entrada) entrada.ordem = indice;
+    });
+    await salvarManifesto(`Reordena os flipbooks da estante "${info.nome}"`);
+    avisar('Ordem salva! A estante republica em 1–2 minutos.');
+  });
+}
+
 /* ====== Diálogo de catálogos ====== */
 
 function abrirDialogoCatalogos(info, ehPrincipal) {
@@ -385,6 +492,8 @@ async function iniciar() {
   el('btn-nova-estante').addEventListener('click', novaEstante);
   el('catalogos-cancelar').addEventListener('click', () => el('dialogo-catalogos').close());
   el('catalogos-salvar').addEventListener('click', salvarDialogoCatalogos);
+  el('ordenar-cancelar').addEventListener('click', () => el('dialogo-ordenar').close());
+  el('ordenar-salvar').addEventListener('click', salvarOrdenar);
   el('personalizar-cancelar').addEventListener('click', () => el('dialogo-personalizar').close());
   el('personalizar-salvar').addEventListener('click', salvarPersonalizar);
   el('personalizar-capa-escolher').addEventListener('click', () => el('personalizar-capa-arquivo').click());

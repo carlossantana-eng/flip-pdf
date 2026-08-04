@@ -260,9 +260,13 @@ async function iniciar() {
   document.getElementById('rodape-texto').textContent =
     `${document.title} · atualizado em ${new Date().toLocaleDateString('pt-BR')}`;
 
+  // Ordem definida pelo dono (campo "ordem", crescente); sem ela, os mais
+  // recentes primeiro. Flipbooks novos (sem "ordem") entram no fim da fila.
+  const SEM_ORDEM = Number.MAX_SAFE_INTEGER;
   const catalogos = (manifesto.catalogos || [])
     .filter((c) => !c.lixeira && (c.estante || 'principal') === infoEstante.id)
     .sort((a, b) =>
+    ((Number.isFinite(a.ordem) ? a.ordem : SEM_ORDEM) - (Number.isFinite(b.ordem) ? b.ordem : SEM_ORDEM)) ||
     (b.adicionadoEm || '').localeCompare(a.adicionadoEm || '') ||
     a.titulo.localeCompare(b.titulo, 'pt-BR'));
 

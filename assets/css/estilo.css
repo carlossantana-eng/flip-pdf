@@ -1685,6 +1685,44 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 
 .opcoes-pasta { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 
+/* Diálogo "Organizar": arraste (ou setas) para definir a sequência. */
+.lista-ordenar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0 4px;
+  max-height: min(46vh, 380px);
+  overflow-y: auto;
+}
+
+.item-ordenar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--campo-fundo);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  cursor: grab;
+}
+
+.item-ordenar.arrastando { opacity: 0.45; border-style: dashed; }
+.item-ordenar .alca { flex: none; display: flex; color: var(--tinta-suave); }
+.item-ordenar .alca svg { width: 16px; height: 16px; }
+.item-ordenar strong {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--texto-forte);
+}
+
+.setas-ordenar { display: flex; gap: 4px; flex: none; }
+.setas-ordenar .botao-icone { width: 30px; height: 30px; font-size: 0.95rem; color: var(--tinta); }
+.setas-ordenar .botao-icone:disabled { opacity: 0.35; cursor: default; }
+
 .opcao-pasta {
   background: var(--campo-fundo);
   border: 1px solid var(--borda);
