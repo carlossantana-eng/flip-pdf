@@ -22,5 +22,9 @@
       "descricao": "shaushuahsua"
     }
   ],
-  "identidade": {}
+  "identidade": {
+    "cor": "#451a00",
+    "corSecundaria": "#ecd79b",
+    "corFundo": "#bfa6a6"
+  }
 }
