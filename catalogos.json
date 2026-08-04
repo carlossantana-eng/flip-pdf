@@ -6,12 +6,14 @@
       "arquivo": "catalogo-exemplo.pdf",
       "titulo": "Catálogo de Exemplo",
       "adicionadoEm": "2026-07-31",
-      "descricao": "Catálogo de demonstração — pode ser removido."
+      "descricao": "Catálogo de demonstração — pode ser removido.",
+      "ordem": 1
     },
     {
       "arquivo": "we-connect-identidade-visual.pdf",
       "titulo": "WE Connect identidade visual",
-      "adicionadoEm": "2026-07-31"
+      "adicionadoEm": "2026-07-31",
+      "ordem": 0
     }
   ],
   "estantes": [
