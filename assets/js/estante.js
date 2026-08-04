@@ -185,14 +185,17 @@ async function iniciar() {
     ? { id: 'principal', nome: manifesto.titulo || 'Catálogos', descricao: manifesto.descricao }
     : (manifesto.estantes || []).find((e) => e.id === idEstante);
 
-  if (manifesto.titulo) document.getElementById('marca-texto').textContent = manifesto.titulo;
   const identidade = manifesto.identidade || {};
+  // A barra mostra só a logomarca do cliente (o nome fica no hero).
   if (identidade.logo) {
+    const marca = document.getElementById('marca-estante');
     const logo = document.createElement('img');
     logo.className = 'marca-logo';
     logo.src = identidade.logo;
-    logo.alt = '';
-    document.querySelector('.marca').prepend(logo);
+    logo.alt = manifesto.titulo || 'Início';
+    marca.setAttribute('aria-label', manifesto.titulo || 'Início');
+    marca.appendChild(logo);
+    marca.hidden = false;
   }
 
   if (!infoEstante) {
