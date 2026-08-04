@@ -118,12 +118,12 @@ button { font: inherit; }
   gap: 10px;
 }
 
-/* Ícone da logo: fichário isométrico com páginas em leque. */
+/* Ícone da logo: livro aberto com página virando. */
 .marca-icone {
   flex: none;
-  width: 38px;
-  height: 38px;
-  color: var(--realce);
+  width: 40px;
+  height: 40px;
+  color: var(--texto-forte);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -138,6 +138,11 @@ button { font: inherit; }
 .marca .ponto { color: var(--realce); }
 .marca-flip { color: var(--realce); }
 .marca-pdf { color: var(--texto-forte); }
+
+/* "PDF" vazado, como na logomarca oficial */
+@supports (-webkit-text-stroke: 1px #fff) {
+  .marca-pdf { color: transparent; -webkit-text-stroke: 1.2px var(--texto-forte); }
+}
 
 /* A logo fica sempre no centro da ilha; o rótulo da página fixa à esquerda.
    Nas páginas da plataforma a própria marca FlipPDF é o elemento central
