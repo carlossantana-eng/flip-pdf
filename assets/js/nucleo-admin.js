@@ -166,6 +166,7 @@ export function aplicarCorDeDestaque(cor) {
   raiz.setProperty('--realce', cor);
   raiz.setProperty('--cta', cor);
   raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
+  raiz.setProperty('--realce-borda', `rgba(${r}, ${g}, ${b}, 0.5)`);
   raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
 }
 

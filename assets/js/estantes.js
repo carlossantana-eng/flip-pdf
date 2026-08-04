@@ -4,9 +4,24 @@ import {
   temToken, buscarManifesto, manifestoParaBase64, commitar, aplicarCorDeDestaque,
   dataLegivel,
 } from './nucleo-admin.js';
-import { pedirTexto, pedirNomeDescricao, confirmar } from './dialogo.js';
+import { pedirTexto, confirmar } from './dialogo.js';
 
 const el = (id) => document.getElementById(id);
+
+const PADRAO_PRIMARIA = '#a3e635';
+const PADRAO_SECUNDARIA = '#0b0d08';
+const PADRAO_FUNDO = '#000000';
+
+// Cores efetivas de uma estante: as dela > identidade global > padrão.
+function coresDe(info, ehPrincipal) {
+  const identidade = manifesto.identidade || {};
+  const proprio = ehPrincipal ? identidade : info;
+  return {
+    primaria: proprio.cor || identidade.cor || PADRAO_PRIMARIA,
+    secundaria: proprio.corSecundaria || identidade.corSecundaria || PADRAO_SECUNDARIA,
+    fundo: proprio.corFundo || identidade.corFundo || PADRAO_FUNDO,
+  };
+}
 
 let manifesto = null;
 let termoBusca = '';
@@ -155,29 +170,65 @@ async function novaEstante() {
   });
 }
 
-async function personalizar(info, ehPrincipal) {
-  const descricaoAtual = ehPrincipal ? (manifesto.descricao || '') : (info.descricao || '');
-  const resposta = await pedirNomeDescricao({
-    titulo: `Personalizar "${info.nome}"`,
-    valorNome: info.nome,
-    valorDescricao: descricaoAtual,
-    confirmarRotulo: 'Salvar',
-    texto: 'O nome e a descrição aparecem no topo da estante pública.',
-  });
-  if (!resposta) return;
-  const { nome, descricao } = resposta;
+let personalizando = null;   // { info, ehPrincipal }
+
+function personalizar(info, ehPrincipal) {
+  personalizando = { info, ehPrincipal };
+  el('personalizar-titulo').textContent = `Personalizar "${info.nome}"`;
+  el('personalizar-nome').value = info.nome;
+  el('personalizar-descricao').value = ehPrincipal ? (manifesto.descricao || '') : (info.descricao || '');
+  const cores = coresDe(info, ehPrincipal);
+  el('personalizar-cor').value = cores.primaria;
+  el('personalizar-cor-secundaria').value = cores.secundaria;
+  el('personalizar-cor-fundo').value = cores.fundo;
+  el('personalizar-erro').hidden = true;
+  el('dialogo-personalizar').showModal();
+}
+
+function salvarPersonalizar() {
+  const { info, ehPrincipal } = personalizando;
+  const nome = el('personalizar-nome').value.trim();
+  if (!nome) {
+    el('personalizar-erro').textContent = 'Preencha o nome.';
+    el('personalizar-erro').hidden = false;
+    return;
+  }
+  const descricao = el('personalizar-descricao').value.trim();
+  const primaria = el('personalizar-cor').value.toLowerCase();
+  const secundaria = el('personalizar-cor-secundaria').value.toLowerCase();
+  const fundo = el('personalizar-cor-fundo').value.toLowerCase();
+  el('dialogo-personalizar').close();
   executar('Não foi possível personalizar', async () => {
     manifesto = await buscarManifesto();
+    // Grava a cor só quando difere do que a estante herdaria sem ela.
+    const aplicarCores = (alvo, herdadas) => {
+      if (primaria !== herdadas.primaria) alvo.cor = primaria;
+      else delete alvo.cor;
+      if (secundaria !== herdadas.secundaria) alvo.corSecundaria = secundaria;
+      else delete alvo.corSecundaria;
+      if (fundo !== herdadas.fundo) alvo.corFundo = fundo;
+      else delete alvo.corFundo;
+    };
     if (ehPrincipal) {
       manifesto.titulo = nome;
       if (descricao) manifesto.descricao = descricao;
       else delete manifesto.descricao;
+      manifesto.identidade = { ...(manifesto.identidade || {}) };
+      aplicarCores(manifesto.identidade, {
+        primaria: PADRAO_PRIMARIA, secundaria: PADRAO_SECUNDARIA, fundo: PADRAO_FUNDO,
+      });
     } else {
       const alvo = estantes().find((e) => e.id === info.id);
       if (!alvo) throw new Error('estante não encontrada.');
       alvo.nome = nome;
       if (descricao) alvo.descricao = descricao;
       else delete alvo.descricao;
+      const identidade = manifesto.identidade || {};
+      aplicarCores(alvo, {
+        primaria: identidade.cor || PADRAO_PRIMARIA,
+        secundaria: identidade.corSecundaria || PADRAO_SECUNDARIA,
+        fundo: identidade.corFundo || PADRAO_FUNDO,
+      });
     }
     await salvarManifesto(`Personaliza a estante "${nome}"`);
     avisar('Estante atualizada!');
@@ -265,6 +316,8 @@ async function iniciar() {
   el('btn-nova-estante').addEventListener('click', novaEstante);
   el('catalogos-cancelar').addEventListener('click', () => el('dialogo-catalogos').close());
   el('catalogos-salvar').addEventListener('click', salvarDialogoCatalogos);
+  el('personalizar-cancelar').addEventListener('click', () => el('dialogo-personalizar').close());
+  el('personalizar-salvar').addEventListener('click', salvarPersonalizar);
 
   try {
     manifesto = await buscarManifesto();

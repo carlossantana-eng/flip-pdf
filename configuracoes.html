@@ -93,10 +93,23 @@
             </div>
             <input id="campo-logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
           </div>
-          <label class="campo campo-cor">
-            <span>Cor de destaque (detalhes da estante e do leitor)</span>
-            <input id="campo-cor" type="color" value="#c05621">
-          </label>
+          <div class="linha-cores">
+            <label class="campo campo-cor">
+              <span>Cor primária (botões e detalhes)</span>
+              <input id="campo-cor" type="color" value="#a3e635">
+            </label>
+            <label class="campo campo-cor">
+              <span>Cor secundária (barras e painéis)</span>
+              <input id="campo-cor-secundaria" type="color" value="#0b0d08">
+            </label>
+            <label class="campo campo-cor">
+              <span>Cor de fundo (estante e leitor)</span>
+              <input id="campo-cor-fundo" type="color" value="#000000">
+            </label>
+          </div>
+          <button class="botao botao-suave" id="btn-cores-padrao" type="button">Restaurar cores padrão</button>
+          <p class="dica">Estas são as cores padrão das suas páginas públicas. Cada estante
+            pode ter cores próprias em Minhas Estantes → Personalizar.</p>
         </section>
 
         <button class="botao botao-largo" id="btn-salvar-estante">Salvar configurações</button>

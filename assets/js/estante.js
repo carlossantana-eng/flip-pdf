@@ -24,6 +24,7 @@ function aplicarCorDeDestaque(cor) {
   raiz.setProperty('--realce', cor);
   raiz.setProperty('--cta', cor);
   raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
+  raiz.setProperty('--realce-borda', `rgba(${r}, ${g}, ${b}, 0.5)`);
   raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
 }
 
@@ -184,7 +185,6 @@ async function iniciar() {
 
   if (manifesto.titulo) document.getElementById('marca-texto').textContent = manifesto.titulo;
   const identidade = manifesto.identidade || {};
-  if (identidade.cor) aplicarCorDeDestaque(identidade.cor);
   if (identidade.logo) {
     const logo = document.createElement('img');
     logo.className = 'marca-logo';
@@ -199,6 +199,19 @@ async function iniciar() {
       '<p>Ela pode ter sido removida.</p>' +
       '<a class="botao" href="estante.html">Ir para a estante principal</a>');
     return;
+  }
+
+  // Cores: as da estante vencem as da identidade global.
+  const proprio = infoEstante.id === 'principal' ? identidade : infoEstante;
+  const corPrimaria = proprio.cor || identidade.cor;
+  const corSecundaria = proprio.corSecundaria || identidade.corSecundaria;
+  const corFundo = proprio.corFundo || identidade.corFundo;
+  if (corPrimaria) aplicarCorDeDestaque(corPrimaria);
+  const raiz = document.documentElement.style;
+  if (corFundo) raiz.setProperty('--fundo', corFundo);
+  if (corSecundaria) {
+    raiz.setProperty('--estante-fundo', corSecundaria);
+    raiz.setProperty('--prateleira-fundo', corSecundaria);
   }
 
   document.getElementById('titulo-estante').textContent = infoEstante.nome;

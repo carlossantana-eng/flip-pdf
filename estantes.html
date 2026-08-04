@@ -76,6 +76,38 @@
   </main>
   </div>
 
+  <dialog class="dialogo" id="dialogo-personalizar">
+    <h2 id="personalizar-titulo">Personalizar estante</h2>
+    <label class="campo">
+      <span>Nome</span>
+      <input id="personalizar-nome" type="text" maxlength="80">
+    </label>
+    <label class="campo">
+      <span>Descrição (opcional)</span>
+      <input id="personalizar-descricao" type="text" maxlength="160">
+    </label>
+    <div class="linha-cores">
+      <label class="campo campo-cor">
+        <span>Cor primária</span>
+        <input id="personalizar-cor" type="color">
+      </label>
+      <label class="campo campo-cor">
+        <span>Cor secundária</span>
+        <input id="personalizar-cor-secundaria" type="color">
+      </label>
+      <label class="campo campo-cor">
+        <span>Cor de fundo</span>
+        <input id="personalizar-cor-fundo" type="color">
+      </label>
+    </div>
+    <p class="dica">As cores valem para esta estante e para os flipbooks dela.</p>
+    <p class="erro-campo" id="personalizar-erro" hidden></p>
+    <div class="publicar-rodape">
+      <button class="botao botao-suave" id="personalizar-cancelar">Cancelar</button>
+      <button class="botao" id="personalizar-salvar">Salvar</button>
+    </div>
+  </dialog>
+
   <dialog class="dialogo" id="dialogo-catalogos">
     <h2 id="dialogo-catalogos-titulo">Adicionar flipbooks</h2>
     <p class="dica">Marque o que deve aparecer nesta estante. O que for

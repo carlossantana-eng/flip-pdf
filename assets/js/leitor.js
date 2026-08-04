@@ -464,16 +464,24 @@ async function iniciar() {
     logo.src = manifesto.identidade.logo;
     logo.hidden = false;
   }
-  if (manifesto.identidade && manifesto.identidade.cor) {
-    const m = manifesto.identidade.cor.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+  const identidade = manifesto.identidade || {};
+  const estanteDoFlipbook = (manifesto.estantes || []).find((e) => e.id === entrada.estante) || {};
+  const corPrimaria = estanteDoFlipbook.cor || identidade.cor;
+  const corSecundaria = estanteDoFlipbook.corSecundaria || identidade.corSecundaria;
+  const corFundo = estanteDoFlipbook.corFundo || identidade.corFundo;
+  const raiz = document.documentElement.style;
+  if (corPrimaria) {
+    const m = corPrimaria.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
     if (m) {
       const [r, g, b] = [m[1], m[2], m[3]].map((h) => parseInt(h, 16));
-      const raiz = document.documentElement.style;
-      raiz.setProperty('--realce', manifesto.identidade.cor);
+      raiz.setProperty('--realce', corPrimaria);
       raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
+      raiz.setProperty('--realce-borda', `rgba(${r}, ${g}, ${b}, 0.5)`);
       raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
     }
   }
+  if (corFundo) raiz.setProperty('--leitor-fundo', corFundo);
+  if (corSecundaria) raiz.setProperty('--leitor-topo', corSecundaria);
   configurarAcoes(entrada);
 
   el('carregando-texto').textContent = 'Baixando o flipbook…';

@@ -6,6 +6,9 @@ import {
 } from './nucleo-admin.js';
 
 const EXTENSOES_LOGO = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/svg+xml': 'svg' };
+const PADRAO_PRIMARIA = '#a3e635';
+const PADRAO_SECUNDARIA = '#0b0d08';
+const PADRAO_FUNDO = '#000000';
 const el = (id) => document.getElementById(id);
 
 let manifesto = null;
@@ -38,7 +41,10 @@ function preencher() {
   el('campo-descricao-estante').value = manifesto.descricao || '';
   el('campo-nome-painel').value = nomeDoPerfil();
   el('campo-email-perfil').value = (manifesto.perfil && manifesto.perfil.email) || '';
-  el('campo-cor').value = (manifesto.identidade && manifesto.identidade.cor) || '#c05621';
+  const identidade = manifesto.identidade || {};
+  el('campo-cor').value = identidade.cor || PADRAO_PRIMARIA;
+  el('campo-cor-secundaria').value = identidade.corSecundaria || PADRAO_SECUNDARIA;
+  el('campo-cor-fundo').value = identidade.corFundo || PADRAO_FUNDO;
   const logo = manifesto.identidade && manifesto.identidade.logo;
   const previa = el('logo-previa');
   previa.hidden = !logo;
@@ -93,7 +99,15 @@ async function salvar() {
     delete manifesto.painelNome;
 
     manifesto.identidade = { ...(manifesto.identidade || {}) };
-    manifesto.identidade.cor = el('campo-cor').value;
+    const primaria = el('campo-cor').value.toLowerCase();
+    const secundaria = el('campo-cor-secundaria').value.toLowerCase();
+    const fundo = el('campo-cor-fundo').value.toLowerCase();
+    if (primaria !== PADRAO_PRIMARIA) manifesto.identidade.cor = primaria;
+    else delete manifesto.identidade.cor;
+    if (secundaria !== PADRAO_SECUNDARIA) manifesto.identidade.corSecundaria = secundaria;
+    else delete manifesto.identidade.corSecundaria;
+    if (fundo !== PADRAO_FUNDO) manifesto.identidade.corFundo = fundo;
+    else delete manifesto.identidade.corFundo;
 
     if (logoPendente) {
       const caminhoLogo = `assets/identidade/logo.${EXTENSOES_LOGO[logoPendente.type]}`;
@@ -113,7 +127,7 @@ async function salvar() {
     logoPendente = null;
     removerLogo = false;
     alteracoesPendentes = false;
-    aplicarCorDeDestaque(manifesto.identidade.cor);
+    if (manifesto.identidade.cor) aplicarCorDeDestaque(manifesto.identidade.cor);
     avisar('Configurações salvas! O site republica em 1–2 minutos.', true);
   } catch (erro) {
     console.error(erro);
@@ -125,11 +139,18 @@ async function salvar() {
 }
 
 function configurarEventos() {
-  for (const id of ['campo-titulo-estante', 'campo-descricao-estante', 'campo-nome-painel', 'campo-email-perfil', 'campo-cor']) {
+  for (const id of ['campo-titulo-estante', 'campo-descricao-estante', 'campo-nome-painel', 'campo-email-perfil', 'campo-cor', 'campo-cor-secundaria', 'campo-cor-fundo']) {
     el(id).addEventListener('input', () => { alteracoesPendentes = true; });
     el(id).addEventListener('change', () => { alteracoesPendentes = true; });
   }
   el('btn-salvar-estante').addEventListener('click', salvar);
+  el('btn-cores-padrao').addEventListener('click', () => {
+    el('campo-cor').value = PADRAO_PRIMARIA;
+    el('campo-cor-secundaria').value = PADRAO_SECUNDARIA;
+    el('campo-cor-fundo').value = PADRAO_FUNDO;
+    alteracoesPendentes = true;
+    avisar('Cores padrão restauradas — salve para publicar.');
+  });
   el('btn-escolher-logo').addEventListener('click', () => el('campo-logo').click());
   el('campo-logo').addEventListener('change', () => {
     if (el('campo-logo').files[0]) escolherLogo(el('campo-logo').files[0]);

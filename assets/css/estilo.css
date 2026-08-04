@@ -2194,3 +2194,7 @@ html[data-tema="claro"] .arquivos-ferramentas select {
 @media (max-width: 420px) {
   .grade-passos--detalhada { grid-template-columns: 1fr; }
 }
+
+/* Três cores da identidade lado a lado nas Configurações */
+.linha-cores { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; }
+.linha-cores .campo { margin-bottom: 0; }
