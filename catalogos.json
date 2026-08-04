@@ -17,8 +17,12 @@
   "estantes": [
     {
       "id": "catalogo2",
-      "nome": "Catalogo2",
-      "criadaEm": "2026-08-03"
+      "nome": "Teste",
+      "criadaEm": "2026-08-03",
+      "descricao": "shaushuahsua"
     }
-  ]
+  ],
+  "identidade": {
+    "cor": "#b521c0"
+  }
 }
