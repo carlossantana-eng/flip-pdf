@@ -12,14 +12,14 @@ const PADRAO_PRIMARIA = '#a3e635';
 const PADRAO_SECUNDARIA = '#0b0d08';
 const PADRAO_FUNDO = '#000000';
 
-// Cores efetivas de uma estante: as dela > identidade global > padrão.
+// Cores efetivas de uma estante: as dela > padrão do tema.
+// (A principal guarda as suas na identidade do manifesto.)
 function coresDe(info, ehPrincipal) {
-  const identidade = manifesto.identidade || {};
-  const proprio = ehPrincipal ? identidade : info;
+  const proprio = ehPrincipal ? (manifesto.identidade || {}) : info;
   return {
-    primaria: proprio.cor || identidade.cor || PADRAO_PRIMARIA,
-    secundaria: proprio.corSecundaria || identidade.corSecundaria || PADRAO_SECUNDARIA,
-    fundo: proprio.corFundo || identidade.corFundo || PADRAO_FUNDO,
+    primaria: proprio.cor || PADRAO_PRIMARIA,
+    secundaria: proprio.corSecundaria || PADRAO_SECUNDARIA,
+    fundo: proprio.corFundo || PADRAO_FUNDO,
   };
 }
 
@@ -223,11 +223,8 @@ function salvarPersonalizar() {
       alvo.nome = nome;
       if (descricao) alvo.descricao = descricao;
       else delete alvo.descricao;
-      const identidade = manifesto.identidade || {};
       aplicarCores(alvo, {
-        primaria: identidade.cor || PADRAO_PRIMARIA,
-        secundaria: identidade.corSecundaria || PADRAO_SECUNDARIA,
-        fundo: identidade.corFundo || PADRAO_FUNDO,
+        primaria: PADRAO_PRIMARIA, secundaria: PADRAO_SECUNDARIA, fundo: PADRAO_FUNDO,
       });
     }
     await salvarManifesto(`Personaliza a estante "${nome}"`);

@@ -464,11 +464,12 @@ async function iniciar() {
     logo.src = manifesto.identidade.logo;
     logo.hidden = false;
   }
-  const identidade = manifesto.identidade || {};
-  const estanteDoFlipbook = (manifesto.estantes || []).find((e) => e.id === entrada.estante) || {};
-  const corPrimaria = estanteDoFlipbook.cor || identidade.cor;
-  const corSecundaria = estanteDoFlipbook.corSecundaria || identidade.corSecundaria;
-  const corFundo = estanteDoFlipbook.corFundo || identidade.corFundo;
+  const estanteDoFlipbook = entrada.estante
+    ? ((manifesto.estantes || []).find((e) => e.id === entrada.estante) || {})
+    : (manifesto.identidade || {});
+  const corPrimaria = estanteDoFlipbook.cor;
+  const corSecundaria = estanteDoFlipbook.corSecundaria;
+  const corFundo = estanteDoFlipbook.corFundo;
   const raiz = document.documentElement.style;
   if (corPrimaria) {
     const m = corPrimaria.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);

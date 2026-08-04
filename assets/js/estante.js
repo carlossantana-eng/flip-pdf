@@ -201,11 +201,11 @@ async function iniciar() {
     return;
   }
 
-  // Cores: as da estante vencem as da identidade global.
+  // Cores da estante: a principal guarda as dela na identidade.
   const proprio = infoEstante.id === 'principal' ? identidade : infoEstante;
-  const corPrimaria = proprio.cor || identidade.cor;
-  const corSecundaria = proprio.corSecundaria || identidade.corSecundaria;
-  const corFundo = proprio.corFundo || identidade.corFundo;
+  const corPrimaria = proprio.cor;
+  const corSecundaria = proprio.corSecundaria;
+  const corFundo = proprio.corFundo;
   if (corPrimaria) aplicarCorDeDestaque(corPrimaria);
   const raiz = document.documentElement.style;
   if (corFundo) raiz.setProperty('--fundo', corFundo);
