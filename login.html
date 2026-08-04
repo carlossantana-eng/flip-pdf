@@ -34,6 +34,9 @@
       </label>
       <p class="erro-campo" id="erro" hidden></p>
       <button class="botao botao-largo" id="btn-entrar" type="submit">Entrar</button>
+      <button class="botao botao-suave botao-largo" id="btn-demo" type="button">Entrar com a conta demo</button>
+      <p class="autenticacao-nota">Conta demo: <code>demo@flippdf.com</code> · senha <code>demo123</code> —
+        já vem pronta em qualquer navegador.</p>
       <p class="autenticacao-troca">Ainda não tem conta? <a href="cadastro.html">Criar conta grátis</a></p>
       <p class="autenticacao-nota">Esqueceu a senha? Como a conta é uma demonstração local,
         basta <a href="cadastro.html">criar outra</a> com um novo e-mail.</p>
@@ -41,11 +44,18 @@
   </main>
 
   <script type="module">
-    import { entrar, usuarioAtual } from './assets/js/conta-simulada.js';
+    import { entrar, usuarioAtual, CONTA_DEMO } from './assets/js/conta-simulada.js';
 
     if (usuarioAtual()) location.href = 'admin.html';
 
     const el = (id) => document.getElementById(id);
+
+    el('btn-demo').addEventListener('click', () => {
+      el('campo-email').value = CONTA_DEMO.email;
+      el('campo-senha').value = CONTA_DEMO.senha;
+      el('formulario').requestSubmit();
+    });
+
     el('formulario').addEventListener('submit', async (evento) => {
       evento.preventDefault();
       const erro = el('erro');

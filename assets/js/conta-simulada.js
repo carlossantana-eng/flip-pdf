@@ -62,6 +62,23 @@ export function sairDaConta() {
   localStorage.removeItem(CHAVE_SESSAO);
 }
 
+// Conta demo pré-cadastrada: existe em qualquer navegador, sem cadastro.
+export const CONTA_DEMO = { email: 'demo@flippdf.com', senha: 'demo123' };
+
+async function garantirContaDemo() {
+  const usuarios = lerUsuarios();
+  if (usuarios.some((u) => u.email === CONTA_DEMO.email)) return;
+  usuarios.push({
+    nome: 'Demo',
+    email: CONTA_DEMO.email,
+    senha: await hash(CONTA_DEMO.senha),
+    criadoEm: new Date().toISOString().slice(0, 10),
+  });
+  gravarUsuarios(usuarios);
+}
+
+garantirContaDemo();
+
 // Ajusta a navegação das páginas públicas conforme a sessão:
 // elementos com [data-visitante] aparecem deslogado; [data-logado], logado.
 export function ajustarNavegacao() {

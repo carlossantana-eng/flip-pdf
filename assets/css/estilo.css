@@ -413,6 +413,7 @@ button { font: inherit; }
 .autenticacao-troca { text-align: center; margin-top: 16px !important; }
 .autenticacao-troca a, .autenticacao-nota a { color: var(--realce); }
 .autenticacao-nota { font-size: 0.82rem; text-align: center; margin-top: 10px !important; }
+.autenticacao-nota code { background: var(--superficie-suave); color: var(--realce); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; }
 
 /* Páginas de conteúdo */
 .pagina-conteudo { max-width: 860px; margin: 0 auto; padding: 44px 20px 64px; }
