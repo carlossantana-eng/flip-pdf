@@ -25,6 +25,7 @@
   "identidade": {
     "cor": "#451a00",
     "corSecundaria": "#ecd79b",
-    "corFundo": "#bfa6a6"
+    "corFundo": "#bfa6a6",
+    "logo": "assets/identidade/logo.png"
   }
 }
