@@ -4,7 +4,7 @@ import {
   temToken, buscarManifesto, manifestoParaBase64, commitar,
   arquivoParaBase64, aplicarCorDeDestaque, dataLegivel,
 } from './nucleo-admin.js';
-import { pedirTexto, confirmar } from './dialogo.js';
+import { confirmar } from './dialogo.js';
 
 const EXTENSOES_CAPA = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
 const LIMITE_CAPA = 2 * 1024 * 1024;
@@ -37,34 +37,6 @@ function avisar(texto, demorado = false) {
 
 function entradaAtual() {
   return manifesto.catalogos.find((c) => c.arquivo === arquivo);
-}
-
-function preencherPastas(selecionada) {
-  const select = el('campo-pasta');
-  select.innerHTML = '';
-  select.appendChild(new Option('Sem pasta', ''));
-  for (const nome of [...(manifesto.pastas || [])].sort((a, b) => a.localeCompare(b, 'pt-BR'))) {
-    select.appendChild(new Option(nome, nome));
-  }
-  select.appendChild(new Option('+ Nova pasta…', '__nova__'));
-  select.value = selecionada || '';
-  select.addEventListener('change', async () => {
-    if (select.value !== '__nova__') return;
-    const nome = await pedirTexto({
-      titulo: 'Nova pasta',
-      rotulo: 'Nome da pasta',
-      confirmarRotulo: 'Criar pasta',
-    });
-    if (nome) {
-      if (!(manifesto.pastas || []).includes(nome)) {
-        manifesto.pastas = [...(manifesto.pastas || []), nome];
-      }
-      select.add(new Option(nome, nome), select.options.length - 1);
-      select.value = nome;
-    } else {
-      select.value = '';
-    }
-  });
 }
 
 function preencherEstantes(selecionada) {
@@ -130,16 +102,6 @@ async function salvar() {
     const descricao = el('campo-descricao').value.trim();
     if (descricao) entrada.descricao = descricao;
     else delete entrada.descricao;
-
-    const pasta = el('campo-pasta').value;
-    if (pasta && pasta !== '__nova__') {
-      entrada.pasta = pasta;
-      if (!(manifesto.pastas || []).includes(pasta)) {
-        manifesto.pastas = [...(manifesto.pastas || []), pasta];
-      }
-    } else {
-      delete entrada.pasta;
-    }
 
     if (el('campo-download').checked) delete entrada.permitirDownload;
     else entrada.permitirDownload = false;
@@ -225,7 +187,7 @@ async function enviarParaLixeira() {
 }
 
 function configurarEventos(entrada) {
-  for (const campo of ['campo-titulo', 'campo-descricao', 'campo-pasta', 'campo-estante', 'campo-download']) {
+  for (const campo of ['campo-titulo', 'campo-descricao', 'campo-estante', 'campo-download']) {
     el(campo).addEventListener('input', () => { alteracoesPendentes = true; });
     el(campo).addEventListener('change', () => { alteracoesPendentes = true; });
   }
@@ -319,7 +281,6 @@ async function iniciar() {
   el('campo-descricao').value = entrada.descricao || '';
   el('campo-download').checked = entrada.permitirDownload !== false;
   el('editor-arquivo').textContent = `Arquivo: ${entrada.arquivo} · adicionado em ${dataLegivel(entrada.adicionadoEm)}`;
-  preencherPastas(entrada.pasta);
   preencherEstantes(entrada.estante);
   mostrarCapa(entrada);
   mostrarMusica(entrada);
