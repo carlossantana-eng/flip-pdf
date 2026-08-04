@@ -2165,3 +2165,32 @@ html[data-tema="claro"] .arquivos-ferramentas select {
   .hero-estante p { margin-bottom: 16px; font-size: 0.95rem; }
   .hero-estante .botao-cta { padding: 10px 18px; font-size: 0.92rem; }
 }
+
+/* Subtítulo de seção e passos detalhados (home) */
+.secao-subtitulo {
+  text-align: center;
+  color: var(--tinta-suave);
+  max-width: 56ch;
+  margin: -22px auto 32px;
+  line-height: 1.55;
+}
+
+.grade-passos--detalhada {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.grade-passos--detalhada .passo {
+  text-align: left;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 22px;
+}
+
+.grade-passos--detalhada .passo p { margin: 0 0 10px; font-size: 0.95rem; line-height: 1.6; }
+.grade-passos--detalhada .passo p:last-child { margin-bottom: 0; }
+
+@media (max-width: 420px) {
+  .grade-passos--detalhada { grid-template-columns: 1fr; }
+}
