@@ -139,11 +139,6 @@ button { font: inherit; }
 .marca-flip { color: var(--realce); }
 .marca-pdf { color: var(--texto-forte); }
 
-/* "PDF" vazado, como na logomarca oficial */
-@supports (-webkit-text-stroke: 1px #fff) {
-  .marca-pdf { color: transparent; -webkit-text-stroke: 1.2px var(--texto-forte); }
-}
-
 /* A logo fica sempre no centro da ilha; o rótulo da página fixa à esquerda.
    Nas páginas da plataforma a própria marca FlipPDF é o elemento central
    (.marca-central); nas do app, um ícone central dedicado (.logo-central).
