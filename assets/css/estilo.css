@@ -2198,3 +2198,18 @@ html[data-tema="claro"] .arquivos-ferramentas select {
 /* Três cores da identidade lado a lado nas Configurações */
 .linha-cores { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; }
 .linha-cores .campo { margin-bottom: 0; }
+
+/* Seletor de cor com campo hexadecimal ao lado */
+.cor-com-hex { display: flex; align-items: center; gap: 8px; }
+.cor-com-hex input[type="text"] {
+  font: inherit;
+  font-family: var(--fonte-marca);
+  font-size: 0.88rem;
+  width: 96px;
+  padding: 8px 10px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  background: var(--campo-fundo);
+  color: var(--tinta);
+}
+.cor-com-hex input[type="text"]:focus { outline: none; border-color: var(--realce); box-shadow: var(--brilho); }

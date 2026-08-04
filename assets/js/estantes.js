@@ -172,6 +172,25 @@ async function novaEstante() {
 
 let personalizando = null;   // { info, ehPrincipal }
 
+const PARES_DE_COR = [
+  ['personalizar-cor', 'personalizar-cor-hex'],
+  ['personalizar-cor-secundaria', 'personalizar-cor-secundaria-hex'],
+  ['personalizar-cor-fundo', 'personalizar-cor-fundo-hex'],
+];
+
+// Mantém o seletor e o campo hex sempre iguais, nos dois sentidos.
+function ligarCampoHex(idCor, idHex) {
+  const cor = el(idCor);
+  const hex = el(idHex);
+  cor.addEventListener('input', () => { hex.value = cor.value; });
+  hex.addEventListener('input', () => {
+    let valor = hex.value.trim().toLowerCase();
+    if (valor && !valor.startsWith('#')) valor = `#${valor}`;
+    if (/^#[0-9a-f]{6}$/.test(valor)) cor.value = valor;
+  });
+  hex.addEventListener('blur', () => { hex.value = cor.value; });
+}
+
 function personalizar(info, ehPrincipal) {
   personalizando = { info, ehPrincipal };
   el('personalizar-titulo').textContent = `Personalizar "${info.nome}"`;
@@ -181,6 +200,7 @@ function personalizar(info, ehPrincipal) {
   el('personalizar-cor').value = cores.primaria;
   el('personalizar-cor-secundaria').value = cores.secundaria;
   el('personalizar-cor-fundo').value = cores.fundo;
+  for (const [idCor, idHex] of PARES_DE_COR) el(idHex).value = el(idCor).value;
   el('personalizar-erro').hidden = true;
   el('dialogo-personalizar').showModal();
 }
@@ -315,6 +335,7 @@ async function iniciar() {
   el('catalogos-salvar').addEventListener('click', salvarDialogoCatalogos);
   el('personalizar-cancelar').addEventListener('click', () => el('dialogo-personalizar').close());
   el('personalizar-salvar').addEventListener('click', salvarPersonalizar);
+  for (const [idCor, idHex] of PARES_DE_COR) ligarCampoHex(idCor, idHex);
 
   try {
     manifesto = await buscarManifesto();

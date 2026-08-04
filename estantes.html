@@ -87,18 +87,27 @@
       <input id="personalizar-descricao" type="text" maxlength="160">
     </label>
     <div class="linha-cores">
-      <label class="campo campo-cor">
+      <div class="campo campo-cor">
         <span>Cor primária</span>
-        <input id="personalizar-cor" type="color">
-      </label>
-      <label class="campo campo-cor">
+        <div class="cor-com-hex">
+          <input id="personalizar-cor" type="color" aria-label="Cor primária">
+          <input id="personalizar-cor-hex" type="text" maxlength="7" spellcheck="false" placeholder="#a3e635" aria-label="Cor primária em hexadecimal">
+        </div>
+      </div>
+      <div class="campo campo-cor">
         <span>Cor secundária</span>
-        <input id="personalizar-cor-secundaria" type="color">
-      </label>
-      <label class="campo campo-cor">
+        <div class="cor-com-hex">
+          <input id="personalizar-cor-secundaria" type="color" aria-label="Cor secundária">
+          <input id="personalizar-cor-secundaria-hex" type="text" maxlength="7" spellcheck="false" placeholder="#0b0d08" aria-label="Cor secundária em hexadecimal">
+        </div>
+      </div>
+      <div class="campo campo-cor">
         <span>Cor de fundo</span>
-        <input id="personalizar-cor-fundo" type="color">
-      </label>
+        <div class="cor-com-hex">
+          <input id="personalizar-cor-fundo" type="color" aria-label="Cor de fundo">
+          <input id="personalizar-cor-fundo-hex" type="text" maxlength="7" spellcheck="false" placeholder="#000000" aria-label="Cor de fundo em hexadecimal">
+        </div>
+      </div>
     </div>
     <p class="dica">As cores valem para esta estante e para os flipbooks dela.</p>
     <p class="erro-campo" id="personalizar-erro" hidden></p>
