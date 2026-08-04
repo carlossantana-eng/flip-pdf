@@ -135,7 +135,6 @@ button { font: inherit; }
   filter: drop-shadow(0 0 8px rgba(136, 218, 16, 0.45));
 }
 
-.marca .ponto { color: var(--realce); }
 .marca-flip { color: var(--realce); }
 .marca-pdf { color: var(--texto-forte); }
 
