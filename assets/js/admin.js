@@ -62,16 +62,6 @@ function saudar() {
   const periodo = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
   const nome = nomeDoPerfil();
   el('saudacao-titulo').textContent = nome ? `${periodo}, ${nome}!` : `${periodo}!`;
-  const frases = [
-    'Que seu dia seja leve e produtivo!',
-    'Semana começando — bons negócios!',
-    'Que seu dia seja cheio de alegria e conquistas!',
-    'Seus catálogos estão a um clique dos clientes.',
-    'Um bom catálogo vende sozinho — capriche!',
-    'Quase fim de semana, bora fechar bem!',
-    'Bom descanso — a estante trabalha por você.',
-  ];
-  el('saudacao-frase').textContent = frases[agora.getDay()];
 }
 
 function iniciaisDoNome(nome) {

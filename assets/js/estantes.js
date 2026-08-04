@@ -8,7 +8,7 @@ import { pedirTexto, confirmar } from './dialogo.js';
 
 const el = (id) => document.getElementById(id);
 
-const PADRAO_PRIMARIA = '#a3e635';
+const PADRAO_PRIMARIA = '#88da10';
 const PADRAO_SECUNDARIA = '#0b0d08';
 const PADRAO_FUNDO = '#000000';
 
