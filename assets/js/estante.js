@@ -239,6 +239,16 @@ async function iniciar() {
       : 'rgba(16, 19, 12, 0.68)');
   }
 
+  const capaEstante = infoEstante.id === 'principal' ? identidade.capa : infoEstante.capa;
+  if (capaEstante) {
+    const hero = document.querySelector('.hero');
+    hero.classList.add('hero-com-capa');
+    hero.style.backgroundImage =
+      `linear-gradient(rgba(5, 7, 3, 0.5), rgba(5, 7, 3, 0.62)), url("${capaEstante}")`;
+    hero.style.backgroundSize = 'cover';
+    hero.style.backgroundPosition = 'center';
+  }
+
   document.getElementById('titulo-estante').textContent = infoEstante.nome;
   document.title = infoEstante.nome;
   if (infoEstante.descricao) {

@@ -474,10 +474,10 @@ button { font: inherit; }
 .plano li::before { content: '✓'; position: absolute; left: 0; color: var(--realce); font-weight: 700; }
 
 /* ====== Estante (visual de prateleiras, identidade neon) ====== */
+/* O quadro da prateleira ocupa toda a largura; o conteúdo fica centrado
+   pelo padding lateral calculado. */
 .estante {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 36px 20px 56px;
+  padding: 36px max(20px, calc((100% - 1100px) / 2)) 56px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 40px 26px;
@@ -487,6 +487,19 @@ button { font: inherit; }
     repeating-linear-gradient(90deg, rgba(163, 230, 53, 0.025) 0 2px, transparent 2px 110px),
     var(--estante-fundo);
 }
+
+/* A página da estante é uma coluna: a prateleira estica até o rodapé. */
+.pagina-estante { display: flex; flex-direction: column; min-height: 100vh; }
+.pagina-estante .estante { flex: 1; align-content: start; }
+.pagina-estante .rodape {
+  background: var(--estante-fundo);
+  margin: 0;
+  padding: 14px 16px 20px;
+}
+
+/* Hero com capa: imagem de fundo com véu escuro e texto claro. */
+.hero-com-capa h1 { color: #fff; text-shadow: 0 2px 16px rgba(0, 0, 0, 0.55); }
+.hero-com-capa p { color: rgba(255, 255, 255, 0.9); }
 
 /* A "tábua" onde cada catálogo se apoia. */
 .prateleira {
@@ -2218,3 +2231,11 @@ html[data-tema="claro"] .arquivos-ferramentas select {
 .cartao-info .meta { color: var(--texto-painel-suave, var(--tinta-suave)); }
 .leitor-topo, .leitor-rodape { color: var(--leitor-texto-barra, var(--leitor-texto)); }
 .miniaturas, .lupa { color: #ededed; }  /* sobreposições sempre escuras */
+
+/* Miniatura da capa na lista de estantes */
+.estante-icone img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}

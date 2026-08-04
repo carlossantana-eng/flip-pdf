@@ -2,7 +2,7 @@
 // Cada catálogo pertence a uma estante (sem o campo = principal).
 import {
   temToken, buscarManifesto, manifestoParaBase64, commitar, aplicarCorDeDestaque,
-  dataLegivel,
+  dataLegivel, arquivoParaBase64,
 } from './nucleo-admin.js';
 import { pedirTexto, confirmar } from './dialogo.js';
 
@@ -80,7 +80,10 @@ function linhaDeEstante(info, ehPrincipal) {
   identidade.className = 'estante-identidade';
   const icone = document.createElement('span');
   icone.className = 'estante-icone';
-  icone.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 10h16M4 16h16"/><path d="M9 4v6M15 10v6"/></svg>';
+  const capa = capaDe(info, ehPrincipal);
+  icone.innerHTML = capa
+    ? `<img src="${capa}" alt="">`
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 10h16M4 16h16"/><path d="M9 4v6M15 10v6"/></svg>';
   const textos = document.createElement('div');
   const nome = document.createElement('strong');
   nome.textContent = info.nome;
@@ -171,6 +174,31 @@ async function novaEstante() {
 }
 
 let personalizando = null;   // { info, ehPrincipal }
+let capaNova = null;         // imagem escolhida, ainda não salva
+let removerCapa = false;
+const EXTENSOES_CAPA = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
+
+function capaDe(info, ehPrincipal) {
+  return ehPrincipal ? (manifesto.identidade || {}).capa : info.capa;
+}
+
+function mostrarCapaDialogo() {
+  const { info, ehPrincipal } = personalizando;
+  const previa = el('personalizar-capa-previa');
+  const remover = el('personalizar-capa-remover');
+  if (capaNova) {
+    previa.src = URL.createObjectURL(capaNova);
+    previa.hidden = false;
+    remover.hidden = false;
+  } else if (capaDe(info, ehPrincipal) && !removerCapa) {
+    previa.src = capaDe(info, ehPrincipal);
+    previa.hidden = false;
+    remover.hidden = false;
+  } else {
+    previa.hidden = true;
+    remover.hidden = true;
+  }
+}
 
 const PARES_DE_COR = [
   ['personalizar-cor', 'personalizar-cor-hex'],
@@ -202,6 +230,9 @@ function personalizar(info, ehPrincipal) {
   el('personalizar-cor-fundo').value = cores.fundo;
   for (const [idCor, idHex] of PARES_DE_COR) el(idHex).value = el(idCor).value;
   el('personalizar-erro').hidden = true;
+  capaNova = null;
+  removerCapa = false;
+  mostrarCapaDialogo();
   el('dialogo-personalizar').showModal();
 }
 
@@ -218,8 +249,11 @@ function salvarPersonalizar() {
   const secundaria = el('personalizar-cor-secundaria').value.toLowerCase();
   const fundo = el('personalizar-cor-fundo').value.toLowerCase();
   el('dialogo-personalizar').close();
+  const novaCapa = capaNova;
+  const capaRemovida = removerCapa;
   executar('Não foi possível personalizar', async () => {
     manifesto = await buscarManifesto();
+    const mudancas = [];
     // Grava a cor só quando difere do que a estante herdaria sem ela.
     const aplicarCores = (alvo, herdadas) => {
       if (primaria !== herdadas.primaria) alvo.cor = primaria;
@@ -247,7 +281,25 @@ function salvarPersonalizar() {
         primaria: PADRAO_PRIMARIA, secundaria: PADRAO_SECUNDARIA, fundo: PADRAO_FUNDO,
       });
     }
-    await salvarManifesto(`Personaliza a estante "${nome}"`);
+    // Capa: grava/remove a imagem no mesmo commit.
+    const donoDaCapa = ehPrincipal
+      ? (manifesto.identidade = { ...(manifesto.identidade || {}) })
+      : estantes().find((e) => e.id === info.id);
+    const idDaCapa = ehPrincipal ? 'principal' : info.id;
+    if (novaCapa) {
+      const caminho = `assets/estantes/${idDaCapa}.${EXTENSOES_CAPA[novaCapa.type]}`;
+      mudancas.push({ caminho, conteudoBase64: await arquivoParaBase64(novaCapa) });
+      if (donoDaCapa.capa && donoDaCapa.capa !== caminho) {
+        mudancas.push({ caminho: donoDaCapa.capa, conteudoBase64: null });
+      }
+      donoDaCapa.capa = caminho;
+    } else if (capaRemovida && donoDaCapa.capa) {
+      mudancas.push({ caminho: donoDaCapa.capa, conteudoBase64: null });
+      delete donoDaCapa.capa;
+    }
+
+    mudancas.push({ caminho: 'catalogos.json', conteudoBase64: manifestoParaBase64(manifesto) });
+    await commitar(mudancas, `Personaliza a estante "${nome}"`);
     avisar('Estante atualizada!');
   });
 }
@@ -335,6 +387,22 @@ async function iniciar() {
   el('catalogos-salvar').addEventListener('click', salvarDialogoCatalogos);
   el('personalizar-cancelar').addEventListener('click', () => el('dialogo-personalizar').close());
   el('personalizar-salvar').addEventListener('click', salvarPersonalizar);
+  el('personalizar-capa-escolher').addEventListener('click', () => el('personalizar-capa-arquivo').click());
+  el('personalizar-capa-arquivo').addEventListener('change', () => {
+    const imagem = el('personalizar-capa-arquivo').files[0];
+    el('personalizar-capa-arquivo').value = '';
+    if (!imagem) return;
+    if (!EXTENSOES_CAPA[imagem.type]) { avisar('Use uma imagem PNG, JPG ou WebP.'); return; }
+    if (imagem.size > 2 * 1024 * 1024) { avisar('A capa deve ter até 2 MB.'); return; }
+    capaNova = imagem;
+    removerCapa = false;
+    mostrarCapaDialogo();
+  });
+  el('personalizar-capa-remover').addEventListener('click', () => {
+    capaNova = null;
+    removerCapa = true;
+    mostrarCapaDialogo();
+  });
   for (const [idCor, idHex] of PARES_DE_COR) ligarCampoHex(idCor, idHex);
 
   try {
