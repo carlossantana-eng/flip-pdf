@@ -25,6 +25,11 @@
   "identidade": {
     "cor": "#451a00",
     "corSecundaria": "#ecd79b",
-    "corFundo": "#bfa6a6"
+    "corFundo": "#fcfcfc",
+    "logo": "assets/identidade/logo.png",
+    "capa": "assets/estantes/principal.png"
+  },
+  "perfil": {
+    "nome": "TESTE"
   }
 }
