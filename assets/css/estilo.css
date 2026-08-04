@@ -1996,9 +1996,9 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  border: 1px solid var(--borda);
-  background: rgba(0, 0, 0, 0.8);
-  color: var(--tinta);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;               /* o fundo do botão é sempre escuro, em ambos os temas */
   cursor: pointer;
   display: flex;
   align-items: center;
