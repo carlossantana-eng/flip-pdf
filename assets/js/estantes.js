@@ -83,7 +83,7 @@ function linhaDeEstante(info, ehPrincipal) {
   ligacao.textContent = url.replace(/^https?:\/\//, '');
   const meta = document.createElement('p');
   const quantos = catalogosDe(info.id).length;
-  meta.textContent = `${quantos === 1 ? '1 catálogo' : `${quantos} catálogos`}${info.criadaEm ? ` · criada em ${dataLegivel(info.criadaEm)}` : ''}`;
+  meta.textContent = `${quantos === 1 ? '1 flipbook' : `${quantos} flipbooks`}${info.criadaEm ? ` · criada em ${dataLegivel(info.criadaEm)}` : ''}`;
   textos.append(nome, ligacao, meta);
   identidade.append(icone, textos);
 
@@ -99,7 +99,7 @@ function linhaDeEstante(info, ehPrincipal) {
     return botao;
   };
 
-  criarBotao('Adicionar catálogos', 'botao-suave', () => abrirDialogoCatalogos(info, ehPrincipal));
+  criarBotao('Adicionar flipbooks', 'botao-suave', () => abrirDialogoCatalogos(info, ehPrincipal));
   criarBotao('Personalizar', 'botao-suave', () => personalizar(info, ehPrincipal));
   criarBotao('Copiar link', 'botao-suave', async () => {
     try { await navigator.clipboard.writeText(url); avisar('Link copiado!'); } catch { avisar(url, true); }
@@ -151,7 +151,7 @@ async function novaEstante() {
       criadaEm: new Date().toISOString().slice(0, 10),
     }];
     await salvarManifesto(`Cria a estante "${nome}"`);
-    avisar(`Estante "${nome}" criada — use "Adicionar catálogos" para montá-la.`, true);
+    avisar(`Estante "${nome}" criada — use "Adicionar flipbooks" para montá-la.`, true);
   });
 }
 
@@ -189,7 +189,7 @@ async function excluir(info) {
   const aceitou = await confirmar({
     titulo: `Excluir a estante "${info.nome}"?`,
     texto: quantos > 0
-      ? `Os ${quantos} catálogo(s) dela voltam para a estante principal — nada é apagado.`
+      ? `Os ${quantos} flipbook(s) dela voltam para a estante principal — nada é apagado.`
       : 'A estante está vazia.',
     confirmarRotulo: 'Excluir estante',
     perigo: true,
@@ -200,7 +200,7 @@ async function excluir(info) {
     manifesto.estantes = estantes().filter((e) => e.id !== info.id);
     for (const c of manifesto.catalogos) if (c.estante === info.id) delete c.estante;
     await salvarManifesto(`Exclui a estante "${info.nome}"`);
-    avisar('Estante excluída — os catálogos voltaram para a principal.');
+    avisar('Estante excluída — os flipbooks voltaram para a principal.');
   });
 }
 
@@ -208,12 +208,12 @@ async function excluir(info) {
 
 function abrirDialogoCatalogos(info, ehPrincipal) {
   estanteDoDialogo = { info, ehPrincipal };
-  el('dialogo-catalogos-titulo').textContent = `Catálogos em "${info.nome}"`;
+  el('dialogo-catalogos-titulo').textContent = `Flipbooks em "${info.nome}"`;
   const opcoes = el('opcoes-catalogos');
   opcoes.innerHTML = '';
   const ativos = manifesto.catalogos.filter((c) => !c.lixeira);
   if (ativos.length === 0) {
-    opcoes.innerHTML = '<p class="lista-vazia">Nenhum catálogo publicado ainda.</p>';
+    opcoes.innerHTML = '<p class="lista-vazia">Nenhum flipbook publicado ainda.</p>';
   }
   for (const catalogo of ativos) {
     const opcao = document.createElement('label');

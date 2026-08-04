@@ -114,8 +114,8 @@ async function mostrarTelaGestao() {
   el('btn-notificacoes').hidden = false;
   const ativos = manifesto.catalogos.filter((c) => !c.lixeira).length;
   el('resumo-catalogos').textContent = ativos === 1
-    ? '1 catálogo na estante.'
-    : `${ativos} catálogos na estante.`;
+    ? '1 flipbook na estante.'
+    : `${ativos} flipbooks na estante.`;
   atualizarStatusPublicacao();
   carregarNotificacoes();
 }

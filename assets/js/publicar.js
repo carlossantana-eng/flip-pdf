@@ -199,7 +199,7 @@ function desenharConfiguracao() {
     nota.className = 'publicacao-nota';
     nota.textContent = `Arquivo: ${item.nome}`;
     if (item.substitui) {
-      nota.textContent += ' · substituirá o catálogo existente com este nome';
+      nota.textContent += ' · substituirá o flipbook existente com este nome';
       nota.classList.add('publicacao-substitui');
     }
 
@@ -274,7 +274,7 @@ function fichas(alvo, textoPorItem) {
 
 async function publicarAgora() {
   for (const item of selecionados) {
-    if (!item.titulo.trim()) { avisar('Todo catálogo precisa de um título.'); return; }
+    if (!item.titulo.trim()) { avisar('Todo flipbook precisa de um título.'); return; }
   }
   mostrarEtapa('etapa-envio');
   publicando = true;

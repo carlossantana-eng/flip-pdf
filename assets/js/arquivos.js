@@ -226,7 +226,7 @@ function desenharArquivos() {
       el('btn-enviar-agora').hidden = true;
     } else {
       el('vazio-titulo').textContent = 'Ainda não há arquivos';
-      el('vazio-texto').textContent = 'Publique o primeiro catálogo pelo estúdio.';
+      el('vazio-texto').textContent = 'Publique o primeiro flipbook pelo estúdio.';
       el('btn-enviar-agora').hidden = false;
     }
   }

@@ -462,7 +462,7 @@ function configurarAcoes(entrada) {
 async function iniciar() {
   const arquivo = new URLSearchParams(location.search).get('c');
   if (!arquivo) {
-    mostrarErro('Catálogo não informado', 'Abra um catálogo a partir da estante.');
+    mostrarErro('Flipbook não informado', 'Abra um flipbook a partir da estante.');
     return;
   }
 
@@ -473,13 +473,13 @@ async function iniciar() {
     manifesto = await resposta.json();
   } catch (erro) {
     console.error(erro);
-    mostrarErro('Não foi possível carregar o catálogo', 'Verifique sua conexão e tente novamente.');
+    mostrarErro('Não foi possível carregar o flipbook', 'Verifique sua conexão e tente novamente.');
     return;
   }
 
   const entrada = (manifesto.catalogos || []).find((c) => c.arquivo === arquivo && !c.lixeira);
   if (!entrada) {
-    mostrarErro('Catálogo não encontrado', 'Ele pode ter sido removido ou o link está incorreto.');
+    mostrarErro('Flipbook não encontrado', 'Ele pode ter sido removido ou o link está incorreto.');
     return;
   }
 
@@ -502,12 +502,12 @@ async function iniciar() {
   }
   configurarAcoes(entrada);
 
-  el('carregando-texto').textContent = 'Baixando o catálogo…';
+  el('carregando-texto').textContent = 'Baixando o flipbook…';
   try {
     pdf = await pdfjs.getDocument({ url: `catalogos/${encodeURIComponent(entrada.arquivo)}` }).promise;
   } catch (erro) {
     console.error(erro);
-    mostrarErro('Não foi possível abrir o catálogo', 'Verifique sua conexão e tente novamente.');
+    mostrarErro('Não foi possível abrir o flipbook', 'Verifique sua conexão e tente novamente.');
     return;
   }
 

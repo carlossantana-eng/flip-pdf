@@ -157,7 +157,7 @@ function configurarBusca(itens) {
     if (semResultado) semResultado.remove();
     if (visiveis === 0) {
       estante.insertAdjacentHTML('beforeend',
-        '<div class="estado-estante" id="sem-resultado"><h2>Nenhum catálogo encontrado</h2><p>Tente buscar por outro nome.</p></div>');
+        '<div class="estado-estante" id="sem-resultado"><h2>Nenhum flipbook encontrado</h2><p>Tente buscar por outro nome.</p></div>');
     }
   });
 }
@@ -169,7 +169,7 @@ async function iniciar() {
   } catch (erro) {
     console.error(erro);
     mostrarEstado(
-      '<h2>Não foi possível carregar os catálogos</h2>' +
+      '<h2>Não foi possível carregar os flipbooks</h2>' +
       '<p>Verifique sua conexão e tente novamente.</p>' +
       '<button class="botao" onclick="location.reload()">Recarregar</button>');
     return;
@@ -217,8 +217,8 @@ async function iniciar() {
 
   if (catalogos.length === 0) {
     mostrarEstado(
-      '<h2>Nenhum catálogo publicado ainda</h2>' +
-      '<p>Os catálogos enviados para a pasta <code>catalogos/</code> aparecem aqui automaticamente.</p>');
+      '<h2>Nenhum flipbook publicado ainda</h2>' +
+      '<p>Os flipbooks publicados aparecem aqui automaticamente.</p>');
     return;
   }
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
-  <title>Publicar catálogos</title>
+  <title>Publicar flipbooks</title>
   <link rel="stylesheet" href="assets/css/estilo.css?v=__VERSAO__">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23a3e635' stroke-width='2.5' stroke-linejoin='round'%3E%3Cpath d='M22 11 33 4v24l-11 7z' fill='%23a3e635' stroke='%23060803' stroke-width='1.6'/%3E%3Cpath d='M15 14 26 7v24l-11 7z' fill='%23a3e635' stroke='%23060803' stroke-width='1.6'/%3E%3Cpath d='M8 17 19 10v24l-11 7z' fill='%23a3e635' stroke='%23060803' stroke-width='1.6'/%3E%3Cpath d='M7 22l17 9 17-9v13L24 44 7 35z' fill='%230c0f07'/%3E%3Cpath d='M24 31v13' stroke-width='1.8'/%3E%3C/svg%3E">
   <script>try { if (localStorage.getItem('plataforma-tema') === 'claro') document.documentElement.dataset.tema = 'claro'; } catch (e) { /* sem armazenamento */ }</script>
@@ -60,7 +60,7 @@
         <h1><span class="so-mouse">Arraste e solte PDFs aqui</span><span class="so-toque">Toque para escolher os PDFs</span></h1>
         <p class="dica">PDF · até 60 MB por arquivo · um ou vários de uma vez</p>
         <button class="botao botao-grande" id="btn-selecionar" type="button">Selecionar arquivos do computador</button>
-        <p class="dica dica-rodape">O catálogo só é publicado depois que você revisar título,
+        <p class="dica dica-rodape">O flipbook só é publicado depois que você revisar título,
           pasta e descrição na próxima etapa.</p>
       </div>
       <input id="campo-arquivo" type="file" accept="application/pdf,.pdf" multiple hidden>
@@ -69,7 +69,7 @@
     <!-- Etapa 2: configurar antes de publicar -->
     <section id="etapa-config" hidden>
       <h1 class="publicar-titulo">Configurar publicação</h1>
-      <p class="publicar-subtitulo">Revise cada catálogo antes de publicar. A capa é a 1ª página do PDF.</p>
+      <p class="publicar-subtitulo">Revise cada flipbook antes de publicar. A capa é a 1ª página do PDF.</p>
       <div id="lista-publicacoes" class="lista-publicacoes"></div>
       <div class="publicar-rodape">
         <button class="botao botao-suave" id="btn-voltar-escolha">← Escolher outros arquivos</button>
@@ -103,7 +103,7 @@
         <span>✓</span>
       </div>
       <h1>Publicado!</h1>
-      <p class="publicar-subtitulo">Seus catálogos já estão na estante.</p>
+      <p class="publicar-subtitulo">Seus flipbooks já estão na estante.</p>
       <div class="fichas-arquivos" id="fichas-sucesso"></div>
       <div class="publicar-rodape publicar-rodape-central">
         <button class="botao botao-suave" id="btn-enviar-mais">Publicar mais</button>

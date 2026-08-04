@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Catálogos</title>
-  <meta name="description" content="Estante virtual de catálogos em PDF.">
+  <meta name="description" content="Estante virtual de flipbooks.">
   <link rel="stylesheet" href="assets/css/estilo.css?v=__VERSAO__">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='%23a3e635' stroke-width='2.5' stroke-linejoin='round'%3E%3Cpath d='M22 11 33 4v24l-11 7z' fill='%23a3e635' stroke='%23060803' stroke-width='1.6'/%3E%3Cpath d='M15 14 26 7v24l-11 7z' fill='%23a3e635' stroke='%23060803' stroke-width='1.6'/%3E%3Cpath d='M8 17 19 10v24l-11 7z' fill='%23a3e635' stroke='%23060803' stroke-width='1.6'/%3E%3Cpath d='M7 22l17 9 17-9v13L24 44 7 35z' fill='%230c0f07'/%3E%3Cpath d='M24 31v13' stroke-width='1.8'/%3E%3C/svg%3E">
   <script>try { if (localStorage.getItem('plataforma-tema') === 'claro') document.documentElement.dataset.tema = 'claro'; } catch (e) { /* sem armazenamento */ }</script>
@@ -18,12 +18,12 @@
     <a class="logo-central" href="index.html" title="FlipPDF" aria-label="FlipPDF"><span class="marca-icone" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"><path d="M22 11 33 4v24l-11 7z" fill="currentColor" stroke="#060803" stroke-width="1.6"/><path d="M15 14 26 7v24l-11 7z" fill="currentColor" stroke="#060803" stroke-width="1.6"/><path d="M8 17 19 10v24l-11 7z" fill="currentColor" stroke="#060803" stroke-width="1.6"/><path d="M7 22l17 9 17-9v13L24 44 7 35z" fill="#0c0f07"/><path d="M24 31v13" stroke-width="1.8"/></svg></span></a>
     <div class="barra-acoes">
       <div class="busca-barra">
-        <button class="icone-barra" id="btn-busca" aria-label="Buscar catálogo" aria-expanded="false">
+        <button class="icone-barra" id="btn-busca" aria-label="Buscar flipbook" aria-expanded="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         </button>
-        <input id="campo-busca" type="search" placeholder="Buscar catálogo…" aria-label="Buscar catálogo" hidden>
+        <input id="campo-busca" type="search" placeholder="Buscar flipbook…" aria-label="Buscar flipbook" hidden>
       </div>
-      <a class="botao-publicar" href="admin.html" title="Enviar e editar catálogos">
+      <a class="botao-publicar" href="admin.html" title="Enviar e editar flipbooks">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16.2A5 5 0 0 1 7 7a6 6 0 0 1 11.3 2.2A4.5 4.5 0 0 1 17.5 18H8"/><path d="M12 12v7"/><path d="m8.5 15 3.5-3.5L15.5 15"/></svg>
         Publicar
       </a>
@@ -33,14 +33,14 @@
   <section class="hero hero-estante">
     <h1 id="titulo-estante">Catálogos</h1>
     <p id="descricao-estante">Folheie nossos catálogos direto no navegador — sem precisar baixar nada.</p>
-    <a class="botao-cta" href="#estante">Explorar catálogos
+    <a class="botao-cta" href="#estante">Explorar flipbooks
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
     </a>
   </section>
 
   <main class="estante" id="estante" aria-live="polite">
     <div class="estado-estante" id="estado-inicial">
-      <p>Carregando catálogos…</p>
+      <p>Carregando flipbooks…</p>
     </div>
   </main>
 
