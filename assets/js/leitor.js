@@ -113,25 +113,6 @@ function configurarMusica(entrada) {
 }
 
 /* ====== Velocidade da animação ====== */
-const CHAVE_VELOCIDADE = 'estante-leitor-velocidade';
-const VELOCIDADES = [
-  { rotulo: '0.5×', tempo: 2000 },
-  { rotulo: '1×', tempo: 1000 },
-  { rotulo: '1.5×', tempo: 650 },
-  { rotulo: '2×', tempo: 400 },
-];
-let indiceVelocidade = Math.min(
-  Math.max(parseInt(localStorage.getItem(CHAVE_VELOCIDADE) ?? '1', 10) || 1, 0),
-  VELOCIDADES.length - 1,
-);
-
-function aplicarVelocidade() {
-  el('btn-velocidade').textContent = VELOCIDADES[indiceVelocidade].rotulo;
-  // O StPageFlip lê flippingTime das configurações a cada virada,
-  // então dá para ajustar ao vivo.
-  if (livro) livro.getSettings().flippingTime = VELOCIDADES[indiceVelocidade].tempo;
-}
-
 /* ====== Miniaturas ====== */
 function abrirMiniaturas() {
   const grade = el('miniaturas-grade');
@@ -274,6 +255,7 @@ function montarLivro() {
     autoSize: true,
     maxShadowOpacity: 0.35,
     mobileScrollSupport: false,
+    flippingTime: 400,     // virada sempre rápida (antigo 2×)
   });
 
   livro.on('flip', (evento) => {
@@ -294,7 +276,6 @@ function montarLivro() {
   });
 
   livro.loadFromImages(imagens);
-  aplicarVelocidade();
 
   // Permite colar um link #p=N com o leitor já aberto.
   window.addEventListener('hashchange', () => {
@@ -405,13 +386,6 @@ function configurarAcoes(entrada) {
     });
   }
 
-  el('btn-velocidade').addEventListener('click', () => {
-    indiceVelocidade = (indiceVelocidade + 1) % VELOCIDADES.length;
-    localStorage.setItem(CHAVE_VELOCIDADE, String(indiceVelocidade));
-    aplicarVelocidade();
-    avisar(`Velocidade da animação: ${VELOCIDADES[indiceVelocidade].rotulo}`);
-  });
-  aplicarVelocidade();
 
   el('btn-miniaturas').addEventListener('click', abrirMiniaturas);
   el('miniaturas-fechar').addEventListener('click', fecharMiniaturas);
