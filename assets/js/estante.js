@@ -2,7 +2,7 @@
 // (1ª página do PDF) de cada um, sem baixar o arquivo inteiro.
 // O dono (com a chave salva neste navegador) vê um lápis de edição.
 import * as pdfjs from '../vendor/pdf.min.mjs';
-import { temToken } from './nucleo-admin.js';
+import { temToken, corDeTexto } from './nucleo-admin.js';
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdf.worker.min.mjs', import.meta.url).toString();
 
@@ -25,6 +25,8 @@ function aplicarCorDeDestaque(cor) {
   raiz.setProperty('--cta', cor);
   raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
   raiz.setProperty('--realce-borda', `rgba(${r}, ${g}, ${b}, 0.5)`);
+  raiz.setProperty('--realce-texto', corDeTexto(cor));
+  raiz.setProperty('--cta-texto', corDeTexto(cor));
   raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
 }
 
@@ -208,10 +210,33 @@ async function iniciar() {
   const corFundo = proprio.corFundo;
   if (corPrimaria) aplicarCorDeDestaque(corPrimaria);
   const raiz = document.documentElement.style;
-  if (corFundo) raiz.setProperty('--fundo', corFundo);
+  if (corFundo) {
+    raiz.setProperty('--fundo', corFundo);
+    // Contraste automático: os textos da página seguem a luminância do fundo.
+    const texto = corDeTexto(corFundo);
+    const paginaClara = texto !== '#ffffff';
+    raiz.setProperty('--texto-forte', texto);
+    raiz.setProperty('--tinta', paginaClara ? '#262b20' : '#ededed');
+    raiz.setProperty('--tinta-suave', paginaClara ? 'rgba(30, 35, 22, 0.68)' : 'rgba(237, 237, 237, 0.68)');
+    raiz.setProperty('--borda', paginaClara ? 'rgba(20, 25, 12, 0.16)' : 'rgba(255, 255, 255, 0.14)');
+    raiz.setProperty('--barra-fundo', paginaClara ? 'rgba(255, 255, 255, 0.78)' : 'rgba(8, 10, 5, 0.72)');
+    raiz.setProperty('--campo-fundo', paginaClara ? '#ffffff' : '#0d0d0d');
+    raiz.setProperty('--hover-fundo', paginaClara ? 'rgba(0, 0, 0, 0.06)' : '#111111');
+    raiz.setProperty('--linha-suave', paginaClara ? 'rgba(25, 32, 12, 0.08)' : 'rgba(255, 255, 255, 0.08)');
+    raiz.setProperty('--superficie-suave', paginaClara ? 'rgba(0, 0, 0, 0.05)' : '#101010');
+    raiz.setProperty('--sombra-barra', paginaClara
+      ? '0 10px 30px rgba(35, 45, 15, 0.12)'
+      : '0 10px 34px rgba(0, 0, 0, 0.55)');
+  }
   if (corSecundaria) {
     raiz.setProperty('--estante-fundo', corSecundaria);
     raiz.setProperty('--prateleira-fundo', corSecundaria);
+    // Textos dentro dos painéis seguem a luminância do painel.
+    const textoPainel = corDeTexto(corSecundaria);
+    raiz.setProperty('--texto-painel', textoPainel);
+    raiz.setProperty('--texto-painel-suave', textoPainel === '#ffffff'
+      ? 'rgba(255, 255, 255, 0.68)'
+      : 'rgba(16, 19, 12, 0.68)');
   }
 
   document.getElementById('titulo-estante').textContent = infoEstante.nome;

@@ -3,6 +3,18 @@
 // as mais próximas da página em exibição.
 import * as pdfjs from '../vendor/pdf.min.mjs';
 
+// Texto preto ou branco conforme a luminância da cor de fundo (WCAG).
+function corDeTexto(hex) {
+  const m = String(hex).match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+  if (!m) return '#ffffff';
+  const [r, g, b] = [m[1], m[2], m[3]].map((par) => {
+    const c = parseInt(par, 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  const luminancia = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminancia > 0.18 ? '#10130c' : '#ffffff';
+}
+
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdf.worker.min.mjs', import.meta.url).toString();
 
 const LARGURA_RENDER = Math.min(1440, Math.round(880 * Math.min(window.devicePixelRatio || 1, 2)));
@@ -478,11 +490,18 @@ async function iniciar() {
       raiz.setProperty('--realce', corPrimaria);
       raiz.setProperty('--realce-fraco', `rgba(${r}, ${g}, ${b}, 0.16)`);
       raiz.setProperty('--realce-borda', `rgba(${r}, ${g}, ${b}, 0.5)`);
+      raiz.setProperty('--realce-texto', corDeTexto(corPrimaria));
       raiz.setProperty('--brilho', `0 0 22px rgba(${r}, ${g}, ${b}, 0.22)`);
     }
   }
-  if (corFundo) raiz.setProperty('--leitor-fundo', corFundo);
-  if (corSecundaria) raiz.setProperty('--leitor-topo', corSecundaria);
+  if (corFundo) {
+    raiz.setProperty('--leitor-fundo', corFundo);
+    raiz.setProperty('--leitor-texto', corDeTexto(corFundo) === '#ffffff' ? '#ededed' : '#10130c');
+  }
+  if (corSecundaria) {
+    raiz.setProperty('--leitor-topo', corSecundaria);
+    raiz.setProperty('--leitor-texto-barra', corDeTexto(corSecundaria) === '#ffffff' ? '#ededed' : '#10130c');
+  }
   configurarAcoes(entrada);
 
   el('carregando-texto').textContent = 'Baixando o flipbook…';

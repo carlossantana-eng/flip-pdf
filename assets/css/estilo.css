@@ -254,7 +254,7 @@ button { font: inherit; }
   align-items: center;
   gap: 10px;
   background: var(--cta);
-  color: #000;
+  color: var(--cta-texto, #000);
   text-decoration: none;
   font-weight: 800;
   font-size: 1rem;
@@ -574,7 +574,7 @@ button { font: inherit; }
   font-size: 0.98rem;
   font-weight: 600;
   line-height: 1.3;
-  color: var(--texto-forte);
+  color: var(--texto-painel, var(--texto-forte));
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -2213,3 +2213,8 @@ html[data-tema="claro"] .arquivos-ferramentas select {
   color: var(--tinta);
 }
 .cor-com-hex input[type="text"]:focus { outline: none; border-color: var(--realce); box-shadow: var(--brilho); }
+
+/* Contraste automático das paletas personalizadas */
+.cartao-info .meta { color: var(--texto-painel-suave, var(--tinta-suave)); }
+.leitor-topo, .leitor-rodape { color: var(--leitor-texto-barra, var(--leitor-texto)); }
+.miniaturas, .lupa { color: #ededed; }  /* sobreposições sempre escuras */
