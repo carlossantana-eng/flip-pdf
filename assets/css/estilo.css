@@ -1057,7 +1057,7 @@ body.leitor {
 
 section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 
-.saudacao { padding: 12px 2px 0; }
+.saudacao { padding: 0 2px; }
 .saudacao h2 {
   margin: 0;
   font-family: var(--fonte-marca);
@@ -1080,7 +1080,7 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
   background: var(--superficie);
   border: 1px solid var(--borda);
   border-radius: 12px;
-  padding: 14px;
+  padding: 16px 20px;
   cursor: pointer;
   text-decoration: none;
   color: inherit;
@@ -1135,6 +1135,16 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
   gap: 16px;
 }
 
+/* Os wrappers de conteúdo seguem o mesmo ritmo de 16px do corpo. */
+#gerenciador:not([hidden]),
+#tela-gestao:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#gerenciador > .editor-dica, #gerenciador > .botao-largo { margin: 0; }
+
 .cartao-admin {
   background: var(--superficie);
   border: 1px solid var(--borda);
@@ -1145,6 +1155,7 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 .cartao-admin h2 { margin: 0 0 12px; font-size: 1.05rem; color: var(--texto-forte); font-family: var(--fonte-marca); }
 .cartao-admin p { margin: 0 0 10px; line-height: 1.55; color: var(--tinta-suave); }
 .cartao-admin p strong { color: var(--tinta); }
+.cartao-admin > :last-child { margin-bottom: 0; }
 .cartao-admin a { color: var(--realce); }
 
 .passo-a-passo { margin: 6px 0 14px; }
