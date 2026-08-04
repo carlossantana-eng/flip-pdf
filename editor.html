@@ -74,6 +74,17 @@
           <input id="campo-capa" type="file" accept="image/png,image/jpeg,image/webp" hidden>
         </div>
 
+        <div class="campo">
+          <span class="editor-rotulo">Música de fundo (opcional)</span>
+          <p class="publicacao-nota" id="musica-estado">Sem música.</p>
+          <div class="publicacao-controles-capa">
+            <button class="botao botao-suave" id="btn-escolher-musica" type="button">Escolher MP3…</button>
+            <button class="botao botao-suave" id="btn-remover-musica" type="button" hidden>Remover</button>
+          </div>
+          <input id="campo-musica" type="file" accept="audio/mpeg,.mp3" hidden>
+          <p class="dica">Toca em loop no leitor — o cliente pode pausar. Até 8 MB.</p>
+        </div>
+
         <label class="campo-check">
           <input id="campo-download" type="checkbox" checked>
           Permitir que os clientes baixem o PDF

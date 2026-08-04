@@ -8,6 +8,7 @@ import { pedirTexto, confirmar } from './dialogo.js';
 
 const EXTENSOES_CAPA = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
 const LIMITE_CAPA = 2 * 1024 * 1024;
+const LIMITE_MUSICA = 8 * 1024 * 1024;
 const el = (id) => document.getElementById(id);
 
 const arquivo = new URLSearchParams(location.search).get('c');
@@ -22,6 +23,8 @@ window.addEventListener('beforeunload', (evento) => {
 });
 let capaNova = null;      // File escolhido, ainda não salvo
 let removerCapa = false;
+let musicaNova = null;    // MP3 escolhido, ainda não salvo
+let removerMusica = false;
 
 let temporizadorToast = null;
 function avisar(texto, demorado = false) {
@@ -96,6 +99,21 @@ function mostrarCapa(entrada) {
   }
 }
 
+function mostrarMusica(entrada) {
+  const estado = el('musica-estado');
+  const remover = el('btn-remover-musica');
+  if (musicaNova) {
+    estado.textContent = `Nova música: ${musicaNova.name} (salve para publicar)`;
+    remover.hidden = false;
+  } else if (entrada.musica && !removerMusica) {
+    estado.textContent = `Música atual: ${entrada.musica.split('/').pop()}`;
+    remover.hidden = false;
+  } else {
+    estado.textContent = 'Sem música.';
+    remover.hidden = true;
+  }
+}
+
 async function salvar() {
   const titulo = el('campo-titulo').value.trim();
   if (!titulo) { avisar('O título não pode ficar vazio.'); return; }
@@ -145,13 +163,28 @@ async function salvar() {
       delete entrada.capa;
     }
 
+    if (musicaNova) {
+      const caminhoMusica = `catalogos/musicas/${arquivo.replace(/\.pdf$/i, '')}.mp3`;
+      mudancas.push({ caminho: caminhoMusica, conteudoBase64: await arquivoParaBase64(musicaNova) });
+      if (entrada.musica && entrada.musica !== caminhoMusica) {
+        mudancas.push({ caminho: entrada.musica, conteudoBase64: null });
+      }
+      entrada.musica = caminhoMusica;
+    } else if (removerMusica && entrada.musica) {
+      mudancas.push({ caminho: entrada.musica, conteudoBase64: null });
+      delete entrada.musica;
+    }
+
     mudancas.push({ caminho: 'catalogos.json', conteudoBase64: manifestoParaBase64(manifesto) });
     await commitar(mudancas, `Atualiza a publicação "${titulo}"`);
 
     capaNova = null;
     removerCapa = false;
+    musicaNova = null;
+    removerMusica = false;
     alteracoesPendentes = false;
     mostrarCapa(entrada);
+    mostrarMusica(entrada);
     el('editor-nome').textContent = titulo;
     avisar('Salvo! As alterações entram no ar em 1–2 minutos.', true);
   } catch (erro) {
@@ -219,6 +252,26 @@ function configurarEventos(entrada) {
     avisar('A capa volta a ser a 1ª página ao salvar.');
   });
 
+  el('btn-escolher-musica').addEventListener('click', () => el('campo-musica').click());
+  el('campo-musica').addEventListener('change', () => {
+    const som = el('campo-musica').files[0];
+    el('campo-musica').value = '';
+    if (!som) return;
+    if (som.type !== 'audio/mpeg' && !/\.mp3$/i.test(som.name)) { avisar('Use um arquivo MP3.'); return; }
+    if (som.size > LIMITE_MUSICA) { avisar('A música deve ter até 8 MB.'); return; }
+    musicaNova = som;
+    removerMusica = false;
+    alteracoesPendentes = true;
+    mostrarMusica(entrada);
+  });
+  el('btn-remover-musica').addEventListener('click', () => {
+    musicaNova = null;
+    removerMusica = true;
+    alteracoesPendentes = true;
+    mostrarMusica(entrada);
+    avisar('A música será removida ao salvar.');
+  });
+
   const urlLeitor = new URL(`leitor.html?c=${encodeURIComponent(arquivo)}`, location.href).toString();
   const copiar = el('btn-copiar-link');
   copiar.hidden = false;
@@ -269,6 +322,7 @@ async function iniciar() {
   preencherPastas(entrada.pasta);
   preencherEstantes(entrada.estante);
   mostrarCapa(entrada);
+  mostrarMusica(entrada);
   configurarEventos(entrada);
 
   el('previa').src = `leitor.html?c=${encodeURIComponent(arquivo)}`;

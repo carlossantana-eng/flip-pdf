@@ -69,46 +69,47 @@ function atualizarIndicador() {
   el('controle-progresso').value = String(atual);
 }
 
-/* ====== Som da virada de página ====== */
-const CHAVE_SOM = 'estante-leitor-som';
-let somLigado = localStorage.getItem(CHAVE_SOM) !== '0';
-let contextoAudio = null;
+/* ====== Música de fundo (opcional, definida no editor) ====== */
+let musica = null;
+let musicaLigada = false;
 
-// Sintetiza um "swish" curto de papel — sem arquivo de áudio.
-function tocarSomDeVirada() {
-  if (!somLigado) return;
-  try {
-    if (!contextoAudio) contextoAudio = new (window.AudioContext || window.webkitAudioContext)();
-    if (contextoAudio.state === 'suspended') contextoAudio.resume();
-    const duracao = 0.16;
-    const taxa = contextoAudio.sampleRate;
-    const buffer = contextoAudio.createBuffer(1, Math.round(taxa * duracao), taxa);
-    const dados = buffer.getChannelData(0);
-    for (let i = 0; i < dados.length; i += 1) dados[i] = Math.random() * 2 - 1;
-
-    const fonte = contextoAudio.createBufferSource();
-    fonte.buffer = buffer;
-    const filtro = contextoAudio.createBiquadFilter();
-    filtro.type = 'bandpass';
-    filtro.Q.value = 0.9;
-    filtro.frequency.setValueAtTime(900, contextoAudio.currentTime);
-    filtro.frequency.exponentialRampToValueAtTime(2600, contextoAudio.currentTime + duracao);
-    const ganho = contextoAudio.createGain();
-    ganho.gain.setValueAtTime(0.0001, contextoAudio.currentTime);
-    ganho.gain.exponentialRampToValueAtTime(0.16, contextoAudio.currentTime + 0.02);
-    ganho.gain.exponentialRampToValueAtTime(0.0001, contextoAudio.currentTime + duracao);
-    fonte.connect(filtro).connect(ganho).connect(contextoAudio.destination);
-    fonte.start();
-  } catch { /* áudio bloqueado — segue sem som */ }
+function atualizarBotaoMusica() {
+  const botao = el('btn-musica');
+  botao.setAttribute('aria-pressed', String(musicaLigada));
+  botao.title = musicaLigada ? 'Pausar a música' : 'Tocar a música de fundo';
+  botao.innerHTML = musicaLigada
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="m3 3 18 18"/></svg>';
 }
 
-function atualizarBotaoSom() {
-  const botao = el('btn-som');
-  botao.setAttribute('aria-pressed', String(somLigado));
-  botao.title = somLigado ? 'Silenciar virada de página' : 'Ativar som da virada';
-  botao.innerHTML = somLigado
-    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>'
-    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 5M21 9l-5 5"/></svg>';
+function configurarMusica(entrada) {
+  if (!entrada.musica) return;
+  const botao = el('btn-musica');
+  botao.hidden = false;
+  musica = new Audio(entrada.musica);
+  musica.loop = true;
+  musica.volume = 0.45;
+
+  botao.addEventListener('click', () => {
+    musicaLigada = !musicaLigada;
+    if (musicaLigada) musica.play().catch(() => { musicaLigada = false; atualizarBotaoMusica(); });
+    else musica.pause();
+    atualizarBotaoMusica();
+  });
+
+  // Tenta tocar sozinho; se o navegador bloquear o autoplay, começa no
+  // primeiro toque do leitor (o botão continua servindo para pausar).
+  musica.play().then(() => {
+    musicaLigada = true;
+    atualizarBotaoMusica();
+  }).catch(() => {
+    document.addEventListener('pointerdown', () => {
+      if (!musicaLigada && musica.paused) {
+        musica.play().then(() => { musicaLigada = true; atualizarBotaoMusica(); }).catch(() => { /* segue em silêncio */ });
+      }
+    }, { once: true });
+  });
+  atualizarBotaoMusica();
 }
 
 /* ====== Velocidade da animação ====== */
@@ -284,7 +285,6 @@ function montarLivro() {
   livro.on('changeState', (evento) => {
     const estadoAnterior = estadoLivro;
     estadoLivro = evento.data;
-    if (estadoLivro === 'flipping' && estadoAnterior !== 'flipping') tocarSomDeVirada();
     if (estadoLivro === 'read' && atualizacaoPendente) aplicarPaginas();
   });
 
@@ -375,6 +375,7 @@ function configurarAcoes(entrada) {
   } else {
     el('btn-baixar').href = `catalogos/${encodeURIComponent(entrada.arquivo)}`;
   }
+  configurarMusica(entrada);
   if (entrada.estante) {
     document.querySelector('.leitor-topo .botao-icone').href = `estante.html?e=${encodeURIComponent(entrada.estante)}`;
   }
@@ -403,14 +404,6 @@ function configurarAcoes(entrada) {
       else document.documentElement.requestFullscreen();
     });
   }
-
-  el('btn-som').addEventListener('click', () => {
-    somLigado = !somLigado;
-    localStorage.setItem(CHAVE_SOM, somLigado ? '1' : '0');
-    atualizarBotaoSom();
-    if (somLigado) tocarSomDeVirada();
-  });
-  atualizarBotaoSom();
 
   el('btn-velocidade').addEventListener('click', () => {
     indiceVelocidade = (indiceVelocidade + 1) % VELOCIDADES.length;
