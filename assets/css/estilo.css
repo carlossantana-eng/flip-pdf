@@ -1057,7 +1057,7 @@ body.leitor {
 
 section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 
-.saudacao { padding: 12px 2px 4px; }
+.saudacao { padding: 12px 2px 0; }
 .saudacao h2 {
   margin: 0;
   font-family: var(--fonte-marca);
@@ -1070,7 +1070,7 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 .cartoes-acao {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
 .cartao-acao {
@@ -1132,7 +1132,7 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
   padding: 24px 20px 56px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .cartao-admin {
