@@ -240,12 +240,14 @@ button { font: inherit; }
 }
 
 .hero p {
-  margin: 0 auto 30px;
-  max-width: 46ch;
+  margin: 0 auto 14px;
+  max-width: 52ch;
   font-size: clamp(1rem, 2vw, 1.2rem);
   line-height: 1.55;
   color: var(--tinta-suave);
 }
+
+.hero .hero-acoes { margin-top: 30px; }
 
 .botao-cta {
   display: inline-flex;
