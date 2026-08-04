@@ -13,5 +13,12 @@
       "titulo": "WE Connect identidade visual",
       "adicionadoEm": "2026-07-31"
     }
+  ],
+  "estantes": [
+    {
+      "id": "catalogo2",
+      "nome": "Catalogo2",
+      "criadaEm": "2026-08-03"
+    }
   ]
 }
