@@ -1,0 +1,12 @@
+{
+  "name": "flip-pdf",
+  "private": true,
+  "description": "FlipPDF — PDFs em flipbooks numa estante virtual (GitHub Pages).",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/rodar.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

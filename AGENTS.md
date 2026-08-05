@@ -6,14 +6,18 @@ arquivo define as regras de trabalho.
 
 ## Princípios
 
-1. **Site estático, sem build e sem dependências.** Nada de npm install,
-   frameworks ou bundlers. JavaScript puro (ES modules), CSS puro.
-   As bibliotecas de terceiros (PDF.js, StPageFlip) ficam vendorizadas em
-   `assets/vendor/` — não troque por CDN.
+1. **Site estático, sem dependências em runtime.** Nada de frameworks ou
+   bundlers. JavaScript puro (ES modules), CSS puro. As bibliotecas de
+   terceiros (PDF.js, StPageFlip) ficam vendorizadas em `assets/vendor/`
+   — não troque por CDN. A única dependência npm é o Playwright, dev-only,
+   para as suítes de `tests/` — nunca adicione dependência de runtime.
 2. **`catalogos.json` é gerado.** Quem escreve nele é
    `scripts/gerar-manifesto.mjs` (rodado pelo workflow `publicar.yml` na
    `main`). Edições manuais de `titulo`/`descricao` são preservadas pelo
-   script; nunca faça o script sobrescrevê-las.
+   script; nunca faça o script sobrescrevê-las. O mesmo workflow gera as
+   páginas de compartilhamento `f/` (flipbooks) e `e/` (estantes) com
+   `scripts/gerar-compartilhamento.mjs` — são artefatos de build
+   (gitignorados), com Open Graph para preview de link no WhatsApp.
 3. **Conteúdo (PDFs) não se mistura com código.** PDFs vivem só em
    `catalogos/`; capas opcionais em `catalogos/capas/`.
 4. **Caminhos sempre relativos** (sem `/` inicial): o site é servido no
@@ -35,13 +39,17 @@ arquivo define as regras de trabalho.
    os campos extras das entradas (pasta, lixeira, descrição etc.) —
    mudanças nesse contrato exigem atualizar script e páginas juntos.
 9. **Lixeira**: catálogo com `lixeira: true` no manifesto fica oculto
-   da estante e do leitor, mas o PDF permanece no repositório até a
-   exclusão definitiva pela página de arquivos.
+   da estante e do leitor; `lixeiraEm` marca a data e a página de
+   arquivos exclui definitivamente (PDF + capa + música) o que passar
+   de 30 dias.
 10. **Campos por catálogo no manifesto**: `pasta` (organização
     privada), `estante` (estante pública; ausente = principal),
-    `permitirDownload: false`, `capa` e `leitor` (design do leitor:
-    `{fundo, barra, ocultar: [...]}`). Estantes extras vivem no
-    top-level `estantes: [{id, nome, descricao?, criadaEm}]`.
+    `permitirDownload: false`, `capa` (própria ou WebP pré-gerada da
+    1ª página na publicação), `musica` e `ordem` (sequência na
+    estante; menor primeiro, sem `ordem` = por data no fim). Estantes
+    extras vivem no top-level
+    `estantes: [{id, nome, descricao?, criadaEm, cor?, corSecundaria?, corFundo?, capa?}]`;
+    a principal guarda cores/capa em `identidade`.
 
 11. **Contas de usuário são SIMULADAS** (`conta-simulada.js`,
     localStorage): não prometem segurança nem multiusuário real. Não
@@ -49,9 +57,15 @@ arquivo define as regras de trabalho.
     A raiz é a landing da plataforma; a estante dos clientes é
     `estante.html`.
 
-## Testes manuais mínimos antes de entregar
+## Testes antes de entregar
 
+- **Suítes automatizadas**: `npm install` e depois `npm test` (roda
+  `tests/rodar.mjs`: sobe servidor local e executa as suítes Playwright
+  com a API do GitHub simulada — nenhum teste toca a rede). O CI
+  (`verificar.yml`) roda tudo em PRs e em pushes de código na `main`.
+  Se o Chromium local não for o do Playwright, aponte-o com
+  `CHROMIUM_BIN=<caminho>`.
 - `node scripts/gerar-manifesto.mjs --check` passa.
-- Estante e leitor abrem via `python3 -m http.server` (capa renderiza,
-  flip funciona, lupa abre, link `#p=N` posiciona na página certa).
-- Testar viewport mobile (~390px) além do desktop.
+- Para mudanças visuais, confira também no navegador via
+  `python3 -m http.server` em desktop e mobile (~390px) — as suítes
+  cobrem comportamento, não estética.

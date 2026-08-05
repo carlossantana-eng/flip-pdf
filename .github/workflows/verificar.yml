@@ -2,6 +2,16 @@ name: Verificar
 
 on:
   pull_request:
+  push:
+    branches: [main]
+    paths:
+      - '*.html'
+      - 'assets/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/verificar.yml'
 
 permissions:
   contents: read
@@ -21,6 +31,37 @@ jobs:
           node-version: 20
 
       # Não exige manifesto em dia: quem regenera é o workflow da main.
-      # Aqui só validamos que o catalogos.json é válido e o script funciona.
-      - name: Validar manifesto e script
-        run: node scripts/gerar-manifesto.mjs && git diff --stat
+      # Aqui só validamos que o catalogos.json é válido e os scripts funcionam.
+      - name: Validar manifesto e scripts de build
+        run: |
+          node scripts/gerar-manifesto.mjs && git diff --stat
+          node scripts/gerar-compartilhamento.mjs
+
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Instalar o Chromium do Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Rodar as suítes de teste
+        run: npm test
+
+      - name: Guardar capturas de tela (em caso de falha)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas-dos-testes
+          path: tests/capturas/
+          if-no-files-found: ignore

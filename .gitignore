@@ -4,3 +4,6 @@ node_modules/
 # Artefatos de build (gerados no workflow de publicação)
 /f/
 /e/
+
+# Saída das suítes de teste
+/tests/capturas/
