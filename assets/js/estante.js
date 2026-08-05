@@ -83,19 +83,6 @@ function criarCartao(catalogo) {
   return { cartao, capa, esqueleto, meta };
 }
 
-// Quando a capa não tem a proporção do cartão (ex.: catálogo horizontal),
-// preenche a sobra com a própria capa ampliada e desfocada, em vez de
-// deixar barras vazias.
-const PROPORCAO_CARTAO = 210 / 297;
-
-function preencherSobra(capa, origem, proporcao) {
-  if (Math.abs(proporcao - PROPORCAO_CARTAO) < 0.02) return;
-  const fundo = document.createElement('div');
-  fundo.className = 'capa-fundo';
-  fundo.style.backgroundImage = `url("${origem}")`;
-  capa.prepend(fundo);
-}
-
 async function desenharCapa(catalogo, elementos) {
   const { capa, esqueleto, meta } = elementos;
 
@@ -104,10 +91,7 @@ async function desenharCapa(catalogo, elementos) {
     img.alt = '';
     img.loading = 'lazy';
     img.src = catalogo.capa;
-    img.onload = () => {
-      esqueleto.remove();
-      preencherSobra(capa, img.src, img.naturalWidth / img.naturalHeight);
-    };
+    img.onload = () => esqueleto.remove();
     capa.appendChild(img);
     return;
   }
@@ -135,14 +119,6 @@ async function desenharCapa(catalogo, elementos) {
 
     esqueleto.remove();
     capa.appendChild(canvas);
-    if (Math.abs(canvas.width / canvas.height - PROPORCAO_CARTAO) >= 0.02) {
-      // Versão minúscula do canvas como fundo — o desfoque esconde a resolução.
-      const mini = document.createElement('canvas');
-      mini.width = 64;
-      mini.height = Math.max(1, Math.round((64 * canvas.height) / canvas.width));
-      mini.getContext('2d').drawImage(canvas, 0, 0, mini.width, mini.height);
-      preencherSobra(capa, mini.toDataURL('image/jpeg', 0.6), canvas.width / canvas.height);
-    }
     meta.textContent = pdf.numPages === 1 ? '1 página' : `${pdf.numPages} páginas`;
   } catch (erro) {
     console.warn(`Não foi possível gerar a capa de ${catalogo.arquivo}`, erro);
