@@ -2211,6 +2211,16 @@ section[id], div[id="inicio"] { scroll-margin-top: 96px; }
 
 .config-grupo:first-of-type { margin-top: 8px; padding-top: 0; border-top: none; }
 
+/* Dica curta abaixo de um campo (o que a cor altera, medidas da capa…) */
+.dica-campo {
+  margin: 5px 0 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--tinta-suave);
+}
+
+.dica-campo strong { color: var(--tinta); }
+
 .campo-logo > span, .campo-cor > span {
   display: block;
   font-size: 0.86rem;
