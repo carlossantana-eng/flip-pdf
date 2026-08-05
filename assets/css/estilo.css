@@ -908,18 +908,21 @@ body.leitor {
   flex-direction: column;
 }
 
+/* O painel é sempre um overlay quase preto: cores fixas, para não herdar
+   o tema da estante (que pode ser claro) e sumir com o texto. */
 .busca-leitor input[type="search"] {
   font: inherit;
   margin: 18px auto 0;
   width: min(680px, calc(100% - 36px));
   padding: 12px 16px;
   border-radius: 10px;
-  border: 1px solid var(--borda);
-  background: var(--campo-fundo, #101010);
-  color: var(--leitor-texto, #ededed);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.07);
+  color: #ededed;
 }
 
-.busca-leitor input[type="search"]:focus { outline: none; border-color: var(--realce); }
+.busca-leitor input[type="search"]::placeholder { color: rgba(237, 237, 237, 0.5); }
+.busca-leitor input[type="search"]:focus { outline: none; border-color: #88da10; }
 
 .busca-estado {
   width: min(680px, calc(100% - 36px));
@@ -943,7 +946,7 @@ body.leitor {
   font: inherit;
   text-align: left;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--borda);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 10px;
   padding: 10px 14px;
   color: #ededed;
@@ -951,9 +954,9 @@ body.leitor {
   line-height: 1.5;
 }
 
-.busca-resultado:hover { border-color: var(--realce); }
-.busca-resultado strong { display: block; color: var(--realce); font-size: 0.82rem; margin-bottom: 2px; }
-.busca-resultado mark { background: var(--realce); color: #10130c; border-radius: 3px; padding: 0 2px; }
+.busca-resultado:hover { border-color: #88da10; }
+.busca-resultado strong { display: block; color: #88da10; font-size: 0.82rem; margin-bottom: 2px; }
+.busca-resultado mark { background: #88da10; color: #10130c; border-radius: 3px; padding: 0 2px; }
 
 .miniatura {
   background: none;
