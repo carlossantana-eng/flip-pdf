@@ -70,5 +70,5 @@ await page.waitForTimeout(200);
 const voltouEscuro = await page.evaluate(() => document.documentElement.dataset.tema === undefined
   && localStorage.getItem('plataforma-tema') === null);
 
-console.log(JSON.stringify({ temBotao, dataTema, salvo, persistiuAdmin, designSumiu, voltouEscuro, erros }));
+concluir({ temBotao, dataTema, salvo, persistiuAdmin, designSumiu, voltouEscuro, erros }, erros);
 await browser.close();

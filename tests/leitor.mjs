@@ -90,6 +90,7 @@ async function testarBuscaELinks() {
     contentType: 'application/json',
     body: JSON.stringify({
       titulo: 'Testes',
+      perfil: { whatsapp: '5551999990000' },
       catalogos: [{ arquivo: 'oferta-com-links.pdf', titulo: 'Oferta', adicionadoEm: '2026-08-01' }],
     }),
   }));
@@ -114,18 +115,38 @@ async function testarBuscaELinks() {
   await page.click('#btn-buscar');
   await page.fill('#busca-campo', 'whatsapp');
   await page.waitForTimeout(700);
-  const resultados = await page.locator('.busca-resultado').count();
+  const resultados = await page.locator('#busca .busca-resultado').count();
   const primeiroResultado = resultados > 0
-    ? (await page.locator('.busca-resultado strong').first().textContent()).trim()
+    ? (await page.locator('#busca .busca-resultado strong').first().textContent()).trim()
     : '';
   await page.screenshot({ path: `${CAPTURAS}/busca-leitor.png` });
   if (resultados > 0) {
-    await page.locator('.busca-resultado').first().click();
+    await page.locator('#busca .busca-resultado').first().click();
     await page.waitForTimeout(1000);
   }
   const buscaFechou = await page.locator('#busca').isHidden();
 
-  const resultado = { linkExterno, linksNaCapa, indicadorAposGoto, resultados, primeiroResultado, buscaFechou, erros };
+  // Sumário (outline do PDF): 2 itens; "Oferta da semana" volta à página 1
+  const sumarioVisivel = await page.locator('#btn-sumario').isVisible();
+  await page.click('#btn-sumario');
+  const itensSumario = await page.locator('.item-sumario').allTextContents();
+  await page.locator('.item-sumario', { hasText: 'Oferta da semana' }).click();
+  await page.waitForTimeout(1200);
+  const indicadorAposSumario = (await page.locator('#indicador').textContent()).trim();
+
+  // WhatsApp no leitor (número vem do perfil do manifesto)
+  const whatsappLeitor = await page.locator('#btn-whatsapp').getAttribute('href');
+  const whatsappVisivel = await page.locator('#btn-whatsapp').isVisible();
+
+  // WhatsApp flutuante na estante
+  await page.goto(`${BASE}/estante.html`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1200);
+  const whatsappEstante = await page.locator('.botao-whatsapp').getAttribute('href');
+
+  const resultado = {
+    linkExterno, linksNaCapa, indicadorAposGoto, resultados, primeiroResultado, buscaFechou,
+    sumarioVisivel, itensSumario, indicadorAposSumario, whatsappVisivel, whatsappLeitor, whatsappEstante, erros,
+  };
   console.log(JSON.stringify(resultado, null, 1));
   if (linkExterno !== 1) falhas.push(`link externo: esperava 1, veio ${linkExterno}`);
   if (linksNaCapa !== 2) falhas.push(`links na capa: esperava 2, veio ${linksNaCapa}`);
@@ -133,6 +154,15 @@ async function testarBuscaELinks() {
   if (resultados < 1) falhas.push('busca não encontrou "whatsapp"');
   if (primeiroResultado && primeiroResultado !== 'Página 2') falhas.push(`resultado apontou ${primeiroResultado}`);
   if (!buscaFechou) falhas.push('painel de busca não fechou ao clicar no resultado');
+  if (!sumarioVisivel) falhas.push('botão de sumário não apareceu');
+  if (itensSumario.length !== 2) falhas.push(`sumário com ${itensSumario.length} item(ns), esperava 2`);
+  if (!indicadorAposSumario.startsWith('1')) falhas.push(`sumário não voltou à página 1 (${indicadorAposSumario})`);
+  if (!whatsappVisivel || !whatsappLeitor || !whatsappLeitor.includes('wa.me/5551999990000')) {
+    falhas.push(`WhatsApp do leitor errado (${whatsappLeitor})`);
+  }
+  if (!whatsappEstante || !whatsappEstante.includes('wa.me/5551999990000')) {
+    falhas.push(`WhatsApp da estante errado (${whatsappEstante})`);
+  }
   errosTotais.push(...erros);
   await ctx.close();
 }

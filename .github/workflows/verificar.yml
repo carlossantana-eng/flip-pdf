@@ -36,6 +36,7 @@ jobs:
         run: |
           node scripts/gerar-manifesto.mjs && git diff --stat
           node scripts/gerar-compartilhamento.mjs
+          node scripts/gerar-sitemap.mjs
 
   testes:
     runs-on: ubuntu-latest

@@ -74,5 +74,5 @@ const botaoVisivelComMusica = await page.locator('#btn-musica').isVisible();
 const somRemovido = await page.evaluate(() => document.getElementById('btn-som') === null);
 await page.locator('.leitor-rodape').screenshot({ path: `${CAPTURAS}/leitor-musica.png` });
 
-console.log(JSON.stringify({ botaoOcultoSemMusica, estadoMusica, campoMusica, blobMusica, botaoVisivelComMusica, somRemovido, commits, erros }));
+concluir({ botaoOcultoSemMusica, estadoMusica, campoMusica, blobMusica, botaoVisivelComMusica, somRemovido, commits, erros }, erros);
 await browser.close();

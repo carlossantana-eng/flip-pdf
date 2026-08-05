@@ -49,6 +49,9 @@ jobs:
       - name: Gerar páginas de compartilhamento
         run: node scripts/gerar-compartilhamento.mjs
 
+      - name: Gerar sitemap e robots.txt
+        run: node scripts/gerar-sitemap.mjs
+
       # Cada publicação carimba os CSS/JS com o hash do commit, para o
       # navegador nunca misturar HTML novo com arquivos antigos em cache.
       - name: Carimbar versão nos arquivos estáticos

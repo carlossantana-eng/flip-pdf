@@ -411,12 +411,21 @@ async function publicarAgora() {
       copiar.className = 'botao botao-suave';
       copiar.textContent = 'Copiar link';
       copiar.addEventListener('click', async () => {
-        const url = new URL(`leitor.html?c=${encodeURIComponent(item.nome)}`, location.href).toString();
+        // Link de compartilhar: a página f/ tem Open Graph (preview no WhatsApp).
+        const url = new URL(`f/${encodeURIComponent(item.nome.replace(/\.pdf$/i, ''))}.html`, location.href).toString();
         try { await navigator.clipboard.writeText(url); avisar('Link copiado!'); } catch { avisar(url, true); }
       });
       acoes.append(abrir, copiar);
       return acoes;
     });
+    // Lembrete dos planos (a demonstração não bloqueia nada).
+    const ativos = manifesto.catalogos.filter((c) => !c.lixeira).length;
+    const nota = el('nota-planos');
+    nota.hidden = ativos <= 1;
+    if (ativos > 1) {
+      nota.textContent = `🧪 Você tem ${ativos} flipbooks publicados. Nos planos, o Grátis `
+        + 'inclui 1 flipbook e o Pro até 10 por estante — a demonstração não aplica limites.';
+    }
     mostrarEtapa('etapa-sucesso');
   } catch (erro) {
     console.error(erro);

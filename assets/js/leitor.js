@@ -17,6 +17,9 @@ function corDeTexto(hex) {
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('../vendor/pdf.worker.min.mjs', import.meta.url).toString();
 
+// Quem pede menos movimento no sistema recebe viradas quase instantâneas.
+const MOVIMENTO_REDUZIDO = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 const LARGURA_RENDER = Math.min(1440, Math.round(880 * Math.min(window.devicePixelRatio || 1, 2)));
 const LARGURA_LUPA = Math.min(2600, LARGURA_RENDER * 2);
 // Escala de AMPLIAÇÃO: 0 = visão normal (a PÁGINA INTEIRA visível na
@@ -267,7 +270,7 @@ function montarLivro() {
     autoSize: true,
     maxShadowOpacity: 0.35,
     mobileScrollSupport: false,
-    flippingTime: 400,     // virada sempre rápida (antigo 2×)
+    flippingTime: MOVIMENTO_REDUZIDO ? 50 : 400,   // virada sempre rápida (antigo 2×)
   });
 
   livro.on('flip', (evento) => {
@@ -462,6 +465,39 @@ function configurarBuscaLeitor() {
   });
 }
 
+/* ====== Sumário (outline do PDF) ====== */
+async function configurarSumario() {
+  let itens = null;
+  try {
+    itens = await pdf.getOutline();
+  } catch {
+    itens = null;
+  }
+  if (!itens || itens.length === 0) return;
+  const lista = el('sumario-lista');
+  lista.innerHTML = '';
+  const montar = (nos, nivel) => {
+    for (const no of nos) {
+      const item = document.createElement('button');
+      item.className = 'busca-resultado item-sumario';
+      item.setAttribute('role', 'listitem');
+      item.style.paddingLeft = `${14 + nivel * 20}px`;
+      item.textContent = no.title || 'Sem título';
+      item.addEventListener('click', () => {
+        el('sumario').hidden = true;
+        if (no.dest) irParaDestino(no.dest);
+        else if (no.url) window.open(no.url, '_blank', 'noopener');
+      });
+      lista.appendChild(item);
+      if (no.items && no.items.length > 0) montar(no.items, nivel + 1);
+    }
+  };
+  montar(itens, 0);
+  el('btn-sumario').hidden = false;
+  el('btn-sumario').addEventListener('click', () => { el('sumario').hidden = false; });
+  el('sumario-fechar').addEventListener('click', () => { el('sumario').hidden = true; });
+}
+
 /* ====== Links clicáveis do PDF ====== */
 const anotacoesCache = new Map();  // índice da página -> [{caixa, url?, destino?}]
 
@@ -571,9 +607,17 @@ function configurarCamadaDeLinks() {
 }
 
 /* ====== Ações da barra ====== */
-function configurarAcoes(entrada) {
+function configurarAcoes(entrada, manifesto) {
   el('btn-anterior').addEventListener('click', () => livro && livro.flipPrev());
   el('btn-proximo').addEventListener('click', () => livro && livro.flipNext());
+
+  // WhatsApp comercial (número definido no Perfil do painel).
+  const whatsapp = ((manifesto.perfil || {}).whatsapp || '').replace(/\D/g, '');
+  if (whatsapp) {
+    const conversa = el('btn-whatsapp');
+    conversa.href = `https://wa.me/${whatsapp}?text=${encodeURIComponent(`Olá! Estou vendo o flipbook "${entrada.titulo}" e gostaria de mais informações.`)}`;
+    conversa.hidden = false;
+  }
 
   if (entrada.permitirDownload === false) {
     el('btn-baixar').hidden = true;
@@ -646,16 +690,26 @@ function configurarAcoes(entrada) {
   });
 
   document.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Escape' && !el('sumario').hidden) { el('sumario').hidden = true; return; }
     if (evento.key === 'Escape' && !el('miniaturas').hidden) { fecharMiniaturas(); return; }
     if (evento.key === 'Escape' && !lupa.hidden) { fecharLupa(); return; }
+    // Atalhos de letra não valem enquanto se digita (ex.: campo de busca).
+    if (evento.target && ['INPUT', 'TEXTAREA'].includes(evento.target.tagName)) return;
     if (!lupa.hidden) {
       if (evento.key === 'ArrowLeft') mostrarPaginaNaLupa(paginaLupa - 1);
       if (evento.key === 'ArrowRight') mostrarPaginaNaLupa(paginaLupa + 1);
       return;
     }
+    if (!busca.hidden || !el('sumario').hidden) return;
     if (!livro) return;
     if (evento.key === 'ArrowLeft') livro.flipPrev();
     if (evento.key === 'ArrowRight') livro.flipNext();
+    if (evento.key === 'Home') livro.flip(0);
+    if (evento.key === 'End') livro.flip(numPaginas - 1);
+    const tecla = evento.key.toLowerCase();
+    if (tecla === 'b') el('btn-buscar').click();
+    if (tecla === 'm') abrirMiniaturas();
+    if (tecla === 's' && !el('btn-sumario').hidden) el('sumario').hidden = false;
   });
 }
 
@@ -717,7 +771,7 @@ async function iniciar() {
     raiz.setProperty('--leitor-topo', corSecundaria);
     raiz.setProperty('--leitor-texto-barra', corDeTexto(corSecundaria) === '#ffffff' ? '#ededed' : '#10130c');
   }
-  configurarAcoes(entrada);
+  configurarAcoes(entrada, manifesto);
 
   el('carregando-texto').textContent = 'Baixando o flipbook…';
   try {
@@ -727,6 +781,7 @@ async function iniciar() {
     mostrarErro('Não foi possível abrir o flipbook', 'Verifique sua conexão e tente novamente.');
     return;
   }
+  configurarSumario();
 
   numPaginas = pdf.numPages;
   el('controle-progresso').max = String(numPaginas);

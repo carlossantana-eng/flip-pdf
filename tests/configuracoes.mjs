@@ -60,15 +60,18 @@ const nome = await page.locator('#campo-nome-painel').inputValue();
 const menuAtivo = (await page.locator('.admin-menu a[aria-current="page"]').textContent()).trim();
 await page.screenshot({ path: `${CAPTURAS}/configuracoes.png`, fullPage: true });
 
-// 3. Editar e salvar
+// 3. Editar e salvar (WhatsApp sem DDI ganha o 55 e vira só dígitos)
 await page.fill('#campo-titulo-estante', 'Catálogos WE 2026');
 await page.fill('#campo-descricao-estante', 'Nova descrição.');
+await page.fill('#campo-whatsapp-perfil', '(51) 99999-0000');
 await page.click('#btn-salvar-estante');
 await page.waitForTimeout(900);
 const tituloSalvo = manifesto.titulo;
 const descricaoSalva = manifesto.descricao;
+const whatsappSalvo = manifesto.perfil && manifesto.perfil.whatsapp;
 const semCoresNaConfig = await page.evaluate(() => document.getElementById('campo-cor') === null);
 const identidadePreservada = manifesto.identidade;
 
-console.log(JSON.stringify({ semChave, titulo, nome, menuAtivo, tituloSalvo, descricaoSalva, semCoresNaConfig, identidadePreservada, commits, erros }));
+if (whatsappSalvo !== '5551999990000') erros.push(`whatsapp salvo errado: ${whatsappSalvo}`);
+concluir({ semChave, titulo, nome, menuAtivo, tituloSalvo, descricaoSalva, whatsappSalvo, semCoresNaConfig, identidadePreservada, commits, erros }, erros);
 await browser.close();

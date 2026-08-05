@@ -14,10 +14,11 @@ arquivo define as regras de trabalho.
 2. **`catalogos.json` é gerado.** Quem escreve nele é
    `scripts/gerar-manifesto.mjs` (rodado pelo workflow `publicar.yml` na
    `main`). Edições manuais de `titulo`/`descricao` são preservadas pelo
-   script; nunca faça o script sobrescrevê-las. O mesmo workflow gera as
-   páginas de compartilhamento `f/` (flipbooks) e `e/` (estantes) com
-   `scripts/gerar-compartilhamento.mjs` — são artefatos de build
-   (gitignorados), com Open Graph para preview de link no WhatsApp.
+   script; nunca faça o script sobrescrevê-las. O mesmo workflow gera os
+   artefatos de build (gitignorados): páginas de compartilhamento `f/`
+   (flipbooks) e `e/` (estantes) com Open Graph
+   (`scripts/gerar-compartilhamento.mjs`) e `sitemap.xml`/`robots.txt`
+   (`scripts/gerar-sitemap.mjs`).
 3. **Conteúdo (PDFs) não se mistura com código.** PDFs vivem só em
    `catalogos/`; capas opcionais em `catalogos/capas/`.
 4. **Caminhos sempre relativos** (sem `/` inicial): o site é servido no
@@ -49,7 +50,9 @@ arquivo define as regras de trabalho.
     estante; menor primeiro, sem `ordem` = por data no fim). Estantes
     extras vivem no top-level
     `estantes: [{id, nome, descricao?, criadaEm, cor?, corSecundaria?, corFundo?, capa?}]`;
-    a principal guarda cores/capa em `identidade`.
+    a principal guarda cores/capa em `identidade`. O `perfil` aceita
+    `nome`, `email` e `whatsapp` (só dígitos, com DDI) — o WhatsApp vira
+    botão de conversa na estante e no leitor.
 
 11. **Contas de usuário são SIMULADAS** (`conta-simulada.js`,
     localStorage): não prometem segurança nem multiusuário real. Não

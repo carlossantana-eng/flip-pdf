@@ -15,6 +15,9 @@
     <img class="leitor-logo" id="leitor-logo" alt="" hidden>
     <h1 id="titulo">Carregando…</h1>
     <div class="leitor-acoes">
+      <a class="botao-icone botao-whatsapp-barra" id="btn-whatsapp" title="Falar no WhatsApp" aria-label="Falar no WhatsApp" target="_blank" rel="noopener" hidden>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a9.9 9.9 0 0 0-8.5 15L2 22l5.2-1.4A9.9 9.9 0 1 0 12 2Zm0 18.1a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-3-.2-.3A8.1 8.1 0 1 1 12 20.1Zm4.5-6c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.6 6.6 0 0 1-2-1.2 7.4 7.4 0 0 1-1.3-1.7c-.1-.2 0-.4.1-.5l.4-.4c.1-.2.2-.3.3-.5a.5.5 0 0 0 0-.4c0-.1-.6-1.4-.8-1.9s-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6A11.2 11.2 0 0 0 12.1 15a13 13 0 0 0 1.4.5 3.4 3.4 0 0 0 1.6.1 2.6 2.6 0 0 0 1.7-1.2 2 2 0 0 0 .1-1.2c0-.1-.2-.2-.4-.3Z"/></svg>
+      </a>
       <button class="botao-icone" id="btn-compartilhar" title="Compartilhar link" aria-label="Compartilhar link">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>
       </button>
@@ -54,8 +57,11 @@
     <button class="botao-icone" id="btn-ampliar" title="Ampliar página" aria-label="Ampliar página">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>
     </button>
-    <button class="botao-icone" id="btn-buscar" title="Buscar no flipbook" aria-label="Buscar no flipbook">
+    <button class="botao-icone" id="btn-buscar" title="Buscar no flipbook (B)" aria-label="Buscar no flipbook">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+    <button class="botao-icone" id="btn-sumario" title="Sumário (S)" aria-label="Sumário" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
     </button>
     <button class="botao-icone" id="btn-musica" title="Tocar a música de fundo" aria-label="Música de fundo" aria-pressed="false" hidden></button>
     <span class="indicador" id="indicador">– / –</span>
@@ -64,6 +70,16 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
     </button>
   </footer>
+
+  <div class="busca-leitor" id="sumario" hidden>
+    <div class="miniaturas-topo">
+      <h2>Sumário</h2>
+      <button class="botao-icone" id="sumario-fechar" title="Fechar" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="busca-resultados sumario-lista" id="sumario-lista" role="list"></div>
+  </div>
 
   <div class="busca-leitor" id="busca" hidden>
     <div class="miniaturas-topo">

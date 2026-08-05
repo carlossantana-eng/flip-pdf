@@ -900,6 +900,30 @@ body.leitor {
   align-content: start;
 }
 
+/* ====== WhatsApp comercial ====== */
+.botao-whatsapp {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 40;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.botao-whatsapp:hover { transform: scale(1.06); }
+.botao-whatsapp svg { width: 30px; height: 30px; }
+
+.botao-whatsapp-barra { color: #25d366; }
+.botao-whatsapp-barra svg { fill: currentColor; }
+
 /* ====== Busca no leitor ====== */
 .busca-leitor {
   position: fixed;
@@ -2381,3 +2405,15 @@ html[data-tema="claro"] .arquivos-ferramentas select {
 html:not([data-tema="claro"]) .marca-imagem--escuro { display: block; }
 html[data-tema="claro"] .marca-imagem--claro { display: block; }
 .logo-central .marca-imagem { height: 34px; }
+
+/* ====== Menos movimento ====== */
+/* Quem pede menos animação no sistema navega sem transições nem brilhos
+   animados (a virada de página fica quase instantânea via leitor.js). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

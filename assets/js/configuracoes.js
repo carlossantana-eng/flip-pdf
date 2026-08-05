@@ -38,6 +38,7 @@ function preencher() {
   el('campo-descricao-estante').value = manifesto.descricao || '';
   el('campo-nome-painel').value = nomeDoPerfil();
   el('campo-email-perfil').value = (manifesto.perfil && manifesto.perfil.email) || '';
+  el('campo-whatsapp-perfil').value = (manifesto.perfil && manifesto.perfil.whatsapp) || '';
   const logo = manifesto.identidade && manifesto.identidade.logo;
   const previa = el('logo-previa');
   previa.hidden = !logo;
@@ -82,10 +83,14 @@ async function salvar() {
 
     const nome = el('campo-nome-painel').value.trim();
     const email = el('campo-email-perfil').value.trim();
-    if (nome || email) {
+    // Guarda só os dígitos; sem DDI, assume Brasil (55).
+    let whatsapp = el('campo-whatsapp-perfil').value.replace(/\D/g, '');
+    if (whatsapp && whatsapp.length <= 11) whatsapp = `55${whatsapp}`;
+    if (nome || email || whatsapp) {
       manifesto.perfil = {};
       if (nome) manifesto.perfil.nome = nome;
       if (email) manifesto.perfil.email = email;
+      if (whatsapp) manifesto.perfil.whatsapp = whatsapp;
     } else {
       delete manifesto.perfil;
     }
@@ -122,7 +127,7 @@ async function salvar() {
 }
 
 function configurarEventos() {
-  for (const id of ['campo-titulo-estante', 'campo-descricao-estante', 'campo-nome-painel', 'campo-email-perfil']) {
+  for (const id of ['campo-titulo-estante', 'campo-descricao-estante', 'campo-nome-painel', 'campo-email-perfil', 'campo-whatsapp-perfil']) {
     el(id).addEventListener('input', () => { alteracoesPendentes = true; });
     el(id).addEventListener('change', () => { alteracoesPendentes = true; });
   }
