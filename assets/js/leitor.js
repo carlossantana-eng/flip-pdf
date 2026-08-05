@@ -274,20 +274,26 @@ function montarLivro() {
     paginaAtual = evento.data;
     gravarPaginaNoEndereco(paginaAtual);
     atualizarIndicador();
+    atualizarCamadaDeLinks();
   });
 
   livro.on('changeState', (evento) => {
     const estadoAnterior = estadoLivro;
     estadoLivro = evento.data;
     if (estadoLivro === 'read' && atualizacaoPendente) aplicarPaginas();
+    // Esconde os links durante a virada; volta quando o livro assenta.
+    atualizarCamadaDeLinks();
   });
 
   livro.on('changeOrientation', () => {
     dimensionarLivro();
     atualizarIndicador();
+    atualizarCamadaDeLinks();
   });
 
   livro.loadFromImages(imagens);
+  configurarCamadaDeLinks();
+  window.addEventListener('resize', () => atualizarCamadaDeLinks());
 
   // Permite colar um link #p=N com o leitor já aberto.
   window.addEventListener('hashchange', () => {
@@ -358,6 +364,212 @@ function fecharLupa() {
   lupa.hidden = true;
 }
 
+/* ====== Busca por texto ====== */
+const busca = el('busca');
+let textosDasPaginas = null;   // [{ texto, plano }] por página (extraído uma vez)
+let extraindoTextos = null;
+
+function semAcentos(texto) {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+async function extrairTextos() {
+  if (textosDasPaginas) return textosDasPaginas;
+  if (!extraindoTextos) {
+    extraindoTextos = (async () => {
+      const paginas = [];
+      for (let numero = 1; numero <= numPaginas; numero += 1) {
+        try {
+          const pagina = await pdf.getPage(numero);
+          const conteudo = await pagina.getTextContent();
+          const texto = conteudo.items.map((item) => item.str).join(' ')
+            .replace(/\s+/g, ' ').trim();
+          paginas.push({ texto, plano: semAcentos(texto) });
+        } catch {
+          paginas.push({ texto: '', plano: '' });
+        }
+      }
+      textosDasPaginas = paginas;
+      return paginas;
+    })();
+  }
+  return extraindoTextos;
+}
+
+function trechoDestacado(texto, posicao, tamanho) {
+  const inicio = Math.max(0, posicao - 45);
+  const fim = Math.min(texto.length, posicao + tamanho + 45);
+  const marcado = document.createElement('span');
+  marcado.append(
+    (inicio > 0 ? '…' : '') + texto.slice(inicio, posicao),
+    Object.assign(document.createElement('mark'), { textContent: texto.slice(posicao, posicao + tamanho) }),
+    texto.slice(posicao + tamanho, fim) + (fim < texto.length ? '…' : ''),
+  );
+  return marcado;
+}
+
+async function pesquisar(termo) {
+  const estado = el('busca-estado');
+  const lista = el('busca-resultados');
+  lista.innerHTML = '';
+  const limpo = semAcentos(termo.trim());
+  if (limpo.length < 2) { estado.hidden = true; return; }
+  estado.hidden = false;
+  estado.textContent = 'Procurando…';
+  const paginas = await extrairTextos();
+  let encontrados = 0;
+  paginas.forEach(({ texto, plano }, indice) => {
+    if (encontrados >= 60) return;
+    let posicao = plano.indexOf(limpo);
+    let porPagina = 0;
+    while (posicao !== -1 && encontrados < 60 && porPagina < 3) {
+      const item = document.createElement('button');
+      item.className = 'busca-resultado';
+      item.setAttribute('role', 'listitem');
+      const rotulo = document.createElement('strong');
+      rotulo.textContent = `Página ${indice + 1}`;
+      item.append(rotulo, trechoDestacado(texto, posicao, limpo.length));
+      item.addEventListener('click', () => {
+        busca.hidden = true;
+        if (livro) livro.flip(indice);
+      });
+      lista.appendChild(item);
+      encontrados += 1;
+      porPagina += 1;
+      posicao = plano.indexOf(limpo, posicao + limpo.length);
+    }
+  });
+  estado.textContent = encontrados === 0
+    ? 'Nada encontrado. O PDF pode não ter texto pesquisável (só imagens).'
+    : `${encontrados} resultado(s)${encontrados >= 60 ? ' — refine a busca' : ''}:`;
+}
+
+function configurarBuscaLeitor() {
+  const campo = el('busca-campo');
+  let temporizador = null;
+  el('btn-buscar').addEventListener('click', () => {
+    busca.hidden = false;
+    campo.focus();
+    extrairTextos();  // aquece o cache enquanto a pessoa digita
+  });
+  el('busca-fechar').addEventListener('click', () => { busca.hidden = true; });
+  busca.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Escape') busca.hidden = true;
+  });
+  campo.addEventListener('input', () => {
+    clearTimeout(temporizador);
+    temporizador = setTimeout(() => pesquisar(campo.value), 250);
+  });
+}
+
+/* ====== Links clicáveis do PDF ====== */
+const anotacoesCache = new Map();  // índice da página -> [{caixa, url?, destino?}]
+
+// Anotações de link da página, com a caixa em coordenadas normalizadas (0–1).
+async function anotacoesDaPagina(indice) {
+  if (anotacoesCache.has(indice)) return anotacoesCache.get(indice);
+  let links = [];
+  try {
+    const pagina = await pdf.getPage(indice + 1);
+    const base = pagina.getViewport({ scale: 1 });
+    const anotacoes = await pagina.getAnnotations();
+    for (const anotacao of anotacoes) {
+      if (anotacao.subtype !== 'Link') continue;
+      // O rect vem em coordenadas do PDF (origem embaixo); converte os
+      // dois cantos para o espaço do viewport (origem em cima).
+      const [x1, y1] = base.convertToViewportPoint(anotacao.rect[0], anotacao.rect[1]);
+      const [x2, y2] = base.convertToViewportPoint(anotacao.rect[2], anotacao.rect[3]);
+      const caixa = {
+        esquerda: Math.min(x1, x2) / base.width,
+        topo: Math.min(y1, y2) / base.height,
+        largura: Math.abs(x2 - x1) / base.width,
+        altura: Math.abs(y2 - y1) / base.height,
+      };
+      if (anotacao.url) {
+        links.push({ caixa, url: anotacao.url });
+      } else if (anotacao.dest) {
+        links.push({ caixa, dest: anotacao.dest });
+      }
+    }
+  } catch {
+    links = [];
+  }
+  anotacoesCache.set(indice, links);
+  return links;
+}
+
+async function irParaDestino(dest) {
+  try {
+    const destino = typeof dest === 'string' ? await pdf.getDestination(dest) : dest;
+    const indice = await pdf.getPageIndex(destino[0]);
+    if (livro) livro.flip(indice);
+  } catch (erro) {
+    console.warn('Destino de link não resolvido', erro);
+  }
+}
+
+// Páginas visíveis e a faixa horizontal que cada uma ocupa no livro.
+// Com capa (showCover), os pares abertos são [1,2], [3,4]… e a capa fica só.
+function paginasVisiveis() {
+  if (!livro) return [];
+  if (livro.getOrientation() === 'portrait') {
+    return [{ indice: paginaAtual, esquerda: 0, largura: 1 }];
+  }
+  if (paginaAtual === 0) return [{ indice: 0, esquerda: 0.5, largura: 0.5 }];
+  const esquerda = paginaAtual % 2 === 1 ? paginaAtual : paginaAtual - 1;
+  const visiveis = [{ indice: esquerda, esquerda: 0, largura: 0.5 }];
+  if (esquerda + 1 < numPaginas) visiveis.push({ indice: esquerda + 1, esquerda: 0.5, largura: 0.5 });
+  return visiveis;
+}
+
+let geracaoDeLinks = 0;
+
+async function atualizarCamadaDeLinks() {
+  const camada = el('camada-links');
+  if (!camada) return;
+  // Chamadas concorrentes (flip + changeState) se atropelam entre os
+  // awaits; só a mais recente pode escrever na camada.
+  const geracao = ++geracaoDeLinks;
+  camada.innerHTML = '';
+  if (estadoLivro !== 'read' && estadoLivro !== 'init') return;
+  const alvoLivro = el('livro').getBoundingClientRect();
+  const alvoMoldura = camada.parentElement.getBoundingClientRect();
+  for (const visivel of paginasVisiveis()) {
+    const links = await anotacoesDaPagina(visivel.indice);
+    if (geracao !== geracaoDeLinks) return;
+    for (const link of links) {
+      const area = document.createElement('a');
+      area.className = 'link-do-pdf';
+      const larguraPagina = alvoLivro.width * visivel.largura;
+      area.style.left = `${alvoLivro.left - alvoMoldura.left + alvoLivro.width * visivel.esquerda + link.caixa.esquerda * larguraPagina}px`;
+      area.style.top = `${alvoLivro.top - alvoMoldura.top + link.caixa.topo * alvoLivro.height}px`;
+      area.style.width = `${link.caixa.largura * larguraPagina}px`;
+      area.style.height = `${link.caixa.altura * alvoLivro.height}px`;
+      if (link.url) {
+        area.href = link.url;
+        area.target = '_blank';
+        area.rel = 'noopener';
+        area.title = link.url;
+      } else {
+        area.href = '#';
+        area.title = 'Ir para outra página';
+        area.addEventListener('click', (evento) => {
+          evento.preventDefault();
+          irParaDestino(link.dest);
+        });
+      }
+      camada.appendChild(area);
+    }
+  }
+}
+
+function configurarCamadaDeLinks() {
+  const camada = document.createElement('div');
+  camada.id = 'camada-links';
+  document.querySelector('.livro-moldura').appendChild(camada);
+  atualizarCamadaDeLinks();
+}
+
 /* ====== Ações da barra ====== */
 function configurarAcoes(entrada) {
   el('btn-anterior').addEventListener('click', () => livro && livro.flipPrev());
@@ -401,6 +613,7 @@ function configurarAcoes(entrada) {
   }
 
 
+  configurarBuscaLeitor();
   el('btn-miniaturas').addEventListener('click', abrirMiniaturas);
   el('miniaturas-fechar').addEventListener('click', fecharMiniaturas);
 

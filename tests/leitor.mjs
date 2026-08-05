@@ -1,5 +1,7 @@
 import { chromium } from 'playwright';
-import { BASE, CAPTURAS, OPCOES_NAVEGADOR, concluir } from './apoio.mjs';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { BASE, CAPTURAS, RECURSOS, OPCOES_NAVEGADOR, concluir } from './apoio.mjs';
 
 // Estante pública + leitor, em desktop e celular, com manifesto fixo
 // (independente do catalogos.json real do repositório).
@@ -76,5 +78,65 @@ async function testar(nome, viewport) {
 
 await testar('desktop', { width: 1280, height: 800 });
 await testar('mobile', { width: 390, height: 780 });
+
+// Busca por texto e links clicáveis, com um PDF de fixture que tem
+// texto pesquisável e anotações de link (URI externa + GoTo interno).
+async function testarBuscaELinks() {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const page = await ctx.newPage();
+  const erros = [];
+  page.on('pageerror', (e) => erros.push(`pageerror: ${e.message}`));
+  await page.route(`${BASE}/catalogos.json*`, (rota) => rota.fulfill({
+    contentType: 'application/json',
+    body: JSON.stringify({
+      titulo: 'Testes',
+      catalogos: [{ arquivo: 'oferta-com-links.pdf', titulo: 'Oferta', adicionadoEm: '2026-08-01' }],
+    }),
+  }));
+  await page.route(`${BASE}/catalogos/oferta-com-links.pdf`, (rota) => rota.fulfill({
+    contentType: 'application/pdf',
+    body: readFileSync(join(RECURSOS, 'oferta-com-links.pdf')),
+  }));
+
+  await page.goto(`${BASE}/leitor.html?c=oferta-com-links.pdf`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(2500);
+
+  // Links do PDF na capa: o URI externo vira <a> na camada
+  const linkExterno = await page.locator('#camada-links a[href="https://example.com/oferta"]').count();
+  const linksNaCapa = await page.locator('#camada-links .link-do-pdf').count();
+
+  // Link interno (GoTo) leva à página 2
+  await page.locator('#camada-links .link-do-pdf[title="Ir para outra página"]').click();
+  await page.waitForTimeout(1200);
+  const indicadorAposGoto = (await page.locator('#indicador').textContent()).trim();
+
+  // Busca: "whatsapp" (sem acento, caixa baixa) deve achar a página 2
+  await page.click('#btn-buscar');
+  await page.fill('#busca-campo', 'whatsapp');
+  await page.waitForTimeout(700);
+  const resultados = await page.locator('.busca-resultado').count();
+  const primeiroResultado = resultados > 0
+    ? (await page.locator('.busca-resultado strong').first().textContent()).trim()
+    : '';
+  await page.screenshot({ path: `${CAPTURAS}/busca-leitor.png` });
+  if (resultados > 0) {
+    await page.locator('.busca-resultado').first().click();
+    await page.waitForTimeout(1000);
+  }
+  const buscaFechou = await page.locator('#busca').isHidden();
+
+  const resultado = { linkExterno, linksNaCapa, indicadorAposGoto, resultados, primeiroResultado, buscaFechou, erros };
+  console.log(JSON.stringify(resultado, null, 1));
+  if (linkExterno !== 1) falhas.push(`link externo: esperava 1, veio ${linkExterno}`);
+  if (linksNaCapa !== 2) falhas.push(`links na capa: esperava 2, veio ${linksNaCapa}`);
+  if (!indicadorAposGoto.startsWith('2')) falhas.push(`GoTo não levou à página 2 (${indicadorAposGoto})`);
+  if (resultados < 1) falhas.push('busca não encontrou "whatsapp"');
+  if (primeiroResultado && primeiroResultado !== 'Página 2') falhas.push(`resultado apontou ${primeiroResultado}`);
+  if (!buscaFechou) falhas.push('painel de busca não fechou ao clicar no resultado');
+  errosTotais.push(...erros);
+  await ctx.close();
+}
+
+await testarBuscaELinks();
 await browser.close();
 concluir({ suite: 'leitor', concluida: true }, errosTotais, falhas);

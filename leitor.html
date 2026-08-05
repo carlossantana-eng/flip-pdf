@@ -54,6 +54,9 @@
     <button class="botao-icone" id="btn-ampliar" title="Ampliar página" aria-label="Ampliar página">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M11 8v6M8 11h6"/></svg>
     </button>
+    <button class="botao-icone" id="btn-buscar" title="Buscar no flipbook" aria-label="Buscar no flipbook">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
     <button class="botao-icone" id="btn-musica" title="Tocar a música de fundo" aria-label="Música de fundo" aria-pressed="false" hidden></button>
     <span class="indicador" id="indicador">– / –</span>
     <input type="range" class="controle-progresso" id="controle-progresso" min="1" max="1" step="1" value="1" aria-label="Ir para a página">
@@ -61,6 +64,18 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
     </button>
   </footer>
+
+  <div class="busca-leitor" id="busca" hidden>
+    <div class="miniaturas-topo">
+      <h2>Buscar no flipbook</h2>
+      <button class="botao-icone" id="busca-fechar" title="Fechar" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <input type="search" id="busca-campo" placeholder="Digite ao menos 2 letras…" aria-label="Texto a buscar" autocomplete="off">
+    <p class="busca-estado" id="busca-estado" hidden></p>
+    <div class="busca-resultados" id="busca-resultados" role="list"></div>
+  </div>
 
   <div class="miniaturas" id="miniaturas" hidden>
     <div class="miniaturas-topo">
