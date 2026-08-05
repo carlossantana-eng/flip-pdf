@@ -563,10 +563,22 @@ button { font: inherit; }
 }
 
 .capa canvas, .capa img {
+  position: relative;   /* acima do fundo desfocado */
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
+}
+
+/* Capa fora da proporção do cartão: a sobra é preenchida pela própria
+   capa ampliada e desfocada, no lugar de barras vazias. */
+.capa-fundo {
+  position: absolute;
+  inset: -12%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(16px) saturate(1.1);
+  opacity: 0.8;
 }
 
 .capa .esqueleto {
