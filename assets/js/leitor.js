@@ -374,8 +374,10 @@ function configurarAcoes(entrada) {
   }
 
   el('btn-compartilhar').addEventListener('click', async () => {
-    // Inclui o #p=N: quem recebe o link abre direto na página atual.
-    const url = `${location.origin}${location.pathname}${location.search}${location.hash}`;
+    // Compartilha a página f/ (com Open Graph): o WhatsApp mostra capa e
+    // título, e ela redireciona para o leitor mantendo o #p=N da página atual.
+    const slug = entrada.arquivo.replace(/\.pdf$/i, '');
+    const url = new URL(`f/${encodeURIComponent(slug)}.html${location.hash}`, location.href).toString();
     if (navigator.share) {
       try { await navigator.share({ title: entrada.titulo, url }); } catch { /* cancelado */ }
       return;

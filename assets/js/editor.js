@@ -235,10 +235,12 @@ function configurarEventos(entrada) {
   });
 
   const urlLeitor = new URL(`leitor.html?c=${encodeURIComponent(arquivo)}`, location.href).toString();
+  // Link de compartilhar: a página f/ tem Open Graph (preview no WhatsApp).
+  const urlCompartilhar = new URL(`f/${encodeURIComponent(arquivo.replace(/\.pdf$/i, ''))}.html`, location.href).toString();
   const copiar = el('btn-copiar-link');
   copiar.hidden = false;
   copiar.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(urlLeitor); avisar('Link copiado!'); } catch { avisar(urlLeitor, true); }
+    try { await navigator.clipboard.writeText(urlCompartilhar); avisar('Link copiado!'); } catch { avisar(urlCompartilhar, true); }
   });
   const abrir = el('btn-abrir');
   abrir.hidden = false;

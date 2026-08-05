@@ -284,6 +284,43 @@ function restaurar(catalogo) {
   });
 }
 
+// Tudo o que precisa sair do repositório junto com a publicação.
+function arquivosDe(catalogo) {
+  const caminhos = [`catalogos/${catalogo.arquivo}`];
+  if (catalogo.capa) caminhos.push(catalogo.capa);
+  if (catalogo.musica) caminhos.push(catalogo.musica);
+  return caminhos.map((caminho) => ({ caminho, conteudoBase64: null }));
+}
+
+const DIAS_NA_LIXEIRA = 30;
+
+// Itens há mais de 30 dias na lixeira são excluídos de vez, num commit
+// automático ao abrir a página. Sem lixeiraEm (registros antigos), conta
+// a partir de hoje: o campo é gravado para valer nos próximos 30 dias.
+async function limparLixeiraAntiga() {
+  const hoje = new Date().toISOString().slice(0, 10);
+  const limite = new Date(Date.now() - DIAS_NA_LIXEIRA * 24 * 60 * 60 * 1000)
+    .toISOString().slice(0, 10);
+  const semData = manifesto.catalogos.filter((c) => c.lixeira && !c.lixeiraEm);
+  const vencidos = manifesto.catalogos.filter((c) => c.lixeira && c.lixeiraEm && c.lixeiraEm < limite);
+  if (semData.length === 0 && vencidos.length === 0) return;
+  try {
+    for (const entrada of semData) entrada.lixeiraEm = hoje;
+    manifesto.catalogos = manifesto.catalogos.filter((c) => !vencidos.includes(c));
+    await salvarManifesto(
+      vencidos.length > 0
+        ? `Esvazia automaticamente a lixeira (${vencidos.length} item(ns) com mais de ${DIAS_NA_LIXEIRA} dias)`
+        : 'Registra a data dos itens da lixeira',
+      vencidos.flatMap(arquivosDe),
+    );
+    if (vencidos.length > 0) {
+      avisar(`${vencidos.length} item(ns) com mais de ${DIAS_NA_LIXEIRA} dias saíram da lixeira.`, true);
+    }
+  } catch (erro) {
+    console.warn('Não foi possível limpar a lixeira antiga', erro);
+  }
+}
+
 async function excluirDefinitivo(catalogo) {
   const aceitou = await confirmar({
     titulo: 'Excluir definitivamente?',
@@ -294,10 +331,11 @@ async function excluirDefinitivo(catalogo) {
   if (!aceitou) return;
   executar('Não foi possível excluir', async () => {
     manifesto = await buscarManifesto();
+    const entrada = manifesto.catalogos.find((c) => c.arquivo === catalogo.arquivo) || catalogo;
     manifesto.catalogos = manifesto.catalogos.filter((c) => c.arquivo !== catalogo.arquivo);
     await salvarManifesto(
       `Exclui definitivamente "${catalogo.titulo}"`,
-      [{ caminho: `catalogos/${catalogo.arquivo}`, conteudoBase64: null }],
+      arquivosDe(entrada),
     );
     avisar('Excluído definitivamente.');
   });
@@ -319,7 +357,7 @@ async function esvaziarLixeira() {
     manifesto.catalogos = manifesto.catalogos.filter((c) => !c.lixeira);
     await salvarManifesto(
       `Esvazia a lixeira (${naLixeira.length} arquivo(s))`,
-      naLixeira.map((c) => ({ caminho: `catalogos/${c.arquivo}`, conteudoBase64: null })),
+      naLixeira.flatMap(arquivosDe),
     );
     avisar('Lixeira esvaziada.');
   });
@@ -472,6 +510,8 @@ async function iniciar() {
     return;
   }
   el('gerenciador').hidden = false;
+  desenhar();
+  await limparLixeiraAntiga();
   desenhar();
 }
 

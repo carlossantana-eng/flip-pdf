@@ -93,7 +93,8 @@ function linhaDeEstante(info, ehPrincipal) {
     selo.textContent = 'Principal';
     nome.appendChild(selo);
   }
-  const url = new URL(ehPrincipal ? 'estante.html' : `estante.html?e=${encodeURIComponent(info.id)}`, location.href).toString();
+  // A página e/ tem Open Graph (preview no WhatsApp) e redireciona à estante.
+  const url = new URL(`e/${encodeURIComponent(info.id)}.html`, location.href).toString();
   const ligacao = document.createElement('a');
   ligacao.href = url;
   ligacao.target = '_blank';

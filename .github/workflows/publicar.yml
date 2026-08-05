@@ -44,6 +44,11 @@ jobs:
             git push
           fi
 
+      # Páginas f/ e e/ com Open Graph: fazem o WhatsApp e as redes
+      # mostrarem capa e título ao compartilhar um link.
+      - name: Gerar páginas de compartilhamento
+        run: node scripts/gerar-compartilhamento.mjs
+
       # Cada publicação carimba os CSS/JS com o hash do commit, para o
       # navegador nunca misturar HTML novo com arquivos antigos em cache.
       - name: Carimbar versão nos arquivos estáticos

@@ -1,2 +1,6 @@
 node_modules/
 .DS_Store
+
+# Artefatos de build (gerados no workflow de publicação)
+/f/
+/e/

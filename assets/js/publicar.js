@@ -71,6 +71,34 @@ async function capaLocal(arquivo, alvo) {
   }
 }
 
+// Gera a capa em WebP a partir da 1ª página, para a estante pública
+// carregar uma imagem leve em vez de renderizar o PDF no navegador
+// do visitante. Falhou? Sem problema: a estante renderiza na hora.
+async function capaWebP(arquivo) {
+  try {
+    const dados = await arquivo.arrayBuffer();
+    const tarefa = pdfjs.getDocument({ data: dados });
+    const pdf = await tarefa.promise;
+    const pagina = await pdf.getPage(1);
+    const base = pagina.getViewport({ scale: 1 });
+    const viewport = pagina.getViewport({ scale: 480 / base.width });
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(viewport.width);
+    canvas.height = Math.round(viewport.height);
+    const contexto = canvas.getContext('2d');
+    contexto.fillStyle = '#ffffff';
+    contexto.fillRect(0, 0, canvas.width, canvas.height);
+    await pagina.render({ canvasContext: contexto, viewport }).promise;
+    tarefa.destroy().catch(() => {});
+    const blob = await new Promise((resolver) => { canvas.toBlob(resolver, 'image/webp', 0.82); });
+    if (!blob || blob.type !== 'image/webp' || blob.size > 512 * 1024) return null;
+    return blob;
+  } catch (erro) {
+    console.warn('Sem capa pré-gerada', erro);
+    return null;
+  }
+}
+
 function opcoesDePasta(selecionada) {
   const select = document.createElement('select');
   const nenhuma = new Option('Sem pasta', '');
@@ -314,14 +342,25 @@ async function publicarAgora() {
       }
       if (item.permitirDownload === false) entrada.permitirDownload = false;
       else delete entrada.permitirDownload;
+      const nomeBase = item.nome.replace(/\.pdf$/i, '');
       if (item.capaArquivo) {
-        const nomeBase = item.nome.replace(/\.pdf$/i, '');
         const caminhoCapa = `catalogos/capas/${nomeBase}.${EXTENSOES_CAPA[item.capaArquivo.type]}`;
         mudancas.push({ caminho: caminhoCapa, conteudoBase64: await arquivoParaBase64(item.capaArquivo) });
         if (entrada.capa && entrada.capa !== caminhoCapa) {
           mudancas.push({ caminho: entrada.capa, conteudoBase64: null });
         }
         entrada.capa = caminhoCapa;
+      } else {
+        // Sem capa escolhida: pré-gera uma da 1ª página do PDF.
+        const capaGerada = await capaWebP(item.arquivo);
+        if (capaGerada) {
+          const caminhoCapa = `catalogos/capas/${nomeBase}.webp`;
+          mudancas.push({ caminho: caminhoCapa, conteudoBase64: await arquivoParaBase64(capaGerada) });
+          if (entrada.capa && entrada.capa !== caminhoCapa) {
+            mudancas.push({ caminho: entrada.capa, conteudoBase64: null });
+          }
+          entrada.capa = caminhoCapa;
+        }
       }
       delete entrada.lixeira;
       delete entrada.lixeiraEm;
