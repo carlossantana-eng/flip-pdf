@@ -2406,6 +2406,15 @@ html:not([data-tema="claro"]) .marca-imagem--escuro { display: block; }
 html[data-tema="claro"] .marca-imagem--claro { display: block; }
 .logo-central .marca-imagem { height: 34px; }
 
+/* No celular a barra fica cheia: mostra só o livro da logo (o corte cai
+   no vão entre o desenho e o texto "FlipPDF" do PNG). */
+@media (max-width: 640px) {
+  .marca-imagem { width: 54px; object-fit: cover; object-position: left center; }
+  html:not([data-tema="claro"]) .marca-imagem--escuro,
+  html[data-tema="claro"] .marca-imagem--claro { display: block; }
+  .logo-central .marca-imagem { width: 46px; }
+}
+
 /* ====== Menos movimento ====== */
 /* Quem pede menos animação no sistema navega sem transições nem brilhos
    animados (a virada de página fica quase instantânea via leitor.js). */
