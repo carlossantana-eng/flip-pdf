@@ -81,6 +81,10 @@ gravam `false`/vazio.
 | `identidade` | objeto? | Identidade da estante principal: `cor`, `corSecundaria`, `corFundo`, `logo` (caminho), `capa` (caminho do banner) |
 | `perfil` | objeto? | `nome`, `email`, `whatsapp` (só dígitos com DDI). No WE Station, perfil vem da conta — mas **`whatsapp` alimenta o botão de conversa** na estante e no leitor; preservar essa configuração em algum lugar |
 
+Campo legado: manifestos antigos podem ter `painelNome` (top-level),
+substituído por `perfil.nome` — as páginas o apagam ao salvar. Na
+importação dos dados (§10, passo 6), tratar como `perfil.nome`.
+
 ### Entrada de catálogo (`catalogos[]`)
 
 | Campo | Tipo | Significado / regra |
@@ -120,10 +124,10 @@ gravam `false`/vazio.
 | `assets/js/publicar.js` (483 l.) | Estúdio de upload em 3 etapas (§5.1) | `buscarManifesto`/`commitar`; o poll do workflow (linhas ~379–398) **cai fora** — sem Pages, publicar é síncrono |
 | `assets/js/arquivos.js` (518 l.) | Meus Arquivos: pastas, busca, ordenação, lixeira (§5.3) | `buscarManifesto`/`commitar` |
 | `assets/js/estantes.js` (530 l.) | Gestão de estantes: criar, personalizar, ordenar, excluir (§5.2) | `buscarManifesto`/`commitar` |
-| `assets/js/editor.js` (294 l.) | Editor por publicação com prévia ao vivo (iframe do leitor) | `buscarManifesto`/`commitar` |
+| `assets/js/editor.js` (294 l.) | Editor por publicação com prévia ao vivo — iframe do leitor (§5.6) | `buscarManifesto`/`commitar` |
 | `assets/js/dialogo.js` (113 l.) | Diálogos `pedirTexto`/`confirmar` (usa `<dialog>`) | Nenhum |
 | `assets/js/nucleo-admin.js` (176 l.) | **Reescrever**: manter a interface, trocar o transporte | É o próprio adaptador |
-| `assets/css/estilo.css` (2.428 l.) | Todo o visual (painel, estante, leitor) | Variáveis CSS no `:root`; adaptar ao shell do WE Station |
+| `assets/css/estilo.css` (2.428 l.) | Todo o visual (painel, estante, leitor) | Variáveis CSS no `:root`; adaptar ao shell do WE Station. **Atenção**: `estante.js` e `leitor.js` sobrescrevem ~25 dessas variáveis em runtime para aplicar o tema de cada estante (`--realce`, `--cta`, `--fundo`, `--estante-fundo`, `--prateleira-fundo`, `--leitor-fundo`, `--leitor-topo` e derivadas de contraste) — ao reestilizar, manter os nomes ou ajustar os scripts junto |
 | HTMLs correspondentes | `publicar.html`, `arquivos.html`, `estantes.html`, `editor.html`, `configuracoes.html`, `estante.html`, `leitor.html` | Os scripts esperam os `id`s desses HTMLs — levar o markup junto |
 
 Utilitários de `nucleo-admin.js` que as telas importam e devem continuar
@@ -146,11 +150,15 @@ Manter vendorizado (sem CDN) segue valendo como boa prática no WE Station.
 ### Não levar
 
 `index.html`, `login.html`, `cadastro.html`, `como-funciona.html`,
-`precos.html`, `conta-simulada.js`, `admin.html`/`admin.js` (o painel-home
-com saudação — o WE Station tem o próprio shell/navegação; as ações dele
-apontam para as telas acima), `tema.js` (alternância claro/escuro do
-painel — usar o tema do WE Station), `404.html`, workflows, scripts de
-build (§7), fluxo de token do GitHub (telas "cole sua chave" e afins).
+`precos.html`, `conta-simulada.js`, `admin.html`/`admin.js` (o painel-home:
+tela de token, saudação, menu de conta, cadastro de perfil, e os cartões
+de "status de publicação" e o sino de notificações — estes dois fazem
+poll dos runs do GitHub Actions e **morrem por design**: no WE Station a
+escrita é síncrona, não existe "aguardando publicação"; o WE Station tem
+o próprio shell/navegação e as ações do painel apontam para as telas
+acima), `tema.js` (alternância claro/escuro do painel — usar o tema do
+WE Station), `404.html`, workflows, scripts de build (§7), fluxo de
+token do GitHub (telas "cole sua chave" e afins).
 
 ## 5. Regras de negócio (especificação de comportamento)
 
@@ -299,7 +307,19 @@ inexistente ou na lixeira. Funcionalidades a preservar:
   50 ms (padrão 400 ms); atalhos de letra ignorados enquanto se digita;
   tela cheia opcional.
 
-### 5.6 Configurações que sobrevivem fora do "perfil"
+### 5.6 Editor por publicação (`editor.js`)
+
+Configurações à esquerda, prévia ao vivo à direita (iframe do próprio
+leitor). Edita: título (obrigatório), descrição, estante (select com a
+principal + extras), permissão de download, capa própria e **música de
+fundo**. Regras da música: só MP3 (`audio/mpeg` ou extensão `.mp3`),
+até **8 MB**, gravada em `catalogos/musicas/<slug>.mp3`; trocar apaga a
+anterior no mesmo lote, remover apaga o arquivo. Também envia para a
+lixeira (mesma semântica do §5.3). Publicação na lixeira não é editável
+(a tela manda restaurar primeiro). `beforeunload` avisa sobre mudanças
+não salvas.
+
+### 5.7 Configurações que sobrevivem fora do "perfil"
 
 De `configuracoes.js`, ignorando o perfil em si: título/descrição da
 estante principal, **logomarca** (`identidade.logo`, PNG/JPG/WebP/SVG
@@ -332,6 +352,10 @@ Outros invariantes de integridade:
 - Excluir contêiner (pasta, estante) **nunca** exclui conteúdo — sempre
   devolve à raiz/principal. (Mesma filosofia do "reconcile nunca
   deleta" dos padrões WE.)
+- Todos os limites e formatos do §5 são validados **só no cliente** hoje
+  (a "defesa" real era o escopo do token). No WE Station, a API deve
+  revalidar tudo no servidor: tipos MIME, tamanhos, unicidade de slug,
+  título obrigatório, estante/pasta existente.
 
 ## 7. O que hoje é build e vira responsabilidade do servidor
 
@@ -403,8 +427,15 @@ seletores e fluxos de UI permanece válida se o markup for levado junto.
    do `publicar.js` e as telas de token.
 5. **Servidor**: OG server-side (§7), job de expurgo da lixeira (§5.3),
    autorização (§8).
-6. **Testes**: adaptar `tests/` com mock da nova API (§9).
-7. **Decomissionamento** deste site (Pages) só depois do WE Station em
+6. **Importar o acervo atual**: o conteúdo em produção precisa migrar —
+   `catalogos.json` (convertendo o legado `painelNome` → `perfil.nome`),
+   os PDFs de `catalogos/`, capas de `catalogos/capas/`, músicas de
+   `catalogos/musicas/`, logo de `assets/identidade/` e capas de estante
+   de `assets/estantes/`. Validar o resultado contra o contrato do §3
+   (todo `capa`/`musica`/`logo` referenciado existe no storage; slugs e
+   ids únicos).
+7. **Testes**: adaptar `tests/` com mock da nova API (§9).
+8. **Decomissionamento** deste site (Pages) só depois do WE Station em
    produção — ato manual e deliberado, documentado aqui no repo.
 
 ## 11. Referências dentro deste repositório
